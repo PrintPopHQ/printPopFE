@@ -112,7 +112,7 @@ export const Testimonials = () => {
     if (!api) return;
     const interval = setInterval(() => {
       api.scrollNext();
-    }, 10000);
+    }, 6000);
     return () => clearInterval(interval);
   }, [api]);
 
