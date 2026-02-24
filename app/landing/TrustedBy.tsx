@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 export const TrustedBy = () => {
   return (
     <div className="pb-16 border-b border-gray-900">
@@ -7,7 +9,10 @@ export const TrustedBy = () => {
         </p>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-16 items-center justify-items-center">
           {/* Apple / iPhone */}
-          <div className="group flex flex-col items-center justify-center p-6 rounded-4xl bg-zinc-900/50 border border-gray-800 w-full h-32 hover:border-white/50 transition-all duration-500 relative overflow-hidden cursor-pointer shadow-[0_0_0_rgba(255,255,255,0)] hover:shadow-[0_0_20px_rgba(255,255,255,0.3)]">
+          <Link
+            href="/customize?brand=Apple"
+            className="group flex flex-col items-center justify-center p-6 rounded-4xl bg-zinc-900/50 border border-gray-800 w-full h-32 hover:border-white/50 transition-all duration-500 relative overflow-hidden cursor-pointer shadow-[0_0_0_rgba(255,255,255,0)] hover:shadow-[0_0_20px_rgba(255,255,255,0.3)]"
+          >
             <div className="absolute inset-0 bg-linear-to-b from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
             <svg
               className="h-12 w-auto fill-gray-500 group-hover:fill-white transition-all duration-300 transform group-hover:scale-110"
@@ -19,10 +24,13 @@ export const TrustedBy = () => {
             <span className="mt-2 text-xs text-gray-600 group-hover:text-white uppercase tracking-wider font-bold opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
               iPhone Series
             </span>
-          </div>
+          </Link>
 
           {/* Samsung */}
-          <div className="group flex flex-col items-center justify-center p-6 rounded-4xl bg-zinc-900/50 border border-gray-800 w-full h-32 hover:border-[#1428a0] transition-all duration-500 relative overflow-hidden cursor-pointer shadow-[0_0_0_rgba(20,40,160,0)] hover:shadow-[0_0_20px_rgba(20,40,160,0.5)]">
+          <Link
+            href="/customize?brand=Samsung"
+            className="group flex flex-col items-center justify-center p-6 rounded-4xl bg-zinc-900/50 border border-gray-800 w-full h-32 hover:border-[#1428a0] transition-all duration-500 relative overflow-hidden cursor-pointer shadow-[0_0_0_rgba(20,40,160,0)] hover:shadow-[0_0_20px_rgba(20,40,160,0.5)]"
+          >
             <div className="absolute inset-0 bg-linear-to-b from-[#1428a0]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
             <svg
               className="h-12 w-auto fill-gray-500 group-hover:fill-[#1428a0] transition-all duration-300 transform group-hover:scale-110"
@@ -35,10 +43,13 @@ export const TrustedBy = () => {
             <span className="mt-2 text-xs text-gray-600 group-hover:text-[#1428a0] uppercase tracking-wider font-bold opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
               Galaxy Series
             </span>
-          </div>
+          </Link>
 
           {/* Google / Pixel */}
-          <div className="group flex flex-col items-center justify-center p-6 rounded-4xl bg-zinc-900/50 border border-gray-800 w-full h-32 hover:border-white transition-all duration-500 relative overflow-hidden cursor-pointer shadow-[0_0_0_rgba(255,255,255,0)] hover:shadow-[0_0_20px_rgba(66,133,244,0.4)]">
+          <Link
+            href="/customize?brand=Google"
+            className="group flex flex-col items-center justify-center p-6 rounded-4xl bg-zinc-900/50 border border-gray-800 w-full h-32 hover:border-white transition-all duration-500 relative overflow-hidden cursor-pointer shadow-[0_0_0_rgba(255,255,255,0)] hover:shadow-[0_0_20px_rgba(66,133,244,0.4)]"
+          >
             <div className="absolute inset-0 bg-linear-to-b from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
             <svg
               className="h-12 w-auto fill-gray-500 group-hover:fill-white transition-all duration-300 transform group-hover:scale-110"
@@ -50,10 +61,13 @@ export const TrustedBy = () => {
             <span className="mt-2 text-xs text-gray-600 group-hover:text-white uppercase tracking-wider font-bold opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
               Pixel
             </span>
-          </div>
+          </Link>
 
           {/* OnePlus */}
-          <div className="group flex flex-col items-center justify-center p-6 rounded-4xl bg-zinc-900/50 border border-gray-800 w-full h-32 hover:border-red-500 transition-all duration-500 relative overflow-hidden cursor-pointer shadow-[0_0_0_rgba(235,0,40,0)] hover:shadow-[0_0_20px_rgba(235,0,40,0.5)]">
+          <Link
+            href="/customize?brand=OnePlus"
+            className="group flex flex-col items-center justify-center p-6 rounded-4xl bg-zinc-900/50 border border-gray-800 w-full h-32 hover:border-red-500 transition-all duration-500 relative overflow-hidden cursor-pointer shadow-[0_0_0_rgba(235,0,40,0)] hover:shadow-[0_0_20px_rgba(235,0,40,0.5)]"
+          >
             <div className="absolute inset-0 bg-linear-to-b from-red-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
             <div className="flex items-center justify-center h-12 w-12 border-2 border-gray-500 group-hover:border-red-500 rounded-md transition-all duration-300 transform group-hover:scale-110">
               <span className="text-xl font-bold text-gray-500 group-hover:text-red-500 transition-colors">
@@ -63,7 +77,7 @@ export const TrustedBy = () => {
             <span className="mt-2 text-xs text-gray-600 group-hover:text-red-500 uppercase tracking-wider font-bold opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
               OnePlus
             </span>
-          </div>
+          </Link>
         </div>
       </div>
     </div>

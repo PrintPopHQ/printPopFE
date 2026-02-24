@@ -27,6 +27,7 @@ import {
 } from '@/lib/canvas-utils';
 import { cn } from '@/lib/utils';
 import ImageCropper from './ImageCropper'; // Import the new component
+import ClearDesignModal from './modals/ClearDesignModal';
 
 interface EditorControlsProps {
   canvas: any | null;
@@ -48,6 +49,9 @@ export default function EditorControls({
   // Cropper State
   const [cropperOpen, setCropperOpen] = useState(false);
   const [selectedImageSrc, setSelectedImageSrc] = useState<string | null>(null);
+
+  // Clear modal state
+  const [isClearModalOpen, setIsClearModalOpen] = useState(false);
 
   // Sync text color
   useEffect(() => {
@@ -119,7 +123,13 @@ export default function EditorControls({
   };
 
   const handleReset = () => {
-    if (canvas && confirm('Are you sure you want to clear all designs?')) {
+    if (canvas) {
+      setIsClearModalOpen(true);
+    }
+  };
+
+  const confirmReset = () => {
+    if (canvas) {
       clearCanvas(canvas, true);
       setZoom(100);
       setRotation(0);
@@ -128,6 +138,12 @@ export default function EditorControls({
 
   return (
     <div className="space-y-6">
+      <ClearDesignModal
+        isOpen={isClearModalOpen}
+        onClose={() => setIsClearModalOpen(false)}
+        onConfirm={confirmReset}
+      />
+
       {/* Cropper Modal */}
       <ImageCropper
         isOpen={cropperOpen}
@@ -166,8 +182,8 @@ export default function EditorControls({
           <p className="text-[9px] text-muted-foreground font-black uppercase tracking-wider">Editor Settings</p>
           <button
             onClick={handleReset}
-            disabled={!canvas}
-            className="text-[10px] text-primary/60 hover:text-primary font-black uppercase tracking-widest transition-all px-2 py-1 rounded-lg hover:bg-primary/10 disabled:opacity-20 active:scale-95"
+            disabled={!canvas || !selectedObject}
+            className="text-[10px] text-primary/60 hover:text-primary font-black uppercase tracking-widest transition-all px-2 py-1 rounded-lg hover:bg-primary/10 disabled:opacity-20 active:scale-95 cursor-pointer"
           >
             Clear All
           </button>

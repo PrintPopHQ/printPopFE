@@ -1,7 +1,7 @@
 interface ApiResponse {
   responseCode: number;
   message?: string;
-  response?: Record<string, any>;
+  data?: any;
 }
 
 export const handleApiResponse = (response: ApiResponse) => {

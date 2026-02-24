@@ -2,11 +2,11 @@ import * as fabric from 'fabric';
 import { SafeArea } from '@/types/phone';
 
 export const initializeCanvas = (
-  canvasId: string,
+  canvasElement: HTMLCanvasElement,
   width: number = 360,
   height: number = 720
 ): any => {
-  const canvas = new fabric.Canvas(canvasId, {
+  const canvas = new fabric.Canvas(canvasElement, {
     width,
     height,
     backgroundColor: 'transparent',
@@ -61,33 +61,6 @@ export const loadCaseImage = (
         ry: radius,
       };
 
-      // Create black background layer clamped to safe area
-      // const backgroundLayer = new fabric.Rect({
-      //   left: safeArea.left,
-      //   top: safeArea.top,
-      //   width: safeArea.width,
-      //   height: safeArea.height,
-      //   rx: safeArea.rx,
-      //   ry: safeArea.ry,
-      //   fill: '#000000',
-      //   selectable: false,
-      //   evented: false,
-      //   id: 'background-layer',
-      // });
-
-      // // Apply clip path to background so it doesn't overflow rounded corners
-      // const backgroundClipPath = new fabric.Rect({
-      //   left: safeArea.left,
-      //   top: safeArea.top,
-      //   width: safeArea.width,
-      //   height: safeArea.height,
-      //   rx: safeArea.rx,
-      //   ry: safeArea.ry,
-      //   absolutePositioned: true,
-      // });
-      // backgroundLayer.clipPath = backgroundClipPath;
-
-      // canvas.add(backgroundLayer);
       canvas.add(fabricImg);
       fabricImg.set('id', 'phone-overlay');
       
@@ -103,7 +76,12 @@ export const loadCaseImage = (
       reject(new Error('Failed to load image'));
     };
 
-    img.src = imageUrl;
+    // Use proxy for external URLs to avoid CORS issues and canvas tainting
+    if (imageUrl.startsWith('http')) {
+      img.src = `/api/proxy?url=${encodeURIComponent(imageUrl)}`;
+    } else {
+      img.src = imageUrl;
+    }
   });
 };
 
@@ -335,11 +313,13 @@ export const clearCanvas = (
 ): void => {
   if (keepCaseImage) {
     const objects = canvas.getObjects();
-    const caseImage = objects[0]; // First object is case image
-    canvas.clear();
-    if (caseImage) {
-      canvas.add(caseImage);
-    }
+    const objectsToRemove = objects.filter(
+      (obj: any) => 
+        obj.id !== 'phone-overlay' && 
+        obj.id !== 'background-layer' && 
+        obj.id !== 'safe-area'
+    );
+    objectsToRemove.forEach((obj: any) => canvas.remove(obj));
   } else {
     canvas.clear();
   }
