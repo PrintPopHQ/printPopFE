@@ -4,14 +4,26 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ─────────────────────────────────────────────
+   Design-token aliases exposed to Tailwind
+   ───────────────────────────────────────────── */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+
+  /* Brand surfaces */
+  --color-surface: var(--surface);
+  --color-surface-alt: var(--surface-alt);
+  --color-border-subtle: var(--border-subtle);
+
+  /* Fonts */
   --font-sans: var(--font-montserrat);
   --font-comic: var(--font-comic-neue);
   --font-comic-sans: "Comic Sans MS", "Comic Sans", cursive;
   --font-montserrat: var(--font-montserrat);
   --font-neon: "Lovelo", sans-serif;
+
+  /* Shadcn tokens */
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -41,6 +53,8 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+
+  /* Radius scale */
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -50,11 +64,29 @@
   --radius-4xl: calc(var(--radius) + 16px);
 }
 
+/* ─────────────────────────────────────────────
+   Raw token values — ONLY place hex lives
+   ───────────────────────────────────────────── */
 :root {
   --radius: 0.5rem;
-  /* Main Colors */
+
+  /* Core palette */
   --background: #000000;
   --foreground: #FFFFFF;
+
+  /* Brand colours */
+  --neon-cyan: #5CE1E6;
+  --neon-red: #FF3131;
+  --neon-red-outer: #ff4da6;
+  /* purple-tinted outer glow stop */
+
+  /* Surfaces */
+  --surface: #161616;
+  /* dark panel / card */
+  --surface-alt: #112238;
+  /* blue-tinted panel  */
+  --border-subtle: #1F2937;
+  /* low-contrast border */
 
   /* Card / Surfaces */
   --card: #112238;
@@ -62,45 +94,66 @@
   --popover: #112238;
   --popover-foreground: #FFFFFF;
 
-  /* Brand Colors */
-  --primary: #5CE1E6;
-  --primary-foreground: #112238;
-  --secondary: #FF3131;
+  /* Brand tokens */
+  --primary: var(--neon-cyan);
+  --primary-foreground: var(--surface-alt);
+  --secondary: var(--neon-red);
   --secondary-foreground: #FFFFFF;
 
   /* Muted / Accents */
   --muted: #9CA3AF;
   --muted-foreground: #D1D5DB;
-  --accent: #112238;
-  --accent-foreground: #5CE1E6;
+  --accent: var(--surface-alt);
+  --accent-foreground: var(--neon-cyan);
 
   /* Destructive */
-  --destructive: #FF3131;
+  --destructive: var(--neon-red);
   --destructive-foreground: #FFFFFF;
 
   /* Borders / Inputs */
   --border: #D1D5DB;
   --input: #9CA3AF;
-  --ring: #5CE1E6;
+  --ring: var(--neon-cyan);
 
-  /* Charts - mapped to palette */
-  --chart-1: #5CE1E6;
-  --chart-2: #FF3131;
+  /* Charts */
+  --chart-1: var(--neon-cyan);
+  --chart-2: var(--neon-red);
   --chart-3: #9CA3AF;
   --chart-4: #D1D5DB;
   --chart-5: #FFFFFF;
 
-  /* Sidebar - mapped to Card/Primary */
-  --sidebar: #112238;
+  /* Sidebar */
+  --sidebar: var(--surface-alt);
   --sidebar-foreground: #FFFFFF;
-  --sidebar-primary: #5CE1E6;
-  --sidebar-primary-foreground: #112238;
+  --sidebar-primary: var(--neon-cyan);
+  --sidebar-primary-foreground: var(--surface-alt);
   --sidebar-accent: #373737;
   --sidebar-accent-foreground: #FFFFFF;
   --sidebar-border: #D1D5DB;
-  --sidebar-ring: #5CE1E6;
+  --sidebar-ring: var(--neon-cyan);
+
+  /* Reusable glow shadow presets */
+  --glow-cyan-text:
+    0 0 5px var(--neon-cyan),
+    0 0 10px var(--neon-cyan),
+    0 0 20px var(--neon-cyan),
+    0 0 40px var(--neon-cyan);
+
+  --glow-red-text:
+    0 0 5px var(--neon-red),
+    0 0 10px var(--neon-red),
+    0 0 20px var(--neon-red),
+    0 0 40px var(--neon-red-outer);
+
+  --glow-box-cyan: 0px 0px 7.5px 0px color-mix(in srgb, var(--neon-cyan) 30%, transparent);
+  --glow-box-red: 0px 0px 11.25px 0px color-mix(in srgb, var(--neon-red) 40%, transparent);
+  --neon-border-cyan: 0 0 10px var(--neon-cyan), inset 0 0 5px var(--neon-cyan);
+  --neon-border-red: 0 0 10px var(--neon-red), inset 0 0 5px var(--neon-red);
 }
 
+/* ─────────────────────────────────────────────
+   Base layer
+   ───────────────────────────────────────────── */
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -111,19 +164,26 @@
   }
 }
 
+/* ─────────────────────────────────────────────
+   Utility classes — reference variables only
+   ───────────────────────────────────────────── */
 @layer utilities {
+
+  /* Gradient fill */
   .btn-brand-gradient {
-    background: linear-gradient(90deg, #5CE1E6 0%, #FF3131 100%);
+    background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
   }
 
+  /* Gradient text */
   .text-brand-gradient {
-    background-image: linear-gradient(90deg, #5CE1E6 0%, #FF3131 100%);
+    background-image: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
     color: transparent;
   }
 
+  /* Reset gradient text */
   .text-initial {
     background-image: none;
     -webkit-background-clip: initial;
@@ -132,21 +192,27 @@
     color: inherit;
   }
 
+  /* Box-shadow glows */
   .shadow-glow-cyan {
-    box-shadow: 0px 0px 7.5px 0px #5CE1E64D;
+    box-shadow: var(--glow-box-cyan);
   }
 
   .shadow-glow-red {
-    box-shadow: 0px 0px 11.25px 0px #FF313166;
+    box-shadow: var(--glow-box-red);
   }
 }
 
-/* Custom Fonts & Neon Styles */
+/* ─────────────────────────────────────────────
+   Custom Fonts
+   ───────────────────────────────────────────── */
 @font-face {
   font-family: 'Lovelo';
   src: url('https://fonts.cdnfonts.com/css/lovelo');
 }
 
+/* ─────────────────────────────────────────────
+   Neon text & border helpers
+   ───────────────────────────────────────────── */
 .font-neon {
   font-family: 'Lovelo', 'Montserrat', sans-serif;
   text-transform: uppercase;
@@ -154,33 +220,26 @@
 }
 
 .text-neon-red {
-  color: #ff3131;
-  text-shadow:
-    0 0 5px #ff3131,
-    0 0 10px #ff3131,
-    0 0 20px #ff3131,
-    0 0 40px #ff4da6;
+  color: var(--neon-red);
+  text-shadow: var(--glow-red-text);
 }
 
 .text-neon-blue {
-  color: #5ce1e6;
-  text-shadow:
-    0 0 5px #5ce1e6,
-    0 0 10px #5ce1e6,
-    0 0 20px #5ce1e6,
-    0 0 40px #5ce1e6;
+  color: var(--neon-cyan);
+  text-shadow: var(--glow-cyan-text);
 }
 
 .border-neon-red {
-  box-shadow: 0 0 10px #ff3131, inset 0 0 5px #ff3131;
-  border-color: #ff3131;
+  box-shadow: var(--neon-border-red);
+  border-color: var(--neon-red);
 }
 
 .border-neon-blue {
-  box-shadow: 0 0 10px #5ce1e6, inset 0 0 5px #5ce1e6;
-  border-color: #5ce1e6;
+  box-shadow: var(--neon-border-cyan);
+  border-color: var(--neon-cyan);
 }
 
+/* Neon ambient glow container */
 .neon-glow-container {
   position: relative;
 }
@@ -192,7 +251,7 @@
   left: -2px;
   right: -2px;
   bottom: -2px;
-  background: linear-gradient(45deg, #ff3131, #5ce1e6, #ff3131);
+  background: linear-gradient(45deg, var(--secondary), var(--primary), var(--secondary));
   z-index: -1;
   filter: blur(10px);
   opacity: 0.7;
