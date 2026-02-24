@@ -12,24 +12,44 @@ import faqIcon from "@/public/printpop-fqs-icon.svg"
 
 const faqData = [
   {
-    question: "How long does it take to make my custom case?",
-    answer: "Most designs are ready within 15-30 minutes at our kiosks. If you order online, printing and shipping take 2-3 business days depending on your location.",
+    question: "How do I design a personalised phone case?",
+    answer: "Designing a personalised phone case is simple. Upload your photo, logo, or artwork, adjust the layout, and preview your design in real time. Our system shows you exactly how the final product will look before you order. PrintPOP makes the process clear and easy, even if you have no design experience.",
   },
   {
-    question: "Can I use my own photo or artwork?",
-    answer: "Absolutely! You can upload any JPEG or PNG file to our customizer. For the best results, we recommend high-resolution images.",
+    question: "What phone models do you support?",
+    answer: "We offer personalised phone case options for major brands including Apple, Samsung, Google Pixel and Oppo. Our custom phone cases are made to fit precisely, ensuring proper button access and camera alignment. If you don't see your model listed, contact us and we'll check availability.",
   },
   {
-    question: "What materials are the cases made of?",
-    answer: "Our cases are made from high-grade polycarbonate and TPU, providing military-grade drop protection while remaining slim and stylish.",
+    question: "How durable are your custom phone cases?",
+    answer: "Our custom phone cases combine strong materials with high-resolution printing. They protect against everyday drops and scratches while keeping a slim profile. Your personalised phone case will look sharp and hold up well with daily use.",
   },
   {
-    question: "Do you support all phone models?",
-    answer: "We support over 200+ models from Apple, Samsung, Google, and more. Check our model selector in the customizer to find yours.",
+    question: "Will my design look exactly like the preview?",
+    answer: "Yes. We print your personalised phone case based on the exact preview you approve. Colours may vary slightly depending on screen settings, but we aim for accurate and vibrant results. We focus on clarity, alignment, and print precision.",
   },
   {
-    question: "What if I'm not happy with my design?",
-    answer: "We offer a 100% satisfaction guarantee. If your case doesn't meet your expectations, let us know and we'll make it right.",
+    question: "How long does it take to receive my personalised phone case?",
+    answer: "Production times are fast, and we ship promptly once your personalised phone case is ready. Delivery times depend on your location and chosen shipping method. We keep you updated so you know when to expect your order.",
+  },
+  {
+    question: "Can I use my own logo or brand artwork?",
+    answer: "Yes, you can upload logos and brand graphics to create custom phone cases. Many customers use personalised phone case designs for business branding, events, and promotions. Make sure your artwork is high resolution for the best result.",
+  },
+  {
+    question: "Do you offer bulk orders?",
+    answer: "Yes, we handle bulk orders for events, teams, and businesses. Our custom phone cases are popular for corporate branding and group gifts. Contact PrintPOP directly to discuss quantities and turnaround times.",
+  },
+  {
+    question: "What image quality should I use?",
+    answer: "For the best personalised phone case result, upload high-resolution images. Clear photos with good lighting produce sharper prints. Low-quality images may appear pixelated when printed at full size.",
+  },
+  {
+    question: "Can I return or exchange my order?",
+    answer: "Because each personalised phone case is made to order, we cannot accept returns for design changes. However, if there is a production issue, we will review and resolve it quickly. Customer satisfaction remains important to us.",
+  },
+  {
+    question: "Why choose PrintPOP for custom phone cases?",
+    answer: "PrintPOP focuses on quality, simplicity, and fast service. We combine durable materials with precise printing to create custom phone cases that look great and last. Our easy design process and responsive support make creating a personalised phone case straightforward and reliable.",
   },
 ]
 
