@@ -56,7 +56,9 @@ export function UserActions() {
         <DropdownMenuContent align="end" className="bg-black border border-[#373737] shadow-glow-cyan">
           <DropdownMenuLabel>My Account</DropdownMenuLabel>
           <DropdownMenuSeparator className="bg-zinc-800" />
-          <DropdownMenuItem className="cursor-pointer">Profile</DropdownMenuItem>
+          <DropdownMenuItem className="cursor-pointer" asChild>
+            <Link href="/profile">Profile</Link>
+          </DropdownMenuItem>
           <DropdownMenuItem className="cursor-pointer">Orders</DropdownMenuItem>
           {/* <DropdownMenuItem className="cursor-pointer">Settings</DropdownMenuItem> */}
           <DropdownMenuSeparator className="bg-zinc-800" />
