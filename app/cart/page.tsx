@@ -112,7 +112,7 @@ export default function CartPage() {
                   </div>
 
                   {/* Details Container */}
-                  <div className="flex-1 flex flex-col justify-center py-2 relative">
+                  <div className="flex-1 flex flex-col justify-center py-2 relative font-comic">
                     {/* Remove Button - Positioned absolutely on desktop, relatively on mobile if needed, but relative to row */}
                     <div className="absolute right-0 top-1/2 -translate-y-1/2">
                       <button
@@ -141,17 +141,17 @@ export default function CartPage() {
                       <div className="flex items-center gap-0 w-fit">
                         <button
                           onClick={() => updateQuantity(item.id, 1)}
-                          className="w-8 h-8 flex items-center justify-center bg-[#1A1A1A] text-[#9CA3AF] hover:text-white hover:bg-[#2A2A2A] rounded-l-md transition-colors"
+                          className="w-8 h-8 flex items-center justify-center bg-[#112238] cursor-pointer text-[#9CA3AF] hover:text-white hover:bg-[#2A2A2A] rounded-l-md transition-colors"
                         >
                           <Plus size={16} />
                         </button>
-                        <div className="w-8 h-8 flex items-center justify-center bg-[#1A1A1A] text-white font-medium text-sm">
+                        <div className="w-8 h-8 flex items-center justify-center text-white font-medium text-sm">
                           {item.quantity}
                         </div>
                         <button
                           onClick={() => updateQuantity(item.id, -1)}
                           disabled={item.quantity === 1}
-                          className="w-8 h-8 flex items-center justify-center bg-[#1A1A1A] text-[#9CA3AF] hover:text-white hover:bg-[#2A2A2A] rounded-r-md transition-colors"
+                          className="w-8 h-8 flex items-center justify-center bg-[#112238] cursor-pointer text-[#9CA3AF] hover:text-white hover:bg-[#2A2A2A] rounded-r-md transition-colors"
                         >
                           <Minus size={16} />
                         </button>
