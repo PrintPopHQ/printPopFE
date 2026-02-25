@@ -49,7 +49,7 @@ export function Navbar() {
 
         {/* Right Section: Search + Actions */}
         <div className="flex items-center gap-1 sm:gap-2">
-          <Search />
+          {/* <Search /> */}
           <UserActions />
         </div>
       </div>
