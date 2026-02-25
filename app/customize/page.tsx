@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { Palette } from 'lucide-react';
 
 import { PhoneModel } from '@/types/phone';
@@ -398,6 +398,7 @@ function Spinner({ label }: { label: string }) {
 function CustomizeContent() {
   const searchParams = useSearchParams();
   const brand = searchParams.get('brand');
+  const router = useRouter();
 
   const [localModelId, setLocalModelId] = useState<string | null>(null);
   const [phoneModel, setPhoneModel] = useState<PhoneModel | null>(null);
@@ -458,14 +459,30 @@ function CustomizeContent() {
   // ── Handlers ─────────────────────────────────────────────────────────────
 
   const handleAddToCart = () => {
-    if (!canvas) return;
+    if (!canvas || !phoneModel) return;
     const imageData = exportCanvasAsImage(canvas, 'png', 1);
-    console.log('Adding to cart:', {
-      phoneModel: phoneModel?.id,
+
+    const cartItem = {
+      id: crypto.randomUUID(),
+      phoneModel: phoneModel.name,
+      phoneModelId: phoneModel.id,
       caseType,
-      designImage: imageData,
-    });
-    alert('Added to cart! (This is a demo)');
+      textColor,
+      price: phoneModel.price || 35.0,
+      image: imageData,
+      quantity: 1,
+    };
+
+    // Save to localStorage
+    const existingCartRaw = localStorage.getItem('printpop_cart');
+    const existingCart = existingCartRaw ? JSON.parse(existingCartRaw) : [];
+    existingCart.push(cartItem);
+    localStorage.setItem('printpop_cart', JSON.stringify(existingCart));
+
+    // Optionally fire a custom event to update any cart badges
+    window.dispatchEvent(new Event('cart_updated'));
+
+    router.push('/cart');
   };
 
   // ── Render ────────────────────────────────────────────────────────────────
