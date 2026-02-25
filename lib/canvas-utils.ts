@@ -119,7 +119,7 @@ export const createSafeAreaOutline = (
     rx: safeArea.rx,
     ry: safeArea.ry,
     fill: 'rgba(0,0,0,0)',
-    stroke: '#4f46e5',
+    stroke: 'transparent',
     strokeWidth: 2,
     strokeDashArray: [6, 4],
     selectable: false,

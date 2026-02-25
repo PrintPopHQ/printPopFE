@@ -24,9 +24,9 @@ export const Hero = () => {
                         Custom cases that turn your device into a statement piece. Durable protection meets electric style.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                        <Link href="/shop" className="px-8 py-4 btn-brand-gradient text-white font-bold text-base rounded-full shadow-[0_0_20px_rgba(255,49,49,0.5)] hover:shadow-[0_0_30px_rgba(255,49,49,0.8)] transition-all duration-300 text-center uppercase tracking-wider">
+                        {/* <Link href="/shop" className="px-8 py-4 btn-brand-gradient text-white font-bold text-base rounded-full shadow-[0_0_20px_rgba(255,49,49,0.5)] hover:shadow-[0_0_30px_rgba(255,49,49,0.8)] transition-all duration-300 text-center uppercase tracking-wider">
                             Shop Now
-                        </Link>
+                        </Link> */}
                         <Link href="/customize" className="p-[2px] rounded-full bg-linear-to-r from-[#5CE1E6] to-[#FF3131] group transition-all duration-300 hover:shadow-[0_0_20px_rgba(255,255,255,0.5)]">
                             <div className="bg-black text-white px-8 py-4 rounded-full transition-all duration-300 group-hover:bg-white flex items-center justify-center">
                                 <span className="text-brand-gradient group-hover:text-initial group-hover:text-black font-bold text-base uppercase tracking-wider transition-all duration-300">

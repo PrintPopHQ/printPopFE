@@ -34,7 +34,7 @@ export const TrustedBy = () => {
             <div className="absolute inset-0 bg-linear-to-b from-[#1428a0]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
             <svg
               className="h-12 w-auto fill-gray-500 group-hover:fill-[#1428a0] transition-all duration-300 transform group-hover:scale-110"
-              viewBox="0 0 24 24"
+              viewBox="0 7.2 24 8.8"
               xmlns="http://www.w3.org/2000/svg"
             >
               <title>Samsung</title>
@@ -63,19 +63,22 @@ export const TrustedBy = () => {
             </span>
           </Link>
 
-          {/* OnePlus */}
+          {/* Oppo */}
           <Link
-            href="/customize?brand=OnePlus"
-            className="group flex flex-col items-center justify-center p-6 rounded-4xl bg-zinc-900/50 border border-gray-800 w-full h-32 hover:border-red-500 transition-all duration-500 relative overflow-hidden cursor-pointer shadow-[0_0_0_rgba(235,0,40,0)] hover:shadow-[0_0_20px_rgba(235,0,40,0.5)]"
+            href="/customize?brand=Oppo"
+            className="group flex flex-col items-center justify-center p-6 rounded-4xl bg-zinc-900/50 border border-gray-800 w-full h-32 hover:border-[#009241] transition-all duration-500 relative overflow-hidden cursor-pointer shadow-[0_0_0_rgba(0,146,65,0)] hover:shadow-[0_0_20px_rgba(0,146,65,0.5)]"
           >
-            <div className="absolute inset-0 bg-linear-to-b from-red-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-            <div className="flex items-center justify-center h-12 w-12 border-2 border-gray-500 group-hover:border-red-500 rounded-md transition-all duration-300 transform group-hover:scale-110">
-              <span className="text-xl font-bold text-gray-500 group-hover:text-red-500 transition-colors">
-                1+
-              </span>
-            </div>
-            <span className="mt-2 text-xs text-gray-600 group-hover:text-red-500 uppercase tracking-wider font-bold opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
-              OnePlus
+            <div className="absolute inset-0 bg-linear-to-b from-[#009241]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <svg
+              className="h-12 w-auto fill-gray-500 group-hover:fill-[#009241] transition-all duration-300 transform group-hover:scale-110"
+              viewBox="0 4 24 16"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <title>Oppo</title>
+              <path d="M12 4.416c-4.406 0-7.989 3.398-7.989 7.584s3.583 7.584 7.989 7.584c4.406 0 7.989-3.398 7.989-7.584s-3.583-7.584-7.989-7.584zm0 13.518c-3.483 0-6.315-2.659-6.315-5.934s2.832-5.934 6.315-5.934 6.315 2.659 6.315 5.934-2.832 5.934-6.315 5.934zM12 6.55c-2.585 0-4.688 1.954-4.688 4.364s2.103 4.364 4.688 4.364 4.688-1.954 4.688-4.364-2.103-4.364-4.688-4.364zm0 7.15c-1.632 0-2.956-1.246-2.956-2.786s1.324-2.786 2.956-2.786c1.632 0 2.956 1.246 2.956 2.786s-1.324 2.786-2.956 2.786z" />
+            </svg>
+            <span className="mt-2 text-xs text-gray-600 group-hover:text-[#009241] uppercase tracking-wider font-bold opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
+              Oppo
             </span>
           </Link>
         </div>
