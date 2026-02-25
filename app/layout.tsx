@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { Comic_Neue, Montserrat } from "next/font/google";
 import "./globals.css";
-import { Navbar } from "@/components/navbar/Navbar";
-import { Footer } from "@/components/footer/Footer";
+import { LayoutHeaderFooter } from "@/components/layout/LayoutHeaderFooter";
 import { Providers } from "./providers";
 
 const comicNeue = Comic_Neue({
@@ -40,9 +39,9 @@ export default function RootLayout({
         className={`${comicNeue.variable} ${montserrat.variable} antialiased bg-background text-foreground font-sans`}
       >
         <Providers>
-          <Navbar />
-          {children}
-          <Footer />
+          <LayoutHeaderFooter>
+            {children}
+          </LayoutHeaderFooter>
         </Providers>
       </body>
     </html>
