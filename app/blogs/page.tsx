@@ -198,8 +198,8 @@ export default function BlogPage() {
               {/* Join The Club Widget */}
               <div className="bg-[#1A1A1A] rounded-2xl p-6 relative overflow-hidden border border-[#333333]">
                 {/* Glow effects */}
-                <div className="absolute top-0 right-0 w-40 h-40 bg-[#FF3366]/20 blur-3xl rounded-full translate-x-1/2 -translate-y-1/2"></div>
-                <div className="absolute bottom-0 left-0 w-40 h-40 bg-[#5CE1E6]/20 blur-3xl rounded-full -translate-x-1/2 translate-y-1/2"></div>
+                <div className="absolute top-0 left-0 w-40 h-40 bg-[#FF3366]/20 blur-3xl rounded-full translate-x-1/2 -translate-y-1/2"></div>
+                <div className="absolute bottom-0 right-0 w-40 h-40 bg-[#5CE1E6]/20 blur-3xl rounded-full -translate-x-1/2 translate-y-1/2"></div>
 
                 <div className="relative z-10 text-center flex flex-col items-center">
                   <Mail className="text-white mb-3" size={28} />
