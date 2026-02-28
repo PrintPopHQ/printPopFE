@@ -2,13 +2,16 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { Minus, Plus } from 'lucide-react';
+import { Minus, Plus, Loader2 } from 'lucide-react';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import RemoveCartItemModal from '@/components/modals/RemoveCartItemModal';
-import { isLoggedIn } from '@/lib/auth-store';
+import { isLoggedIn, getUser, getGuestEmail } from '@/lib/auth-store';
+import { ApiService } from '@/services/ApiService';
+import { handleApiResponse } from '@/packages/HandleResponse';
+import { toast } from 'sonner';
 
 interface CartItem {
   id: string;
@@ -17,14 +20,17 @@ interface CartItem {
   caseType: string;
   textColor: string;
   price: number;
-  image: string;
+  image: string;       // base64 data-URL from canvas export
   quantity: number;
+  guestEmail?: string;
+  userEmail?: string;
 }
 
 export default function CartPage() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isMounted, setIsMounted] = useState(false);
   const [itemToRemove, setItemToRemove] = useState<string | null>(null);
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
@@ -66,6 +72,92 @@ export default function CartPage() {
       return updated;
     });
   };
+
+  // ── Checkout ────────────────────────────────────────────────────────────────
+
+  /** Convert a base64 data-URL to a File blob ready for upload. */
+  const dataUrlToFile = async (dataUrl: string, filename = 'design.png'): Promise<File> => {
+    const res = await fetch(dataUrl);
+    const blob = await res.blob();
+    return new File([blob], filename, { type: 'image/png' });
+  };
+
+  const handleCheckout = async () => {
+    if (cartItems.length === 0) return;
+    setIsCheckingOut(true);
+
+    try {
+      // ── 1. Upload all images in parallel ────────────────────────────────
+      toast.loading('Uploading your designs…', { id: 'checkout' });
+
+      const uploadedUrls = await Promise.all(
+        cartItems.map(async (item) => {
+          const file = await dataUrlToFile(item.image, `${item.id}.png`);
+          const res = await ApiService.getInstance().uploadImage(file);
+          const result = handleApiResponse(res.data);
+          return result.data.url as string;
+        })
+      );
+
+      // ── 2. Determine email (logged-in user > guest email) ────────────────
+      const email =
+        getUser()?.email ||
+        getGuestEmail() ||
+        cartItems.find(i => i.guestEmail)?.guestEmail ||
+        cartItems.find(i => i.userEmail)?.userEmail ||
+        '';
+
+      if (!email) {
+        toast.error('No email found', {
+          id: 'checkout',
+          description: 'Please sign in or add an email to continue.',
+        });
+        setIsCheckingOut(false);
+        return;
+      }
+
+      // ── 3. Build order payload ───────────────────────────────────────────
+      toast.loading('Creating your order…', { id: 'checkout' });
+
+      const orderPayload = {
+        items: cartItems.map((item, idx) => ({
+          modelid: item.phoneModelId,
+          customimage: uploadedUrls[idx],
+          quantity: item.quantity,
+        })),
+        email,
+      };
+
+      const orderRes = await ApiService.getInstance().createOrder(orderPayload);
+      const orderResult = handleApiResponse(orderRes.data);
+      const { checkoutUrl } = orderResult.data;
+
+      // ── 4. Clear cart and open Shopify checkout ──────────────────────────
+      localStorage.removeItem('printpop_cart');
+      window.dispatchEvent(new Event('cart_updated'));
+      setCartItems([]);
+
+      // Also clear guest email on successful checkout
+      if (!isLoggedIn()) {
+        localStorage.removeItem('printpop_guest_email');
+      }
+
+      toast.success('Order created!', {
+        id: 'checkout',
+        description: 'Redirecting you to checkout…',
+      });
+
+      window.open(checkoutUrl, '_blank');
+    } catch (err: any) {
+      const message =
+        err?.response?.data?.message || err?.message || 'Something went wrong.';
+      toast.error('Checkout failed', { id: 'checkout', description: message });
+    } finally {
+      setIsCheckingOut(false);
+    }
+  };
+
+  // ── Derived totals ───────────────────────────────────────────────────────────
 
   const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
   const shipping = cartItems.length > 0 ? 5.00 : 0;
@@ -119,7 +211,6 @@ export default function CartPage() {
 
                   {/* Details Container */}
                   <div className="flex-1 flex flex-col justify-center py-2 relative font-comic">
-                    {/* Remove Button - Positioned absolutely on desktop, relatively on mobile if needed, but relative to row */}
                     <div className="absolute right-0 top-1/2 -translate-y-1/2">
                       <button
                         onClick={() => setItemToRemove(item.id)}
@@ -195,12 +286,19 @@ export default function CartPage() {
 
                 <Button
                   size="lg"
+                  onClick={handleCheckout}
+                  disabled={isCheckingOut}
                   className={cn(
                     "w-full h-12 text-sm font-semibold capitalize tracking-wide rounded-xl text-white transition-opacity hover:opacity-90",
                     "bg-linear-to-r from-[#5CE1E6] to-[#FF3131]"
                   )}
                 >
-                  checkout
+                  {isCheckingOut ? (
+                    <span className="flex items-center gap-2">
+                      <Loader2 size={16} className="animate-spin" />
+                      Processing…
+                    </span>
+                  ) : 'checkout'}
                 </Button>
               </div>
             </div>
@@ -221,3 +319,4 @@ export default function CartPage() {
     </div>
   );
 }
+
