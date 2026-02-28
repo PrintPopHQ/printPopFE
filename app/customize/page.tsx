@@ -11,7 +11,9 @@ import { exportCanvasAsImage } from '@/lib/canvas-utils';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import SelectionModals from '@/components/modals/SelectionModals';
+import { GuestEmailModal } from '@/components/modals/GuestEmailModal';
 import { useGetModels } from '@/packages/Queries';
+import { isLoggedIn, getUser, getGuestEmail } from '@/lib/auth-store';
 
 // ─── Shared Primitives ────────────────────────────────────────────────────────
 
@@ -407,6 +409,9 @@ function CustomizeContent() {
   const [caseType, setCaseType] = useState<string>('Non-Magnetic');
   const [textColor, setTextColor] = useState<string>('#000000');
   const [isMounted, setIsMounted] = useState(false);
+  const [showGuestModal, setShowGuestModal] = useState(false);
+  // Holds a pending cart item while waiting for guest email
+  const [pendingCartItem, setPendingCartItem] = useState<any | null>(null);
 
   const { data: modelsResponse, isLoading: isLoadingModels } = useGetModels(brand || '');
   const models = (modelsResponse as any)?.data ?? [];
@@ -458,31 +463,57 @@ function CustomizeContent() {
 
   // ── Handlers ─────────────────────────────────────────────────────────────
 
-  const handleAddToCart = () => {
-    if (!canvas || !phoneModel) return;
-    const imageData = exportCanvasAsImage(canvas, 'png', 1);
+  const buildCartItem = (email?: string) => ({
+    id: crypto.randomUUID(),
+    phoneModel: phoneModel!.name,
+    phoneModelId: phoneModel!.id,
+    caseType,
+    textColor,
+    price: phoneModel!.price || 35.0,
+    image: exportCanvasAsImage(canvas, 'png', 1),
+    quantity: 1,
+    // attach user email (logged-in or guest) for order tracking
+    ...(email ? { guestEmail: email } : {}),
+    ...(getUser() ? { userEmail: getUser()!.email } : {}),
+  });
 
-    const cartItem = {
-      id: crypto.randomUUID(),
-      phoneModel: phoneModel.name,
-      phoneModelId: phoneModel.id,
-      caseType,
-      textColor,
-      price: phoneModel.price || 35.0,
-      image: imageData,
-      quantity: 1,
-    };
-
-    // Save to localStorage
+  const commitToCart = (item: any) => {
     const existingCartRaw = localStorage.getItem('printpop_cart');
     const existingCart = existingCartRaw ? JSON.parse(existingCartRaw) : [];
-    existingCart.push(cartItem);
+    existingCart.push(item);
     localStorage.setItem('printpop_cart', JSON.stringify(existingCart));
-
-    // Optionally fire a custom event to update any cart badges
     window.dispatchEvent(new Event('cart_updated'));
-
     router.push('/cart');
+  };
+
+  const handleAddToCart = () => {
+    if (!canvas || !phoneModel) return;
+
+    if (isLoggedIn()) {
+      // ── Logged-in path: go straight to cart ──────────────────────────────
+      commitToCart(buildCartItem());
+      return;
+    }
+
+    // ── Guest path ────────────────────────────────────────────────────────
+    const existingGuestEmail = getGuestEmail();
+    const cartItem = buildCartItem(existingGuestEmail ?? undefined);
+
+    if (existingGuestEmail) {
+      // Email already captured for a previous item — reuse it
+      commitToCart(cartItem);
+    } else {
+      // First item: capture email via modal
+      setPendingCartItem(cartItem);
+      setShowGuestModal(true);
+    }
+  };
+
+  const handleGuestEmailConfirm = (email: string) => {
+    setShowGuestModal(false);
+    if (!pendingCartItem) return;
+    commitToCart({ ...pendingCartItem, guestEmail: email });
+    setPendingCartItem(null);
   };
 
   // ── Render ────────────────────────────────────────────────────────────────
@@ -582,6 +613,12 @@ function CustomizeContent() {
         modelId={localModelId}
         models={models}
         isLoadingModels={isLoadingModels}
+      />
+
+      <GuestEmailModal
+        open={showGuestModal}
+        onConfirm={handleGuestEmailConfirm}
+        onClose={() => { setShowGuestModal(false); setPendingCartItem(null); }}
       />
     </div>
   );

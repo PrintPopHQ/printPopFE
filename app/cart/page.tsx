@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import RemoveCartItemModal from '@/components/modals/RemoveCartItemModal';
+import { isLoggedIn } from '@/lib/auth-store';
 
 interface CartItem {
   id: string;
@@ -56,6 +57,11 @@ export default function CartPage() {
     setCartItems(prev => {
       const updated = prev.filter(item => item.id !== id);
       localStorage.setItem('printpop_cart', JSON.stringify(updated));
+      // If the cart is now empty and the user is not logged in,
+      // clear the guest email so the next add-to-cart asks again.
+      if (updated.length === 0 && !isLoggedIn()) {
+        localStorage.removeItem('printpop_guest_email');
+      }
       window.dispatchEvent(new Event('cart_updated'));
       return updated;
     });
