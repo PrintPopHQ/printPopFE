@@ -3,11 +3,11 @@ import { ENV } from "./env";
 
 const ENDPOINTS = {
   GET_MODELS: "/models",
-  SIGNUP: "/auth/signup",
-  LOGIN: "/auth/login",
-  VERIFY_EMAIL: "/auth/verify-email",
-  UPLOAD_IMAGE: "/r2/upload",
-  CREATE_ORDER: "/orders/create-order",
+  SIGNUP: "/api/auth/signup",
+  LOGIN: "/api/auth/login",
+  VERIFY_EMAIL: "/api/auth/verify-email",
+  UPLOAD_IMAGE: "/api/r2/upload",
+  CREATE_ORDER: "/api/orders/create-order",
 };
 
 export interface SignUpPayload {
