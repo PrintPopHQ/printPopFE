@@ -147,7 +147,15 @@ export default function CartPage() {
         description: 'Redirecting you to checkout…',
       });
 
-      window.open(checkoutUrl, '_blank');
+      // window.open is blocked by popup blockers after async work.
+      // Programmatic anchor click is treated as a trusted navigation.
+      const a = document.createElement('a');
+      a.href = checkoutUrl;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
     } catch (err: any) {
       const message =
         err?.response?.data?.message || err?.message || 'Something went wrong.';
