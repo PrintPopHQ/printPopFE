@@ -12,6 +12,7 @@ const ENDPOINTS = {
   UPLOAD_IMAGE: "/api/r2/upload",
   CREATE_ORDER: "/api/orders/create-order",
   MY_ORDERS: "/api/orders/my-orders",
+  BLOGS: "/api/blogs",
 };
 
 export interface SignUpPayload {
@@ -38,6 +39,31 @@ export interface ResetPasswordPayload {
 export interface ChangePasswordPayload {
   current_password: string;
   new_password: string;
+}
+
+export interface BlogsParams {
+  page?: number;
+  limit?: number;
+  published?: boolean;
+}
+
+export interface Blog {
+  id: string;
+  title: string;
+  slug: string;
+  content: string;
+  cover_image: string;
+  author_name: string;
+  is_published: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface BlogMeta {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
 }
 
 export interface OrderItem {
@@ -118,5 +144,9 @@ export class ApiService {
     return this.axiosInstance.get(ENDPOINTS.MY_ORDERS, {
       headers: { Authorization: `Bearer ${bearerToken}` }
     });
+  }
+
+  public getBlogs(params: BlogsParams) {
+    return this.axiosInstance.get(ENDPOINTS.BLOGS, { params });
   }
 }
