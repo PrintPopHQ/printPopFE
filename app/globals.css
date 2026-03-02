@@ -257,3 +257,146 @@
   opacity: 0.7;
   border-radius: inherit;
 }
+
+/* ─────────────────────────────────────────────
+   Blog HTML content renderer
+   ───────────────────────────────────────────── */
+.blog-content {
+  color: #D1D5DB;
+  font-size: 0.9375rem;
+  line-height: 1.75;
+}
+
+.blog-content h1 {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #ffffff;
+  text-transform: uppercase;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+
+.blog-content h2 {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-top: 2.25rem;
+  margin-bottom: 0.75rem;
+  border-left: 3px solid #FF3366;
+  padding-left: 0.75rem;
+}
+
+.blog-content h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #5CE1E6;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.blog-content p {
+  margin-top: 0;
+  margin-bottom: 1.1rem;
+  color: #D1D5DB;
+}
+
+.blog-content em {
+  color: #9CA3AF;
+  font-style: italic;
+}
+
+.blog-content strong {
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.blog-content ul,
+.blog-content ol {
+  margin: 1rem 0 1.25rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.blog-content ul {
+  list-style-type: disc;
+}
+
+.blog-content ol {
+  list-style-type: decimal;
+}
+
+.blog-content li {
+  color: #D1D5DB;
+  padding-left: 0.25rem;
+}
+
+.blog-content li::marker {
+  color: #5CE1E6;
+}
+
+.blog-content blockquote {
+  margin: 1.5rem 0;
+  padding: 1rem 1.25rem;
+  background: #1A1A2E;
+  border-left: 4px solid #5CE1E6;
+  border-radius: 0 0.5rem 0.5rem 0;
+  color: #9CA3AF;
+  font-style: italic;
+  font-size: 0.9rem;
+}
+
+.blog-content hr {
+  border: none;
+  border-top: 1px solid #2D2D2D;
+  margin: 2rem 0;
+}
+
+.blog-content img {
+  width: 100%;
+  border-radius: 0.75rem;
+  margin: 1.5rem 0;
+  display: block;
+}
+
+.blog-content a {
+  color: #5CE1E6;
+  text-decoration: none;
+}
+
+.blog-content a:hover {
+  text-decoration: underline;
+}
+
+.blog-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  font-size: 0.875rem;
+}
+
+.blog-content th {
+  background: #1A1A1A;
+  color: #ffffff;
+  padding: 0.6rem 1rem;
+  border: 1px solid #333;
+  text-align: left;
+  font-weight: 700;
+}
+
+.blog-content td {
+  color: #D1D5DB;
+  padding: 0.6rem 1rem;
+  border: 1px solid #2D2D2D;
+}
+
+.blog-content tr:nth-child(even) td {
+  background: #161616;
+}
+
+.blog-content article {
+  display: contents;
+}

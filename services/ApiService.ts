@@ -149,4 +149,8 @@ export class ApiService {
   public getBlogs(params: BlogsParams) {
     return this.axiosInstance.get(ENDPOINTS.BLOGS, { params });
   }
+
+  public getBlogBySlug(slug: string) {
+    return this.axiosInstance.get(`${ENDPOINTS.BLOGS}/slug/${slug}`);
+  }
 }

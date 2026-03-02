@@ -2,8 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { PageHeader } from '@/components/layout/PageHeader';
-import { Search, Flame, Camera } from 'lucide-react';
-import { NewsletterWidget } from './NewsletterWidget';
+import { Search, Flame } from 'lucide-react';
 import type { Blog, BlogMeta } from '@/services/ApiService';
 
 /* ─── SEO ────────────────────────────────────────────────────────────── */
