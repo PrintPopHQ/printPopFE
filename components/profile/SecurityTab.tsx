@@ -8,6 +8,7 @@ import { getAccessToken } from '@/lib/auth-store';
 import { useChangePasswordMutation } from '@/packages/Mutations';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import { toast } from 'sonner';
 
 export function SecurityTab() {
   const [showPassword, setShowPassword] = useState({
@@ -40,6 +41,7 @@ export function SecurityTab() {
 
       const token = getAccessToken();
       if (!token) {
+        toast.error('You must be logged in to change your password.');
         setError('You must be logged in to change your password.');
         setSubmitting(false);
         return;
@@ -55,14 +57,20 @@ export function SecurityTab() {
         {
           onSuccess: (data) => {
             if (data && data.responseCode === 2000) {
-              setMessage(data.message || 'Password changed successfully.');
+              const successMsg = data.message || 'Password changed successfully.';
+              toast.success(successMsg);
+              setMessage(successMsg);
               resetForm();
             } else {
-              setError(data?.message || 'Failed to change password.');
+              const errorMsg = data?.message || 'Failed to change password.';
+              toast.error(errorMsg);
+              setError(errorMsg);
             }
           },
           onError: (err: any) => {
-            setError(err.response?.data?.message || err.message || 'An error occurred.');
+            const errorMsg = err.response?.data?.message || err.message || 'An error occurred.';
+            toast.error(errorMsg);
+            setError(errorMsg);
           },
           onSettled: () => {
             setSubmitting(false);
@@ -152,9 +160,6 @@ export function SecurityTab() {
             <div className="text-red-500 text-sm mt-1">{formik.errors.confirmPassword}</div>
           ) : null}
         </div>
-
-        {message && <p className="text-green-500 text-sm font-medium">{message}</p>}
-        {error && <p className="text-red-500 text-sm font-medium">{error}</p>}
 
         <div className="pt-6">
           <Button
