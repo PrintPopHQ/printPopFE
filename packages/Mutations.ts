@@ -6,6 +6,7 @@ import {
   CreateOrderPayload,
   ForgotPasswordPayload,
   ResetPasswordPayload,
+  ChangePasswordPayload,
 } from "../services/ApiService";
 import { handleApiResponse } from "./HandleResponse";
 
@@ -14,6 +15,15 @@ export const useSignUpMutation = () => {
     mutationFn: async (payload: SignUpPayload) => {
       const response = await ApiService.getInstance().signUp(payload);
       return handleApiResponse(response.data);
+    },
+  });
+};
+
+export const useChangePasswordMutation = () => {
+  return useMutation({
+    mutationFn: async ({ payload, token }: { payload: ChangePasswordPayload; token: string }) => {
+      const response = await ApiService.getInstance().changePassword(payload, token);
+      return response.data; // Don't use handleApiResponse if we want direct raw data or if handleApiResponse throws
     },
   });
 };
