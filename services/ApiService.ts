@@ -11,6 +11,7 @@ const ENDPOINTS = {
   CHANGE_PASSWORD: "/api/auth/change-password",
   UPLOAD_IMAGE: "/api/r2/upload",
   CREATE_ORDER: "/api/orders/create-order",
+  MY_ORDERS: "/api/orders/my-orders",
 };
 
 export interface SignUpPayload {
@@ -111,5 +112,11 @@ export class ApiService {
   public createOrder(payload: CreateOrderPayload, bearerToken?: string) {
     const headers = bearerToken ? { Authorization: `Bearer ${bearerToken}` } : undefined;
     return this.axiosInstance.post(ENDPOINTS.CREATE_ORDER, payload, { headers });
+  }
+
+  public getMyOrders(bearerToken: string) {
+    return this.axiosInstance.get(ENDPOINTS.MY_ORDERS, {
+      headers: { Authorization: `Bearer ${bearerToken}` }
+    });
   }
 }

@@ -13,3 +13,15 @@ export const useGetModels = (brandName: string) => {
     enabled: !!brandName,
   });
 };
+
+export const useGetMyOrders = (token: string | null) => {
+  return useQuery({
+    queryKey: ["my-orders"],
+    queryFn: async () => {
+      if (!token) throw new Error("No token provided");
+      const response = await ApiService.getInstance().getMyOrders(token);
+      return handleApiResponse(response.data);
+    },
+    enabled: !!token,
+  });
+};

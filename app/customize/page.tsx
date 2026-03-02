@@ -246,11 +246,13 @@ function PriceActionBlock({
   canvas,
   onAddToCart,
   className,
+  selectedObject,
 }: {
   price: number;
   canvas: any;
   onAddToCart: () => void;
   className?: string;
+  selectedObject: any;
 }) {
   return (
     <div
@@ -278,7 +280,7 @@ function PriceActionBlock({
         size="lg"
         className="w-full h-14 text-xs font-neon font-black btn-brand-gradient text-white rounded-xl shadow-[0_0_25px_rgba(255,49,49,0.3)] hover:shadow-[0_0_40px_rgba(255,49,49,0.5)] transition-all duration-500 group uppercase tracking-[0.2em]"
         onClick={onAddToCart}
-        disabled={!canvas}
+        disabled={!canvas || !selectedObject}
       >
         ADD TO CART
         <svg
@@ -580,6 +582,7 @@ function CustomizeContent() {
               canvas={canvas}
               onAddToCart={handleAddToCart}
               className="hidden lg:block"
+              selectedObject={selectedObject}
             />
           </div>
 
@@ -599,6 +602,7 @@ function CustomizeContent() {
               canvas={canvas}
               onAddToCart={handleAddToCart}
               className="lg:hidden mt-4"
+              selectedObject={selectedObject}
             />
           </div>
         </div>

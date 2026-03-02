@@ -79,7 +79,9 @@ export function UserActions() {
               <DropdownMenuItem className="cursor-pointer" asChild>
                 <Link href="/profile">Profile</Link>
               </DropdownMenuItem>
-              <DropdownMenuItem className="cursor-pointer">Orders</DropdownMenuItem>
+              <DropdownMenuItem className="cursor-pointer" asChild>
+                <Link href="/orders">Orders</Link>
+              </DropdownMenuItem>
               <DropdownMenuSeparator className="bg-zinc-800" />
               <DropdownMenuItem
                 className="cursor-pointer text-red-400 focus:text-red-400 focus:bg-red-400/10"
