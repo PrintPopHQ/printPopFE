@@ -13,28 +13,28 @@ import type { CarouselApi } from "@/components/ui/carousel";
 const steps = [
   {
     step: "STEP 1",
-    title: "Schedule a call/ visit",
-    description: `Submit your information ont the "Contact Us" form, and our sales team will reach out to schedule a call/video call or a visit to our location in Guangzhhou, china, to answer any questions`
+    title: "Submit Your Application",
+    description: "Begin by applying to operate a personalised phone case vending machine. Our team will review your application and explain how the turnkey custom phone cases system works."
   },
   {
     step: "STEP 2",
-    title: "Order Your Machine",
-    description: "Using one of our recommended lenders or your own funding, you will pay for your machine, and it will be reserved for delivery"
+    title: "Discovery Call",
+    description: "Next, join a call with the PrintPop team. Learn exactly how the vending machine works, how custom phone cases are produced on demand, and the full support you will receive."
   },
   {
     step: "STEP 3",
-    title: "Set up your Business",
-    description: "Launch your phone case vending empire: create your brand, plan your marketing strategy, recruit a team, and ensure you meet local requirements to dominate your local market"
+    title: "Secure Your Machine and Location",
+    description: "Once approved, you’ll receive your vending machine, branding, and a ready-to-go retail location. PrintPop ensures the location is ideal for high foot traffic to maximise custom phone cases sales."
   },
   {
     step: "STEP 4",
-    title: "Receive Your Machine",
-    description: "The most exciting day! You will receive your machine and schedule comprehensive training wit our support team"
+    title: "Installation and Training",
+    description: "PrintPop handles machine installation, system setup, and training. You’ll learn how to manage your personalised phone case vending machine efficiently and keep operations smooth."
   },
   {
     step: "STEP 5",
-    title: "Learn Your Machine",
-    description: "Our Support team ensures you are from day one. We provide everyt from machine setup to in depth t. With our help, you will start crec stunning, high quality phone case immediately"
+    title: "Launch and Operate",
+    description: "Go live under the PrintPop brand. We continue supporting you with marketing guidance, technical support, and system updates. You can start earning from your custom phone cases vending machine immediately."
   }
 ];
 
@@ -60,10 +60,13 @@ export const HowWeWork = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
         {/* Section Header */}
         <div className="text-center mb-16 animate-in fade-in slide-in-from-bottom-4 duration-1000">
-          <h2 className="font-neon text-3xl md:text-4xl font-bold text-white mb-6 tracking-tighter">
-            <span className="text-neon-blue">HOW DO WE</span> WORK
+          <h2 className="font-neon text-3xl md:text-4xl font-bold text-white mb-4 tracking-tighter">
+            <span className="text-neon-blue">Set Up Once.</span> Earn Daily
           </h2>
-          <div className="h-1.5 w-16 bg-linear-to-r from-pink-500 to-cyan-400 mx-auto rounded-full mt-5"></div>
+          <p className="max-w-3xl mx-auto text-lg text-gray-300 font-comic px-4">
+            Starting your personalised phone case vending machine business with PrintPop is simple. We guide you through a 5-step process to make it easy to get operational and profitable.
+          </p>
+          <div className="h-1.5 w-16 bg-linear-to-r from-primary to-secondary mx-auto rounded-full mt-6"></div>
         </div>
 
         <div className="relative w-full mx-auto">

@@ -9,7 +9,7 @@ export const Hero = () => {
                 <div className="absolute top-[60%] right-[36%] w-[180px] h-[180px] bg-primary opacity-15 blur-[100px] rounded-full mix-blend-screen animate-pulse duration-4000"></div>
             </div>
 
-            <div className="relative z-10 w-full max-w-7xl mx-auto px-4 md:px-8 py-12 md:py-36 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div className="relative z-10 w-full max-w-7xl mx-auto px-4 md:px-8 py-12 md:py-16 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                 {/* Left Content */}
                 <div className="text-left space-y-6">
                     <span
@@ -17,16 +17,17 @@ export const Hero = () => {
                         Own a PrintPop Franchise
                     </span>
                     <h1
-                        className="font-neon text-4xl md:text-6xl font-black text-transparent bg-clip-text bg-linear-to-r from-white via-gray-200 to-gray-500 leading-tight drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]">
-                        Build Your Custom <br /><span className="bg-linear-to-r from-[#5CE1E6] to-[#FF3131] bg-clip-text text-transparent">Cover Empire.</span>
+                        className="font-neon text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-linear-to-r from-white via-gray-200 to-gray-500 leading-tight drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]">
+                        Personalised Phone Case That Goes <br /><span className="bg-linear-to-r from-[#5CE1E6] to-[#FF3131] bg-clip-text text-transparent">Beyond Basic Retail</span>
                     </h1>
-                    <p className="text-xl md:text-2xl text-gray-300 font-comic max-w-lg leading-relaxed">
-                        Join our growing network and turn creativity into a profitable business with our custom mobile cover franchise. We provide everything you need to launch successfully — advanced printing technology, premium materials, branding support, and step-by-step guidance.
+                    <p className="text-base md:text-lg text-gray-300 font-comic max-w-lg leading-relaxed">
+                        Start your journey with a personalised phone case franchise under the trusted PrintPop brand. The demand for custom phone cases is growing fast, and our turnkey vending machine model makes it easy to tap into this market.
+                        We provide everything you need to get started: the vending machine, location support, branding, training, and ongoing guidance. You can launch, scale, and run a profitable business without the guesswork. PrintPop handles the complex parts so you can focus on generating revenue from day one.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                        {/* <Link href="/shop" className="px-8 py-4 btn-brand-gradient text-white font-bold text-base rounded-full shadow-[0_0_20px_rgba(255,49,49,0.5)] hover:shadow-[0_0_30px_rgba(255,49,49,0.8)] transition-all duration-300 text-center uppercase tracking-wider">
-                            Shop Now
-                        </Link> */}
+                        <Link href="/contact" className="px-8 py-4 btn-brand-gradient text-white font-bold text-base rounded-full shadow-[0_0_20px_rgba(255,49,49,0.5)] hover:shadow-[0_0_30px_rgba(255,49,49,0.8)] transition-all duration-300 text-center uppercase tracking-wider">
+                            Contact Us
+                        </Link>
                         <Link href="/customize" className="p-[2px] rounded-full bg-linear-to-r from-[#5CE1E6] to-[#FF3131] group transition-all duration-300 hover:shadow-[0_0_20px_rgba(255,255,255,0.5)]">
                             <div className="bg-black text-white px-8 py-4 rounded-full transition-all duration-300 group-hover:bg-white flex items-center justify-center">
                                 <span className="text-brand-gradient group-hover:text-initial group-hover:text-black font-bold text-base uppercase tracking-wider transition-all duration-300">

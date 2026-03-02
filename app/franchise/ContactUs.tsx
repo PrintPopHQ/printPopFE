@@ -5,7 +5,7 @@ import { MapPin, Mail, Phone, Clock, Linkedin, Facebook, Instagram, Youtube } fr
 import { ContactForm } from "@/components/contact/ContactForm";
 
 export default function ContactUs() {
-  return (<div className="max-w-7xl mx-auto px-4 w-full pt-16 pb-24 flex flex-col lg:flex-row gap-16 justify-between items-center">
+  return (<div className="max-w-7xl mx-auto px-4 w-full pt-16 pb-24 flex flex-col gap-16 justify-between items-center lg:flex-row-reverse">
 
     {/* Left Form Section */}
     <div className="w-full lg:w-[55%] flex flex-col relative">
