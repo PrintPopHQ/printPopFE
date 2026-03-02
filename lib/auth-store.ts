@@ -1,9 +1,10 @@
 /**
  * Auth store — thin wrapper around localStorage for persisting the
- * authenticated user and a guest email captured at cart-time.
+ * authenticated user, access token, and a guest email captured at cart-time.
  */
 
 const USER_KEY = "printpop_user";
+const TOKEN_KEY = "printpop_access_token";
 const GUEST_EMAIL_KEY = "printpop_guest_email";
 
 export interface StoredUser {
@@ -39,6 +40,23 @@ export function removeUser() {
 
 export function isLoggedIn(): boolean {
   return getUser() !== null;
+}
+
+// ─── Access token ─────────────────────────────────────────────────────────────
+
+export function saveAccessToken(token: string) {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(TOKEN_KEY, token);
+}
+
+export function getAccessToken(): string | null {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem(TOKEN_KEY);
+}
+
+export function removeAccessToken() {
+  if (typeof window === "undefined") return;
+  localStorage.removeItem(TOKEN_KEY);
 }
 
 // ─── Guest email (captured at add-to-cart for first item) ────────────────────

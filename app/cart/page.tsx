@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import RemoveCartItemModal from '@/components/modals/RemoveCartItemModal';
-import { isLoggedIn, getUser, getGuestEmail } from '@/lib/auth-store';
+import { isLoggedIn, getUser, getGuestEmail, getAccessToken } from '@/lib/auth-store';
 import { ApiService } from '@/services/ApiService';
 import { handleApiResponse } from '@/packages/HandleResponse';
 import { toast } from 'sonner';
@@ -128,7 +128,10 @@ export default function CartPage() {
         email,
       };
 
-      const orderRes = await ApiService.getInstance().createOrder(orderPayload);
+      const orderRes = await ApiService.getInstance().createOrder(
+        orderPayload,
+        getAccessToken() ?? undefined,
+      );
       const orderResult = handleApiResponse(orderRes.data);
       const { checkoutUrl } = orderResult.data;
 

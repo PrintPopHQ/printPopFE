@@ -77,7 +77,8 @@ export class ApiService {
     });
   }
 
-  public createOrder(payload: CreateOrderPayload) {
-    return this.axiosInstance.post(ENDPOINTS.CREATE_ORDER, payload);
+  public createOrder(payload: CreateOrderPayload, bearerToken?: string) {
+    const headers = bearerToken ? { Authorization: `Bearer ${bearerToken}` } : undefined;
+    return this.axiosInstance.post(ENDPOINTS.CREATE_ORDER, payload, { headers });
   }
 }

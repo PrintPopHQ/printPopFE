@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useSignInMutation } from "@/packages/Mutations";
-import { saveUser } from "@/lib/auth-store";
+import { saveUser, saveAccessToken } from "@/lib/auth-store";
 
 export function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -32,8 +32,9 @@ export function SignInForm() {
         { email: values.email, password: values.password },
         {
           onSuccess: (data) => {
-            // Persist user to localStorage for auth-aware features
-            if (data.data) saveUser(data.data);
+            // Persist user and access token to localStorage
+            if (data.data?.user) saveUser(data.data.user);
+            if (data.data?.access_token) saveAccessToken(data.data.access_token);
             toast.success("Welcome back!", {
               description: data.message || "You have signed in successfully.",
             });
