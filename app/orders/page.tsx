@@ -87,7 +87,7 @@ export default function OrdersPage() {
         />
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 w-full pt-16 pb-24 space-y-6">
+      <div className="max-w-7xl mx-auto px-4 w-full pt-16 pb-24 space-y-6">
         {isLoading ? (
           <div className="flex justify-center py-20">
             <Loader2 className="animate-spin text-[#5CE1E6]" size={48} />
