@@ -1,5 +1,11 @@
 import { useMutation } from "@tanstack/react-query";
-import { ApiService, SignInPayload, SignUpPayload, CreateOrderPayload } from "../services/ApiService";
+import {
+  ApiService,
+  SignInPayload,
+  SignUpPayload,
+  CreateOrderPayload,
+  ForgotPasswordPayload,
+} from "../services/ApiService";
 import { handleApiResponse } from "./HandleResponse";
 
 export const useSignUpMutation = () => {
@@ -29,6 +35,15 @@ export const useVerifyEmailMutation = () => {
   });
 };
 
+export const useForgotPasswordMutation = () => {
+  return useMutation({
+    mutationFn: async (payload: ForgotPasswordPayload) => {
+      const response = await ApiService.getInstance().forgotPassword(payload);
+      return handleApiResponse(response.data);
+    },
+  });
+};
+
 /** Converts a base64 data-URL to a File and uploads it, returning the CDN URL. */
 export const useUploadImageMutation = () => {
   return useMutation({
@@ -49,6 +64,54 @@ export const useCreateOrderMutation = () => {
     mutationFn: async (payload: CreateOrderPayload) => {
       const response = await ApiService.getInstance().createOrder(payload);
       return handleApiResponse(response.data);
+    },
+  });
+};
+
+interface CheckoutItem {
+  id: string;
+  image: string; // base64 data-URL
+  phoneModelId: string;
+  quantity: number;
+  guestEmail?: string;
+  userEmail?: string;
+}
+
+interface CheckoutPayload {
+  cartItems: CheckoutItem[];
+  email: string;
+  accessToken?: string;
+}
+
+/** Uploads all cart-item images in parallel, then creates the order in one shot. */
+export const useCheckoutMutation = () => {
+  return useMutation({
+    mutationFn: async ({ cartItems, email, accessToken }: CheckoutPayload) => {
+      // 1. Upload all images in parallel
+      const uploadedUrls = await Promise.all(
+        cartItems.map(async (item) => {
+          const res = await fetch(item.image);
+          const blob = await res.blob();
+          const file = new File([blob], `${item.id}.png`, { type: "image/png" });
+          const uploadRes = await ApiService.getInstance().uploadImage(file);
+          const result = handleApiResponse(uploadRes.data);
+          return result.data.url as string;
+        })
+      );
+
+      // 2. Create order
+      const orderPayload: CreateOrderPayload = {
+        items: cartItems.map((item, idx) => ({
+          modelid: item.phoneModelId,
+          customimage: uploadedUrls[idx],
+          quantity: item.quantity,
+        })),
+        email,
+      };
+
+      const orderRes = await ApiService.getInstance().createOrder(orderPayload, accessToken);
+      const orderResult = handleApiResponse(orderRes.data);
+      return orderResult.data as { checkoutUrl: string };
     },
   });
 };

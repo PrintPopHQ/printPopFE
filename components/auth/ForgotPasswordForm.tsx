@@ -5,8 +5,12 @@ import * as Yup from "yup";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { useForgotPasswordMutation } from "@/packages/Mutations";
 
 export function ForgotPasswordForm() {
+  const forgotPasswordMutation = useForgotPasswordMutation();
+
   const formik = useFormik({
     initialValues: {
       email: "",
@@ -14,9 +18,24 @@ export function ForgotPasswordForm() {
     validationSchema: Yup.object({
       email: Yup.string().email("Invalid email address").required("Email is required"),
     }),
-    onSubmit: async (values) => {
-      // Handle forgot password logic
-      console.log(values);
+    onSubmit: (values) => {
+      forgotPasswordMutation.mutate(
+        { email: values.email },
+        {
+          onSuccess: (data) => {
+            toast.success("Email Sent!", {
+              description: data.message || "If that email is registered, a reset link has been sent.",
+            });
+          },
+          onError: (error: unknown) => {
+            const message =
+              (error as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+              (error as Error)?.message ||
+              "Something went wrong. Please try again.";
+            toast.error("Request Failed", { description: message });
+          },
+        }
+      );
     },
   });
 
@@ -46,11 +65,11 @@ export function ForgotPasswordForm() {
 
         <Button
           type="submit"
-          disabled={!formik.isValid || !formik.dirty}
+          disabled={!formik.isValid || !formik.dirty || forgotPasswordMutation.isPending}
           className="w-full text-white font-bold h-12 rounded-xl mt-6 font-neon tracking-widest shadow-glow-cyan"
           style={{ background: "linear-gradient(90deg, #5CE1E6 0%, #FF3131 100%)" }}
         >
-          SEND OTP
+          {forgotPasswordMutation.isPending ? "FORGOT PASSWORD..." : "FORGOT PASSWORD"}
         </Button>
       </form>
 

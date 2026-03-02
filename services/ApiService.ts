@@ -6,6 +6,7 @@ const ENDPOINTS = {
   SIGNUP: "/api/auth/signup",
   LOGIN: "/api/auth/login",
   VERIFY_EMAIL: "/api/auth/verify-email",
+  FORGOT_PASSWORD: "/api/auth/forgot-password",
   UPLOAD_IMAGE: "/api/r2/upload",
   CREATE_ORDER: "/api/orders/create-order",
 };
@@ -20,6 +21,10 @@ export interface SignUpPayload {
 export interface SignInPayload {
   email: string;
   password: string;
+}
+
+export interface ForgotPasswordPayload {
+  email: string;
 }
 
 export interface OrderItem {
@@ -60,6 +65,10 @@ export class ApiService {
 
   public signIn(payload: SignInPayload) {
     return this.axiosInstance.post(ENDPOINTS.LOGIN, payload);
+  }
+
+  public forgotPassword(payload: ForgotPasswordPayload) {
+    return this.axiosInstance.post(ENDPOINTS.FORGOT_PASSWORD, payload);
   }
 
   public verifyEmail(token: string) {

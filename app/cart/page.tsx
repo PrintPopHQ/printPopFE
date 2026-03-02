@@ -9,9 +9,8 @@ import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import RemoveCartItemModal from '@/components/modals/RemoveCartItemModal';
 import { isLoggedIn, getUser, getGuestEmail, getAccessToken } from '@/lib/auth-store';
-import { ApiService } from '@/services/ApiService';
-import { handleApiResponse } from '@/packages/HandleResponse';
 import { toast } from 'sonner';
+import { useCheckoutMutation } from '@/packages/Mutations';
 
 interface CartItem {
   id: string;
@@ -30,7 +29,7 @@ export default function CartPage() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isMounted, setIsMounted] = useState(false);
   const [itemToRemove, setItemToRemove] = useState<string | null>(null);
-  const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const checkoutMutation = useCheckoutMutation();
 
   useEffect(() => {
     setIsMounted(true);
@@ -75,97 +74,57 @@ export default function CartPage() {
 
   // ── Checkout ────────────────────────────────────────────────────────────────
 
-  /** Convert a base64 data-URL to a File blob ready for upload. */
-  const dataUrlToFile = async (dataUrl: string, filename = 'design.png'): Promise<File> => {
-    const res = await fetch(dataUrl);
-    const blob = await res.blob();
-    return new File([blob], filename, { type: 'image/png' });
-  };
-
-  const handleCheckout = async () => {
+  const handleCheckout = () => {
     if (cartItems.length === 0) return;
-    setIsCheckingOut(true);
 
-    try {
-      // ── 1. Upload all images in parallel ────────────────────────────────
-      toast.loading('Uploading your designs…', { id: 'checkout' });
+    const email =
+      getUser()?.email ||
+      getGuestEmail() ||
+      cartItems.find(i => i.guestEmail)?.guestEmail ||
+      cartItems.find(i => i.userEmail)?.userEmail ||
+      '';
 
-      const uploadedUrls = await Promise.all(
-        cartItems.map(async (item) => {
-          const file = await dataUrlToFile(item.image, `${item.id}.png`);
-          const res = await ApiService.getInstance().uploadImage(file);
-          const result = handleApiResponse(res.data);
-          return result.data.url as string;
-        })
-      );
-
-      // ── 2. Determine email (logged-in user > guest email) ────────────────
-      const email =
-        getUser()?.email ||
-        getGuestEmail() ||
-        cartItems.find(i => i.guestEmail)?.guestEmail ||
-        cartItems.find(i => i.userEmail)?.userEmail ||
-        '';
-
-      if (!email) {
-        toast.error('No email found', {
-          id: 'checkout',
-          description: 'Please sign in or add an email to continue.',
-        });
-        setIsCheckingOut(false);
-        return;
-      }
-
-      // ── 3. Build order payload ───────────────────────────────────────────
-      toast.loading('Creating your order…', { id: 'checkout' });
-
-      const orderPayload = {
-        items: cartItems.map((item, idx) => ({
-          modelid: item.phoneModelId,
-          customimage: uploadedUrls[idx],
-          quantity: item.quantity,
-        })),
-        email,
-      };
-
-      const orderRes = await ApiService.getInstance().createOrder(
-        orderPayload,
-        getAccessToken() ?? undefined,
-      );
-      const orderResult = handleApiResponse(orderRes.data);
-      const { checkoutUrl } = orderResult.data;
-
-      // ── 4. Clear cart and open Shopify checkout ──────────────────────────
-      localStorage.removeItem('printpop_cart');
-      window.dispatchEvent(new Event('cart_updated'));
-      setCartItems([]);
-
-      // Also clear guest email on successful checkout
-      if (!isLoggedIn()) {
-        localStorage.removeItem('printpop_guest_email');
-      }
-
-      toast.success('Order created!', {
-        id: 'checkout',
-        description: 'Redirecting you to checkout…',
+    if (!email) {
+      toast.error('No email found', {
+        description: 'Please sign in or add an email to continue.',
       });
-
-      // window.open is blocked by popup blockers after async work.
-      // Programmatic anchor click is treated as a trusted navigation.
-      const a = document.createElement('a');
-      a.href = checkoutUrl;
-      a.target = '_blank';
-      a.rel = 'noopener noreferrer';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    } catch (err: any) {
-      const message =
-        err?.response?.data?.message || err?.message || 'Something went wrong.';
-      toast.error('Checkout failed', { id: 'checkout', description: message });
-    } finally {
-      setIsCheckingOut(false);
+      return;
     }
+
+    toast.loading('Uploading your designs…', { id: 'checkout' });
+
+    checkoutMutation.mutate(
+      { cartItems, email, accessToken: getAccessToken() ?? undefined },
+      {
+        onSuccess: ({ checkoutUrl }) => {
+          localStorage.removeItem('printpop_cart');
+          window.dispatchEvent(new Event('cart_updated'));
+          setCartItems([]);
+          if (!isLoggedIn()) localStorage.removeItem('printpop_guest_email');
+
+          toast.success('Order created!', {
+            id: 'checkout',
+            description: 'Redirecting you to checkout…',
+          });
+
+          // Programmatic anchor click avoids popup-blocker issues after async work
+          const a = document.createElement('a');
+          a.href = checkoutUrl;
+          a.target = '_blank';
+          a.rel = 'noopener noreferrer';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        },
+        onError: (err: unknown) => {
+          const message =
+            (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+            (err as Error)?.message ||
+            'Something went wrong.';
+          toast.error('Checkout failed', { id: 'checkout', description: message });
+        },
+      }
+    );
   };
 
   // ── Derived totals ───────────────────────────────────────────────────────────
@@ -298,13 +257,13 @@ export default function CartPage() {
                 <Button
                   size="lg"
                   onClick={handleCheckout}
-                  disabled={isCheckingOut}
+                  disabled={checkoutMutation.isPending}
                   className={cn(
                     "w-full h-12 text-sm font-semibold capitalize tracking-wide rounded-xl text-white transition-opacity hover:opacity-90",
                     "bg-linear-to-r from-[#5CE1E6] to-[#FF3131]"
                   )}
                 >
-                  {isCheckingOut ? (
+                  {checkoutMutation.isPending ? (
                     <span className="flex items-center gap-2">
                       <Loader2 size={16} className="animate-spin" />
                       Processing…
