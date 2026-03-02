@@ -5,6 +5,7 @@ import {
   SignUpPayload,
   CreateOrderPayload,
   ForgotPasswordPayload,
+  ResetPasswordPayload,
 } from "../services/ApiService";
 import { handleApiResponse } from "./HandleResponse";
 
@@ -39,6 +40,15 @@ export const useForgotPasswordMutation = () => {
   return useMutation({
     mutationFn: async (payload: ForgotPasswordPayload) => {
       const response = await ApiService.getInstance().forgotPassword(payload);
+      return handleApiResponse(response.data);
+    },
+  });
+};
+
+export const useResetPasswordMutation = () => {
+  return useMutation({
+    mutationFn: async (payload: ResetPasswordPayload) => {
+      const response = await ApiService.getInstance().resetPassword(payload);
       return handleApiResponse(response.data);
     },
   });

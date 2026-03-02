@@ -4,6 +4,9 @@ import { useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { Eye, EyeOff, Check } from "lucide-react";
+import { useSearchParams, useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { useResetPasswordMutation } from "@/packages/Mutations";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -11,6 +14,12 @@ import { cn } from "@/lib/utils";
 export function ResetPasswordForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const searchParams = useSearchParams();
+  const token = searchParams.get("token") || "";
+  const router = useRouter();
+
+  const resetPasswordMutation = useResetPasswordMutation();
 
   const formik = useFormik({
     initialValues: {
@@ -29,8 +38,29 @@ export function ResetPasswordForm() {
         .required("Confirm Password is required"),
     }),
     onSubmit: async (values) => {
-      // Handle password reset logic
-      console.log(values);
+      if (!token) {
+        toast.error("Invalid Request", { description: "Reset token is missing." });
+        return;
+      }
+
+      resetPasswordMutation.mutate(
+        { token, new_password: values.password },
+        {
+          onSuccess: (data) => {
+            toast.success("Password Reset Successful", {
+              description: data.message || "Your password has been changed successfully.",
+            });
+            router.push("/signin");
+          },
+          onError: (error: unknown) => {
+            const message =
+              (error as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+              (error as Error)?.message ||
+              "Something went wrong. Please try again.";
+            toast.error("Reset Failed", { description: message });
+          },
+        }
+      );
     },
   });
 
@@ -128,11 +158,11 @@ export function ResetPasswordForm() {
 
         <Button
           type="submit"
-          disabled={!formik.isValid || !formik.dirty}
+          disabled={!formik.isValid || !formik.dirty || resetPasswordMutation.isPending}
           className="w-full text-white font-bold h-12 rounded-xl mt-6 font-neon tracking-widest shadow-glow-red"
           style={{ background: "linear-gradient(90deg, #5CE1E6 0%, #FF3131 100%)" }}
         >
-          RESET PASSWORD
+          {resetPasswordMutation.isPending ? "RESETTING..." : "RESET PASSWORD"}
         </Button>
       </form>
     </div>
