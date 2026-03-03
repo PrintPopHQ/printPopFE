@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, Suspense, useRef } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Palette } from 'lucide-react';
+import { Palette, Maximize, Info } from 'lucide-react';
 
 import { PhoneModel } from '@/types/phone';
 import CanvasEditor from '@/components/CanvasEditor';
 import EditorControls from '@/components/EditorControls';
-import { exportCanvasAsImage } from '@/lib/canvas-utils';
+import { exportCanvasAsImage, fitImageToCanvas, fitSelectedImageToSafeArea } from '@/lib/canvas-utils';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import SelectionModals from '@/components/modals/SelectionModals';
@@ -200,7 +200,7 @@ function CustomizeSection({
   textColor: string;
   onColorChange: (color: string) => void;
 }) {
-  const swatches = ['#000000', '#FF3131', '#5CE1E6', '#8B5CF6', '#FACC15', '#FFFFFF'];
+  const swatches = ['#20211A', '#FF3131', '#5CE1E6', '#8B5CF6', '#FACC15', '#FFFFFF'];
 
   return (
     <SectionCard>
@@ -303,16 +303,51 @@ function CanvasPreviewArea({
   phoneModel,
   caseType,
   canvas,
+  selectedObject,
   onCanvasReady,
   onObjectSelected,
 }: {
   phoneModel: PhoneModel;
   caseType: string;
   canvas: any;
+  selectedObject: any;
   onCanvasReady: (instance: any) => void;
   onObjectSelected: (obj: any) => void;
 }) {
   const isMagnetic = caseType === 'Magnetic';
+  const fitFileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFitImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !canvas) return;
+    const safeArea = (canvas as any).safeArea;
+    if (!safeArea) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (reader.result) {
+        fitImageToCanvas(canvas, reader.result as string, safeArea);
+      }
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  };
+
+  /** Click handler for the Fit to Model button.
+   *  - If a user image is already selected → resize it to fill the safe area.
+   *  - Otherwise → open file picker so user can upload a new image. */
+  const handleFitToModel = () => {
+    if (!canvas) return;
+    const safeArea = (canvas as any).safeArea;
+    if (!safeArea) return;
+
+    // Use the currently selected object if it's an image
+    if (selectedObject && selectedObject.type === 'image' && selectedObject.id !== 'phone-overlay') {
+      fitSelectedImageToSafeArea(canvas, selectedObject, safeArea);
+    } else {
+      // No image selected — let user pick one
+      fitFileInputRef.current?.click();
+    }
+  };
 
   return (
     <div className="flex-1 bg-black/40 border border-border-subtle rounded-[2.5rem] relative flex flex-col items-center justify-center p-8 backdrop-blur-sm overflow-hidden min-h-[600px] shadow-inner">
@@ -322,15 +357,66 @@ function CanvasPreviewArea({
       <div className="absolute bottom-10 left-10 w-16 h-16 border-b-2 border-l-2 border-secondary/40 rounded-bl-2xl shadow-[-10px_10px_30px_-10px_rgba(255,49,49,0.4)]" />
       <div className="absolute bottom-10 right-10 w-16 h-16 border-b-2 border-r-2 border-primary/40 rounded-br-2xl shadow-[10px_10px_30px_-10px_rgba(92,225,230,0.4)]" />
 
+      {/* Hidden file input for fit-to-model */}
+      <input
+        ref={fitFileInputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={handleFitImageSelect}
+      />
+
       {/* Top toolbar */}
       <div className="absolute top-6 left-1/2 -translate-x-1/2 flex items-center gap-1.5 bg-black/60 backdrop-blur-xl border border-border-subtle rounded-2xl px-5 py-2 z-30 shadow-2xl">
-        <button className="p-2.5 text-primary hover:bg-primary/20 rounded-xl transition-all duration-300">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-            <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
-          </svg>
-        </button>
-        <div className="w-px h-6 bg-white/10 mx-2" />
+
+        {/* Device Settings with tooltip */}
+        <div className="relative group/devset">
+          <button className="p-2.5 text-primary hover:bg-primary/20 rounded-xl transition-all duration-300 flex items-center gap-2">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
+            </svg>
+            <Info className="w-3 h-3 opacity-50 group-hover/devset:opacity-100 transition-opacity" />
+          </button>
+
+          {/* Tooltip */}
+          <div
+            className="absolute top-full left-0 mt-2 w-56 bg-black/90 border border-white/10 rounded-xl p-3.5 shadow-2xl backdrop-blur-xl
+                       opacity-0 invisible group-hover/devset:opacity-100 group-hover/devset:visible
+                       transition-all duration-200 pointer-events-none z-50 text-left"
+          >
+            <p className="text-[10px] font-black text-primary uppercase tracking-widest mb-2">Device Info</p>
+            <div className="space-y-1.5 text-[10px] text-muted-foreground">
+              <div className="flex justify-between">
+                <span className="font-semibold text-white/60">Dimensions</span>
+                <span>160.7 × 77.6 mm</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-semibold text-white/60">Canvas</span>
+                <span>320 × 720 px</span>
+              </div>
+            </div>
+            <div className="mt-2.5 pt-2 border-t border-white/10 space-y-1">
+              <p className="text-[9px] font-black text-white/40 uppercase tracking-widest">Tips</p>
+              <p className="text-[9px] text-white/50 leading-relaxed">📌 Pinch with two fingers to zoom in/out on mobile.</p>
+              <p className="text-[9px] text-white/50 leading-relaxed">🖼 Use <span className="text-primary">Fit to Model</span> to fill the case full-bleed.</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="w-px h-6 bg-white/10 mx-1" />
         <p className="text-primary text-xs font-bold tracking-widest uppercase">Device Settings</p>
+        <div className="w-px h-6 bg-white/10 mx-1" />
+
+        {/* Fit to Model button */}
+        <button
+          onClick={handleFitToModel}
+          disabled={!selectedObject || selectedObject.type !== 'image' || selectedObject.id === 'phone-overlay'}
+          className="p-2.5 text-white/60 hover:text-primary hover:bg-primary/20 rounded-xl transition-all duration-300 group/fit flex items-center gap-1.5 disabled:opacity-30 disabled:pointer-events-none"
+          title={selectedObject?.type === 'image' && selectedObject?.id !== 'phone-overlay' ? 'Fit image to fill the model' : 'Select an image first'}
+        >
+          <Maximize className="w-4 h-4" />
+          <span className="text-[10px] font-black tracking-widest uppercase hidden sm:inline">Fit to Model</span>
+        </button>
       </div>
 
       {/* Canvas */}
@@ -592,6 +678,7 @@ function CustomizeContent() {
               phoneModel={phoneModel}
               caseType={caseType}
               canvas={canvas}
+              selectedObject={selectedObject}
               onCanvasReady={setCanvas}
               onObjectSelected={setSelectedObject}
             />

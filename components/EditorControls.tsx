@@ -11,7 +11,8 @@ import {
   Eraser,
   Minus,
   Plus,
-  RefreshCcw as RotateIcon
+  RefreshCcw as RotateIcon,
+  Type,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -20,14 +21,44 @@ import {
   updateObjectScale,
   updateObjectRotation,
   updateObjectColor,
+  updateObjectFontFamily,
   centerObject,
   moveObject,
   deleteObject,
   clearCanvas,
 } from '@/lib/canvas-utils';
 import { cn } from '@/lib/utils';
-import ImageCropper from './ImageCropper'; // Import the new component
+import ImageCropper from './ImageCropper';
 import ClearDesignModal from './modals/ClearDesignModal';
+
+// ─── Font options ─────────────────────────────────────────────────────────────
+
+const FONT_OPTIONS = [
+  { label: 'Arial', value: 'Arial' },
+  { label: 'Georgia', value: 'Georgia' },
+  { label: 'Courier New', value: 'Courier New' },
+  { label: 'Impact', value: 'Impact' },
+  { label: 'Verdana', value: 'Verdana' },
+  { label: 'Trebuchet MS', value: 'Trebuchet MS' },
+  { label: 'Pacifico', value: 'Pacifico' },
+  { label: 'Lobster', value: 'Lobster' },
+  { label: 'Oswald', value: 'Oswald' },
+  { label: 'Playfair Display', value: 'Playfair Display' },
+  { label: 'Dancing Script', value: 'Dancing Script' },
+  { label: 'Press Start 2P', value: 'Press Start 2P' },
+];
+
+// Google Fonts families that need to be loaded dynamically
+const GOOGLE_FONTS = [
+  'Pacifico',
+  'Lobster',
+  'Oswald',
+  'Playfair+Display',
+  'Dancing+Script',
+  'Press+Start+2P',
+];
+
+// ─── Component ────────────────────────────────────────────────────────────────
 
 interface EditorControlsProps {
   canvas: any | null;
@@ -45,6 +76,7 @@ export default function EditorControls({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [zoom, setZoom] = useState(100);
   const [rotation, setRotation] = useState(0);
+  const [fontFamily, setFontFamily] = useState('Arial');
 
   // Cropper State
   const [cropperOpen, setCropperOpen] = useState(false);
@@ -53,12 +85,39 @@ export default function EditorControls({
   // Clear modal state
   const [isClearModalOpen, setIsClearModalOpen] = useState(false);
 
-  // Sync text color
+  // ── Load Google Fonts once on mount ────────────────────────────────────────
+  useEffect(() => {
+    const linkId = 'printpop-google-fonts';
+    if (document.getElementById(linkId)) return;
+    const link = document.createElement('link');
+    link.id = linkId;
+    link.rel = 'stylesheet';
+    link.href = `https://fonts.googleapis.com/css2?family=${GOOGLE_FONTS.map((f) => `${f}:wght@400;700`).join('&family=')}&display=swap`;
+    document.head.appendChild(link);
+  }, []);
+
+  // ── Sync text color ─────────────────────────────────────────────────────────
   useEffect(() => {
     if (canvas && selectedObject && selectedObject.type === 'i-text' && textColor) {
       updateObjectColor(canvas, selectedObject, textColor);
     }
   }, [canvas, selectedObject, textColor]);
+
+  // ── Sync font when selected object changes ──────────────────────────────────
+  useEffect(() => {
+    if (selectedObject && (selectedObject.type === 'i-text' || selectedObject.type === 'text')) {
+      setFontFamily(selectedObject.fontFamily || 'Arial');
+    }
+  }, [selectedObject]);
+
+  // ── Handlers ────────────────────────────────────────────────────────────────
+
+  const handleFontChange = (font: string) => {
+    setFontFamily(font);
+    if (canvas && selectedObject) {
+      updateObjectFontFamily(canvas, selectedObject, font);
+    }
+  };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -72,7 +131,7 @@ export default function EditorControls({
       }
     };
     reader.readAsDataURL(file);
-    e.target.value = ''; // Reset input
+    e.target.value = '';
   };
 
   const handleCropComplete = (croppedImage: string) => {
@@ -84,11 +143,9 @@ export default function EditorControls({
       return;
     }
 
-    // Pass the cropped image URL to the canvas
     addImageToCanvas(canvas, croppedImage, safeArea);
     if (onObjectAdded) onObjectAdded();
 
-    // Reset
     setSelectedImageSrc(null);
     setCropperOpen(false);
   };
@@ -114,7 +171,10 @@ export default function EditorControls({
       alert('Please wait for the phone case to load first!');
       return;
     }
-    addTextToCanvas(canvas, 'YOUR TEXT', safeArea, { fill: textColor || '#FFFFFF' });
+    addTextToCanvas(canvas, 'YOUR TEXT', safeArea, {
+      fill: textColor || '#FFFFFF',
+      fontFamily,
+    });
     if (onObjectAdded) onObjectAdded();
   };
 
@@ -135,6 +195,10 @@ export default function EditorControls({
       setRotation(0);
     }
   };
+
+  const isTextSelected =
+    selectedObject &&
+    (selectedObject.type === 'i-text' || selectedObject.type === 'text');
 
   return (
     <div className="space-y-6">
@@ -177,6 +241,54 @@ export default function EditorControls({
         </div>
       </div>
 
+      {/* Font Family Picker — visible always, active only when text selected */}
+      <div className={cn('space-y-2 transition-all duration-500', !isTextSelected && 'opacity-40 pointer-events-none')}>
+        <div className="flex items-center gap-2 text-[9px] text-muted-foreground font-black uppercase tracking-wider">
+          <Type className="w-3 h-3" />
+          <span>Font Style</span>
+        </div>
+        <div className="relative group/font">
+          <select
+            value={fontFamily}
+            onChange={(e) => handleFontChange(e.target.value)}
+            disabled={!isTextSelected}
+            className="w-full bg-black/60 border border-white/10 rounded-xl px-4 py-3 text-xs font-bold appearance-none cursor-pointer focus:border-primary/50 transition-all outline-none disabled:opacity-30"
+            style={{ fontFamily }}
+          >
+            {FONT_OPTIONS.map((f) => (
+              <option key={f.value} value={f.value} style={{ fontFamily: f.value }}>
+                {f.label}
+              </option>
+            ))}
+          </select>
+          <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground group-hover/font:text-primary transition-colors">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4">
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </div>
+        </div>
+        {/* Font preview strip */}
+        {isTextSelected && (
+          <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
+            {FONT_OPTIONS.map((f) => (
+              <button
+                key={f.value}
+                onClick={() => handleFontChange(f.value)}
+                className={cn(
+                  'shrink-0 px-2.5 py-1 rounded-lg border text-[11px] transition-all',
+                  fontFamily === f.value
+                    ? 'border-primary bg-primary/10 text-primary'
+                    : 'border-white/10 bg-black/40 text-white hover:border-white/30',
+                )}
+                style={{ fontFamily: f.value }}
+              >
+                Aa
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
       <div className="space-y-5">
         <div className="flex items-center justify-between">
           <p className="text-[9px] text-muted-foreground font-black uppercase tracking-wider">Editor Settings</p>
@@ -189,7 +301,7 @@ export default function EditorControls({
           </button>
         </div>
 
-        <div className={cn("space-y-5 transition-all duration-500", !selectedObject && "opacity-20 pointer-events-none grayscale blur-[1px]")}>
+        <div className={cn('space-y-5 transition-all duration-500', !selectedObject && 'opacity-20 pointer-events-none grayscale blur-[1px]')}>
           <div className="flex items-center justify-between">
             <p className="text-[9px] text-muted-foreground font-black uppercase tracking-wider">Transform Art</p>
           </div>

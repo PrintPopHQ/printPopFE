@@ -20,14 +20,16 @@ export default function CanvasEditor({
   onCanvasReady,
   onObjectSelected,
 }: CanvasEditorProps) {
-  // A stable, non-Fabric container wrapper
   const wrapperRef = useRef<HTMLDivElement>(null);
   const fabricCanvasRef = useRef<any | null>(null);
   const canvasElRef = useRef<HTMLCanvasElement | null>(null);
   const onCanvasReadyRef = useRef(onCanvasReady);
   const onObjectSelectedRef = useRef(onObjectSelected);
 
-  // isLoading lives OUTSIDE the Fabric-managed DOM region to avoid insertBefore conflicts
+  // Track pinch state
+  const lastPinchDistRef = useRef<number | null>(null);
+  const pinchBaseScaleRef = useRef<{ x: number; y: number } | null>(null);
+
   const [isLoading, setIsLoading] = useState(true);
 
   // Keep callback refs fresh
@@ -40,8 +42,6 @@ export default function CanvasEditor({
   useEffect(() => {
     if (!wrapperRef.current || fabricCanvasRef.current) return;
 
-    // Dynamically create the canvas element and append to wrapper
-    // This way React never manages the canvas element directly
     const canvasEl = document.createElement('canvas');
     canvasEl.className = 'max-w-full h-auto shadow-lg';
     canvasElRef.current = canvasEl;
@@ -68,10 +68,7 @@ export default function CanvasEditor({
 
     return () => {
       canvas.dispose().then(() => {
-        // After Fabric v7 gracefully restores the canvas element, we remove it from the DOM
-        if (canvasEl.parentNode) {
-          canvasEl.remove();
-        }
+        if (canvasEl.parentNode) canvasEl.remove();
       }).catch(console.error);
       fabricCanvasRef.current = null;
     };
@@ -82,7 +79,6 @@ export default function CanvasEditor({
     const canvas = fabricCanvasRef.current;
     if (!canvas) return;
 
-    // Remove old phone overlay and outline only
     const toRemove = canvas.getObjects().filter(
       (obj: any) => obj.id === 'phone-overlay' || obj.id === 'safe-area-outline'
     );
@@ -103,10 +99,69 @@ export default function CanvasEditor({
     });
   }, [phoneModel]);
 
+  // 3. Pinch-to-zoom — scales the SELECTED OBJECT, not the viewport
+  useEffect(() => {
+    const wrapper = wrapperRef.current;
+    if (!wrapper) return;
+
+    const getDistance = (t1: Touch, t2: Touch) =>
+      Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+
+    const handleTouchStart = (e: TouchEvent) => {
+      if (e.touches.length !== 2) return;
+      const canvas = fabricCanvasRef.current;
+      const activeObj = canvas?.getActiveObject();
+      if (!activeObj) return;
+
+      lastPinchDistRef.current = getDistance(e.touches[0], e.touches[1]);
+      pinchBaseScaleRef.current = {
+        x: activeObj.scaleX ?? 1,
+        y: activeObj.scaleY ?? 1,
+      };
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length !== 2) return;
+      if (lastPinchDistRef.current === null || pinchBaseScaleRef.current === null) return;
+      e.preventDefault();
+
+      const canvas = fabricCanvasRef.current;
+      const activeObj = canvas?.getActiveObject();
+      if (!activeObj) return;
+
+      const newDist = getDistance(e.touches[0], e.touches[1]);
+      const ratio = newDist / lastPinchDistRef.current;
+
+      // Apply ratio on top of the base scale recorded at touch-start
+      const newScaleX = Math.min(Math.max(pinchBaseScaleRef.current.x * ratio, 0.05), 10);
+      const newScaleY = Math.min(Math.max(pinchBaseScaleRef.current.y * ratio, 0.05), 10);
+
+      activeObj.set({ scaleX: newScaleX, scaleY: newScaleY });
+      activeObj.setCoords();
+      canvas.renderAll();
+    };
+
+    const handleTouchEnd = (e: TouchEvent) => {
+      if (e.touches.length < 2) {
+        lastPinchDistRef.current = null;
+        pinchBaseScaleRef.current = null;
+      }
+    };
+
+    wrapper.addEventListener('touchstart', handleTouchStart, { passive: true });
+    wrapper.addEventListener('touchmove', handleTouchMove, { passive: false });
+    wrapper.addEventListener('touchend', handleTouchEnd, { passive: true });
+
+    return () => {
+      wrapper.removeEventListener('touchstart', handleTouchStart);
+      wrapper.removeEventListener('touchmove', handleTouchMove);
+      wrapper.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, []);
+
   return (
-    // Outer div managed by React — safe for state-driven children
     <div className="relative">
-      {/* Loading Overlay — SIBLING to the Fabric wrapper, not inside it */}
+      {/* Loading Overlay */}
       {isLoading && (
         <div className="absolute inset-0 bg-background flex flex-col items-center justify-center z-20 rounded-xl">
           <div className="flex flex-col items-center gap-3">

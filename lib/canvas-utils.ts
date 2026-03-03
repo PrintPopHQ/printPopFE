@@ -326,6 +326,117 @@ export const clearCanvas = (
   canvas.renderAll();
 };
 
+export const fitImageToCanvas = (
+  canvas: any,
+  imageUrl: string,
+  safeArea: SafeArea
+): Promise<any> => {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+
+    img.onload = () => {
+      const fabricImg = new fabric.Image(img);
+
+      // Scale to COVER the safe area (like CSS object-fit: cover)
+      const scaleX = safeArea.width / img.width;
+      const scaleY = safeArea.height / img.height;
+      const scale = Math.max(scaleX, scaleY);
+
+      fabricImg.set({
+        scaleX: scale,
+        scaleY: scale,
+        left: safeArea.left + safeArea.width / 2,
+        top: safeArea.top + safeArea.height / 2,
+        originX: 'center',
+        originY: 'center',
+        cornerColor: '#4f46e5',
+        cornerSize: 10,
+        transparentCorners: false,
+      });
+
+      // Apply safe area clipping
+      const clipPath = new fabric.Rect({
+        left: safeArea.left,
+        top: safeArea.top,
+        width: safeArea.width,
+        height: safeArea.height,
+        rx: safeArea.rx,
+        ry: safeArea.ry,
+        absolutePositioned: true,
+      });
+
+      fabricImg.clipPath = clipPath;
+
+      canvas.add(fabricImg);
+      canvas.setActiveObject(fabricImg);
+      reorderLayers(canvas);
+
+      resolve(fabricImg);
+    };
+
+    img.onerror = () => {
+      reject(new Error('Failed to load image'));
+    };
+
+    img.src = imageUrl;
+  });
+};
+
+/**
+ * Fit an already-on-canvas image object to fill the safe area (cover behaviour).
+ * The image will be centred and clipped to the safe area bounds.
+ */
+export const fitSelectedImageToSafeArea = (
+  canvas: any,
+  object: any,
+  safeArea: SafeArea
+): void => {
+  if (!object || object.type !== 'image') return;
+
+  const imgNatW = (object as any).width as number;
+  const imgNatH = (object as any).height as number;
+
+  const scaleX = safeArea.width / imgNatW;
+  const scaleY = safeArea.height / imgNatH;
+  const scale = Math.max(scaleX, scaleY);
+
+  // Re-clip so the image is bounded by the safe area
+  const clipPath = new fabric.Rect({
+    left: safeArea.left,
+    top: safeArea.top,
+    width: safeArea.width,
+    height: safeArea.height,
+    rx: safeArea.rx,
+    ry: safeArea.ry,
+    absolutePositioned: true,
+  });
+
+  object.set({
+    scaleX: scale,
+    scaleY: scale,
+    originX: 'center',
+    originY: 'center',
+    clipPath,
+  });
+
+  // Centre on the canvas after scaling
+  canvas.centerObject(object);
+  object.setCoords();
+  canvas.renderAll();
+};
+
+export const updateObjectFontFamily = (
+  canvas: any,
+  object: any,
+  fontFamily: string
+): void => {
+  if (object && (object.type === 'i-text' || object.type === 'text')) {
+    object.set({ fontFamily });
+    canvas.renderAll();
+  }
+};
+
 export const exportCanvasAsImage = (
   canvas: any,
   format: 'png' | 'jpeg' = 'png',
