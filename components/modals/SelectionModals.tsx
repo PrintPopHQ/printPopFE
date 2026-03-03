@@ -98,8 +98,10 @@ export default function SelectionModals({ brand, modelId, models, isLoadingModel
                 }}
               >
                 <div className="absolute inset-0 bg-linear-to-b from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                {b.icon}
-                <span className="mt-4 text-xs text-gray-600 group-hover:text-white uppercase tracking-widest font-black opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 text-center">
+                <div className="flex flex-col items-center justify-center translate-y-[-10px] md:translate-y-0">
+                  {b.icon}
+                </div>
+                <span className="absolute bottom-4 md:relative md:bottom-auto md:mt-4 text-[10px] md:text-xs text-gray-500 md:text-gray-600 group-hover:text-white uppercase tracking-widest font-black opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all duration-300 transform translate-y-0 md:translate-y-2 md:group-hover:translate-y-0 text-center">
                   {b.name}
                 </span>
               </div>
