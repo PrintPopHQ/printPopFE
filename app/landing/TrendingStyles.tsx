@@ -34,7 +34,7 @@ export const TrendingStyles = () => {
               <p className="text-gray-300 font-comic text-sm mb-6 opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500 line-clamp-2">
                 High-tech, low-life aesthetics for the modern rebel.
               </p>
-              <Link href="/collection/cyberpunk" className="inline-flex items-center text-primary font-bold uppercase tracking-widest text-xs border-b-2 border-primary/30 hover:border-primary pb-1 transition-all duration-300">
+              <Link href="/customize" className="inline-flex items-center text-primary font-bold uppercase tracking-widest text-xs border-b-2 border-primary/30 hover:border-primary pb-1 transition-all duration-300">
                 View Collection <span className="material-symbols-outlined text-sm ml-2">arrow_forward</span>
               </Link>
             </div>
@@ -60,7 +60,7 @@ export const TrendingStyles = () => {
               <p className="text-gray-300 font-comic text-sm mb-6 opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500 line-clamp-2">
                 Retro-futuristic nostalgia glitch art gems.
               </p>
-              <Link href="/collection/vaporwave" className="inline-flex items-center text-secondary font-bold uppercase tracking-widest text-xs border-b-2 border-secondary/30 hover:border-secondary pb-1 transition-all duration-300">
+              <Link href="/customize" className="inline-flex items-center text-secondary font-bold uppercase tracking-widest text-xs border-b-2 border-secondary/30 hover:border-secondary pb-1 transition-all duration-300">
                 View Collection <span className="material-symbols-outlined text-sm ml-2">arrow_forward</span>
               </Link>
             </div>
@@ -82,7 +82,7 @@ export const TrendingStyles = () => {
               <p className="text-gray-300 font-comic text-sm mb-6 opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500 line-clamp-2">
                 Clean lines with a striking electric punch.
               </p>
-              <Link href="/collection/minimal" className="inline-flex items-center text-primary font-bold uppercase tracking-widest text-xs border-b-2 border-primary/30 hover:border-primary pb-1 transition-all duration-300">
+              <Link href="/customize" className="inline-flex items-center text-primary font-bold uppercase tracking-widest text-xs border-b-2 border-primary/30 hover:border-primary pb-1 transition-all duration-300">
                 View Collection <span className="material-symbols-outlined text-sm ml-2">arrow_forward</span>
               </Link>
             </div>
