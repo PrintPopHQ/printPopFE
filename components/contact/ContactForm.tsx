@@ -4,8 +4,12 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useContactMutation } from "@/packages/Mutations";
+import { toast } from "sonner";
 
 export function ContactForm() {
+  const contactMutation = useContactMutation();
+
   const formik = useFormik({
     initialValues: {
       firstName: "",
@@ -22,10 +26,21 @@ export function ContactForm() {
       description: Yup.string().required("Description is required"),
     }),
     onSubmit: async (values) => {
-      // Handle form submission logic
-      console.log("Contact form submitted:", values);
-      alert("Form submitted successfully!");
-      formik.resetForm();
+      try {
+        const payload = {
+          full_name: `${values.firstName} ${values.lastName}`.trim(),
+          email: values.email,
+          order_number: values.orderNumber,
+          description: values.description,
+        };
+
+        const response = await contactMutation.mutateAsync(payload);
+        toast.success(response.message || "Contact form submitted successfully");
+        formik.resetForm();
+      } catch (error: any) {
+        console.error("Contact form error:", error);
+        toast.error(error?.response?.data?.message || "Something went wrong. Please try again.");
+      }
     },
   });
 
@@ -113,11 +128,11 @@ export function ContactForm() {
       <div className="flex justify-end pt-4">
         <Button
           type="submit"
-          disabled={!formik.isValid || !formik.dirty}
+          disabled={!formik.isValid || !formik.dirty || contactMutation.isPending}
           className="px-10 h-12 rounded-xl mt-4 font-bold tracking-widest text-white hover:opacity-90 shadow-glow-red"
           style={{ background: "linear-gradient(90deg, #5CE1E6 0%, #FF3131 100%)" }}
         >
-          SUBMIT
+          {contactMutation.isPending ? "SUBMITTING..." : "SUBMIT"}
         </Button>
       </div>
     </form>

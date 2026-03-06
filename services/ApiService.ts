@@ -13,6 +13,7 @@ const ENDPOINTS = {
   CREATE_ORDER: "/api/orders/create-order",
   MY_ORDERS: "/api/orders/my-orders",
   BLOGS: "/api/blogs",
+  CONTACT: "/api/contact",
 };
 
 export interface SignUpPayload {
@@ -77,6 +78,13 @@ export interface CreateOrderPayload {
   email: string;
 }
 
+export interface ContactPayload {
+  full_name: string;
+  email: string;
+  order_number: string;
+  description: string;
+}
+
 export class ApiService {
   private static instance: ApiService;
   private axiosInstance: AxiosInstance;
@@ -92,6 +100,11 @@ export class ApiService {
       ApiService.instance = new ApiService();
     }
     return ApiService.instance;
+  }
+
+  public contact(payload: ContactPayload) {
+    // Calling local Next.js API route
+    return axios.post(ENDPOINTS.CONTACT, payload);
   }
 
   public getModels(brandName: string) {

@@ -7,6 +7,7 @@ import {
   ForgotPasswordPayload,
   ResetPasswordPayload,
   ChangePasswordPayload,
+  ContactPayload,
 } from "../services/ApiService";
 import { handleApiResponse } from "./HandleResponse";
 
@@ -132,6 +133,14 @@ export const useCheckoutMutation = () => {
       const orderRes = await ApiService.getInstance().createOrder(orderPayload, accessToken);
       const orderResult = handleApiResponse(orderRes.data);
       return orderResult.data as { checkoutUrl: string };
+    },
+  });
+};
+export const useContactMutation = () => {
+  return useMutation({
+    mutationFn: async (payload: ContactPayload) => {
+      const response = await ApiService.getInstance().contact(payload);
+      return handleApiResponse(response.data);
     },
   });
 };
