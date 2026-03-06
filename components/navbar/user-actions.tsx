@@ -23,7 +23,8 @@ export function UserActions() {
 
   useEffect(() => {
     // Read auth state
-    setUser(getUser());
+    const updateAuth = () => setUser(getUser());
+    updateAuth();
 
     // Sync cart count
     const updateCount = () => {
@@ -39,12 +40,15 @@ export function UserActions() {
 
     updateCount();
     window.addEventListener('cart_updated', updateCount);
-    return () => window.removeEventListener('cart_updated', updateCount);
+    window.addEventListener('auth_updated', updateAuth);
+    return () => {
+      window.removeEventListener('cart_updated', updateCount);
+      window.removeEventListener('auth_updated', updateAuth);
+    };
   }, []);
 
   const handleLogout = () => {
     removeUser();
-    setUser(null);
     toast.success("Logged out", { description: "See you next time!" });
     router.push('/signin');
   };
@@ -64,8 +68,16 @@ export function UserActions() {
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" className="rounded-full border border-[#373737] hover:border-[#5CE1E64D] shadow-glow-cyan">
-            <User className="h-5 w-5" />
+          <Button variant="ghost" size="icon" className="group relative rounded-full border border-[#373737] hover:border-[#5CE1E64D] shadow-glow-cyan overflow-hidden p-0">
+            {user?.profile_pic ? (
+              <img
+                src={user.profile_pic}
+                alt="Profile"
+                className="h-full w-full object-cover rounded-full"
+              />
+            ) : (
+              <User className="h-5 w-5 transition-transform group-hover:scale-110" />
+            )}
             <span className="sr-only">User menu</span>
           </Button>
         </DropdownMenuTrigger>

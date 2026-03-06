@@ -8,8 +8,10 @@ import {
   ResetPasswordPayload,
   ChangePasswordPayload,
   ContactPayload,
+  UpdateProfilePayload,
 } from "../services/ApiService";
 import { handleApiResponse } from "./HandleResponse";
+import { saveUser } from "../lib/auth-store";
 
 export const useSignUpMutation = () => {
   return useMutation({
@@ -141,6 +143,26 @@ export const useContactMutation = () => {
     mutationFn: async (payload: ContactPayload) => {
       const response = await ApiService.getInstance().contact(payload);
       return handleApiResponse(response.data);
+    },
+  });
+};
+
+export const useUpdateProfileMutation = () => {
+  return useMutation({
+    mutationFn: async ({
+      payload,
+      token,
+    }: {
+      payload: UpdateProfilePayload;
+      token: string;
+    }) => {
+      const response = await ApiService.getInstance().updateProfile(payload, token);
+      const result = handleApiResponse(response.data);
+      // Sync updated user data back to local auth store
+      if (result?.data) {
+        saveUser(result.data);
+      }
+      return result;
     },
   });
 };

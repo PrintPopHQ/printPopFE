@@ -14,6 +14,7 @@ const ENDPOINTS = {
   MY_ORDERS: "/api/orders/my-orders",
   BLOGS: "/api/blogs",
   CONTACT: "/api/contact",
+  UPDATE_PROFILE: "/api/auth/profile",
 };
 
 export interface SignUpPayload {
@@ -83,6 +84,12 @@ export interface ContactPayload {
   email: string;
   order_number: string;
   description: string;
+}
+
+export interface UpdateProfilePayload {
+  full_name: string;
+  phone: string;
+  profile_pic: string;
 }
 
 export class ApiService {
@@ -165,5 +172,11 @@ export class ApiService {
 
   public getBlogBySlug(slug: string) {
     return this.axiosInstance.get(`${ENDPOINTS.BLOGS}/slug/${slug}`);
+  }
+
+  public updateProfile(payload: UpdateProfilePayload, bearerToken: string) {
+    return this.axiosInstance.patch(ENDPOINTS.UPDATE_PROFILE, payload, {
+      headers: { Authorization: `Bearer ${bearerToken}` },
+    });
   }
 }

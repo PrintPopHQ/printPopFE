@@ -13,6 +13,9 @@ export interface StoredUser {
   is_verified: boolean;
   created_at: string;
   updated_at: string;
+  full_name?: string;
+  phone?: string;
+  profile_pic?: string;
 }
 
 // ─── User (after login) ───────────────────────────────────────────────────────
@@ -20,6 +23,7 @@ export interface StoredUser {
 export function saveUser(user: StoredUser) {
   if (typeof window === "undefined") return;
   localStorage.setItem(USER_KEY, JSON.stringify(user));
+  window.dispatchEvent(new Event("auth_updated"));
 }
 
 export function getUser(): StoredUser | null {
@@ -36,6 +40,7 @@ export function getUser(): StoredUser | null {
 export function removeUser() {
   if (typeof window === "undefined") return;
   localStorage.removeItem(USER_KEY);
+  window.dispatchEvent(new Event("auth_updated"));
 }
 
 export function isLoggedIn(): boolean {
