@@ -1,6 +1,21 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { isLoggedIn } from "@/lib/auth-store";
+
 export const Newsletter = () => {
+  const [signedIn, setSignedIn] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    setSignedIn(isLoggedIn());
+  }, []);
+
+  if (signedIn) {
+    return <div className="mt-24"></div>;
+  }
+
   return (
     <section className="relative py-24 overflow-hidden border-t border-white/5">
       {/* Background Glows */}
@@ -27,6 +42,7 @@ export const Newsletter = () => {
             type="email"
           />
           <button
+            onClick={() => router.push("/signup")}
             className="absolute right-2 top-2 bottom-2 px-6 btn-brand-gradient cursor-pointer text-base text-black font-bold rounded-full hover:bg-white transition-colors shadow-[0_0_15px_rgba(255,49,49,0.4)] hover:shadow-[0_0_20px_rgba(92,225,230,0.6)]"
             type="button"
           >
