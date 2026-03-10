@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 
@@ -13,12 +13,16 @@ interface SelectionModalsProps {
 
 export default function SelectionModals({ brand, modelId, models, isLoadingModels }: SelectionModalsProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const validBrands = ['Apple', 'Samsung', 'Google', 'Oppo'];
   const isBrandModalOpen = !brand || !validBrands.includes(brand);
 
   const handleBrandSelect = (selectedBrand: string) => {
-    router.push(`/customize?brand=${selectedBrand}`);
+    const g = searchParams.get('g');
+    const c = searchParams.get('c');
+    const extra = g && c ? `&g=${g}&c=${c}` : '';
+    router.push(`/customize?brand=${selectedBrand}${extra}`);
   };
 
   return (

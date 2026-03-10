@@ -490,6 +490,11 @@ function CustomizeContent() {
   const brand = searchParams.get('brand');
   const router = useRouter();
 
+  // ── Group ordering params ─────────────────────────────────────────────────
+  const groupSize = parseInt(searchParams.get('g') ?? '1', 10);
+  const currentIteration = parseInt(searchParams.get('c') ?? '1', 10);
+  const isGroupOrder = groupSize > 1;
+
   const [localModelId, setLocalModelId] = useState<string | null>(null);
   const [phoneModel, setPhoneModel] = useState<PhoneModel | null>(null);
   const [canvas, setCanvas] = useState<any | null>(null);
@@ -571,7 +576,14 @@ function CustomizeContent() {
     existingCart.push(item);
     localStorage.setItem('printpop_cart', JSON.stringify(existingCart));
     window.dispatchEvent(new Event('cart_updated'));
-    router.push('/cart');
+
+    if (isGroupOrder && currentIteration < groupSize) {
+      // More items in the group — go back to brand selector for the next item
+      const nextIteration = currentIteration + 1;
+      router.push(`/customize?g=${groupSize}&c=${nextIteration}`);
+    } else {
+      router.push('/cart');
+    }
   };
 
   const handleAddToCart = () => {
@@ -638,6 +650,36 @@ function CustomizeContent() {
                 Configure your ultimate armor.
               </p>
             </div>
+
+            {/* Group progress indicator */}
+            {isGroupOrder && (
+              <div className="bg-surface border border-border-subtle rounded-2xl p-4 relative overflow-hidden shadow-[0px_4px_6px_-4px_rgba(0,0,0,0.1)]">
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-[9px] font-black text-primary uppercase tracking-[0.2em]">Group Order</p>
+                  <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest opacity-60">
+                    Item {currentIteration} of {groupSize}
+                  </span>
+                </div>
+                <div className="flex gap-1.5">
+                  {Array.from({ length: groupSize }).map((_, i) => (
+                    <div
+                      key={i}
+                      className={cn(
+                        'h-1.5 flex-1 rounded-full transition-all duration-500',
+                        i < currentIteration
+                          ? 'bg-primary shadow-[0_0_6px_rgba(92,225,230,0.6)]'
+                          : 'bg-white/10',
+                      )}
+                    />
+                  ))}
+                </div>
+                <p className="text-[9px] text-muted-foreground mt-2 leading-relaxed">
+                  {currentIteration < groupSize
+                    ? `${groupSize - currentIteration} more phone${groupSize - currentIteration > 1 ? 's' : ''} to customize after this.`
+                    : 'Last phone — add to cart to complete your group!'}
+                </p>
+              </div>
+            )}
 
             {/* Step 1 — Device Model */}
             <DeviceModelSelector
