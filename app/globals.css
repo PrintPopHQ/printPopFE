@@ -265,6 +265,10 @@
   color: #D1D5DB;
   font-size: 0.9375rem;
   line-height: 1.75;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+  overflow-x: hidden;
 }
 
 .blog-content h1 {
@@ -316,9 +320,7 @@
 .blog-content ul,
 .blog-content ol {
   margin: 1rem 0 1.25rem 1.25rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
+  display: block;
 }
 
 .blog-content ul {
@@ -332,6 +334,7 @@
 .blog-content li {
   color: #D1D5DB;
   padding-left: 0.25rem;
+  margin-bottom: 0.35rem;
 }
 
 .blog-content li::marker {
