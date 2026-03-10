@@ -576,13 +576,15 @@ function CustomizeContent() {
 
   // ── Handlers ─────────────────────────────────────────────────────────────
 
+  const currentPrice = caseType === 'Magnetic' ? 40 : 35;
+
   const buildCartItem = (email?: string) => ({
     id: crypto.randomUUID(),
     phoneModel: phoneModel!.name,
     phoneModelId: phoneModel!.id,
     caseType,
     textColor,
-    price: phoneModel!.price || 35.0,
+    price: currentPrice,
     // Compressed preview for cart display (JPEG 100% @ 1x — keeps localStorage lean)
     image: exportCanvasAsImage(canvas, 'jpeg', 1),
     quantity: 1,
@@ -760,7 +762,7 @@ function CustomizeContent() {
 
             {/* Price block — desktop only */}
             <PriceActionBlock
-              price={phoneModel.price}
+              price={currentPrice}
               canvas={canvas}
               onAddToCart={handleAddToCart}
               className="hidden lg:block"
@@ -782,7 +784,7 @@ function CustomizeContent() {
 
             {/* Price block — mobile only */}
             <PriceActionBlock
-              price={phoneModel.price}
+              price={currentPrice}
               canvas={canvas}
               onAddToCart={handleAddToCart}
               className="lg:hidden mt-4"
