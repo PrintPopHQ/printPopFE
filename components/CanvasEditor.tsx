@@ -13,18 +13,21 @@ interface CanvasEditorProps {
   phoneModel: PhoneModel;
   onCanvasReady?: (canvas: any) => void;
   onObjectSelected?: (obj: any | null) => void;
+  onModelLoaded?: (canvas: any) => void;
 }
 
 export default function CanvasEditor({
   phoneModel,
   onCanvasReady,
   onObjectSelected,
+  onModelLoaded,
 }: CanvasEditorProps) {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const fabricCanvasRef = useRef<any | null>(null);
   const canvasElRef = useRef<HTMLCanvasElement | null>(null);
   const onCanvasReadyRef = useRef(onCanvasReady);
   const onObjectSelectedRef = useRef(onObjectSelected);
+  const onModelLoadedRef = useRef(onModelLoaded);
 
   // Track pinch state
   const lastPinchDistRef = useRef<number | null>(null);
@@ -36,6 +39,7 @@ export default function CanvasEditor({
   useEffect(() => {
     onCanvasReadyRef.current = onCanvasReady;
     onObjectSelectedRef.current = onObjectSelected;
+    onModelLoadedRef.current = onModelLoaded;
   });
 
   // 1. Mount canvas element and initialize Fabric ONCE
@@ -93,6 +97,8 @@ export default function CanvasEditor({
       (canvas as any).safeArea = safeArea;
       canvas.renderAll();
       setIsLoading(false);
+      // Notify parent that the model has fully loaded with the real safeArea
+      onModelLoadedRef.current?.(canvas);
     }).catch((err) => {
       console.error('Failed to load case image:', err);
       setIsLoading(false);

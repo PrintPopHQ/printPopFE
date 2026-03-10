@@ -7,7 +7,7 @@ import { Palette, Maximize, Info } from 'lucide-react';
 import { PhoneModel } from '@/types/phone';
 import CanvasEditor from '@/components/CanvasEditor';
 import EditorControls from '@/components/EditorControls';
-import { exportCanvasAsImage, fitImageToCanvas, fitSelectedImageToSafeArea } from '@/lib/canvas-utils';
+import { exportCanvasAsImage, fitImageToCanvas, fitSelectedImageToSafeArea, clearCanvas } from '@/lib/canvas-utils';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import SelectionModals from '@/components/modals/SelectionModals';
@@ -306,6 +306,7 @@ function CanvasPreviewArea({
   selectedObject,
   onCanvasReady,
   onObjectSelected,
+  onModelLoaded,
 }: {
   phoneModel: PhoneModel;
   caseType: string;
@@ -313,6 +314,7 @@ function CanvasPreviewArea({
   selectedObject: any;
   onCanvasReady: (instance: any) => void;
   onObjectSelected: (obj: any) => void;
+  onModelLoaded?: (canvas: any) => void;
 }) {
   const isMagnetic = caseType === 'Magnetic';
   const fitFileInputRef = useRef<HTMLInputElement>(null);
@@ -428,6 +430,7 @@ function CanvasPreviewArea({
           phoneModel={phoneModel}
           onCanvasReady={onCanvasReady}
           onObjectSelected={onObjectSelected}
+          onModelLoaded={onModelLoaded}
         />
       </div>
 
@@ -522,6 +525,21 @@ function CustomizeContent() {
     }
   }, [brand]);
 
+  // ── Reset all state when group iteration increments ───────────────────────
+  useEffect(() => {
+    if (!isMounted) return;
+    // Clear canvas user content and reset UI state for each new iteration
+    if (canvas) {
+      clearCanvas(canvas, true);
+    }
+    setSelectedObject(null);
+    setTextColor('#000000');
+    setLocalModelId(null);
+    setPhoneModel(null);
+    setCaseType('Non-Magnetic');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentIteration]);
+
   useEffect(() => {
     if (models.length === 0) return;
 
@@ -533,6 +551,15 @@ function CustomizeContent() {
 
     if (!localModelId) setLocalModelId(selected.id);
 
+    const newSafeArea = {
+      left: 0,
+      top: 0,
+      width: 320,
+      height: 720,
+      rx: selected.model_radius,
+      ry: selected.model_radius,
+    };
+
     setPhoneModel({
       id: selected.id,
       name: selected.name,
@@ -540,14 +567,7 @@ function CustomizeContent() {
       image: selected.model_pic,
       canvasWidth: 320,
       canvasHeight: 720,
-      safeArea: {
-        left: 0,
-        top: 0,
-        width: 320,
-        height: 720,
-        rx: selected.model_radius,
-        ry: selected.model_radius,
-      },
+      safeArea: newSafeArea,
       price: 35.0,
     });
 
@@ -563,7 +583,8 @@ function CustomizeContent() {
     caseType,
     textColor,
     price: phoneModel!.price || 35.0,
-    image: exportCanvasAsImage(canvas, 'png', 1),
+    // Compressed preview for cart display (JPEG 100% @ 1x — keeps localStorage lean)
+    image: exportCanvasAsImage(canvas, 'jpeg', 1),
     quantity: 1,
     // attach user email (logged-in or guest) for order tracking
     ...(email ? { guestEmail: email } : {}),
@@ -574,7 +595,24 @@ function CustomizeContent() {
     const existingCartRaw = localStorage.getItem('printpop_cart');
     const existingCart = existingCartRaw ? JSON.parse(existingCartRaw) : [];
     existingCart.push(item);
-    localStorage.setItem('printpop_cart', JSON.stringify(existingCart));
+
+    const saveCart = (cart: any[]) => {
+      try {
+        localStorage.setItem('printpop_cart', JSON.stringify(cart));
+      } catch (e) {
+        // Storage quota hit — clear stale cart and retry with just this item
+        console.warn('Cart storage full, clearing old items and retrying.', e);
+        try {
+          localStorage.removeItem('printpop_cart');
+          localStorage.setItem('printpop_cart', JSON.stringify([item]));
+        } catch (e2) {
+          console.error('Could not save cart item even after clearing storage.', e2);
+          return;
+        }
+      }
+    };
+
+    saveCart(existingCart);
     window.dispatchEvent(new Event('cart_updated'));
 
     if (isGroupOrder && currentIteration < groupSize) {
@@ -614,6 +652,22 @@ function CustomizeContent() {
     if (!pendingCartItem) return;
     commitToCart({ ...pendingCartItem, guestEmail: email });
     setPendingCartItem(null);
+  };
+
+  /**
+   * Called by CanvasEditor after the phone overlay has fully loaded.
+   * At this point canvas.safeArea reflects the real scaled dimensions of the
+   * new phone model — safe to auto-fit any existing user image.
+   */
+  const handleModelLoaded = (loadedCanvas: any) => {
+    const safeArea = (loadedCanvas as any).safeArea;
+    if (!safeArea) return;
+    const uploadedImg = loadedCanvas.getObjects().find(
+      (obj: any) => obj.type === 'image' && obj.id !== 'phone-overlay'
+    );
+    if (uploadedImg) {
+      fitSelectedImageToSafeArea(loadedCanvas, uploadedImg, safeArea);
+    }
   };
 
   // ── Render ────────────────────────────────────────────────────────────────
@@ -723,6 +777,7 @@ function CustomizeContent() {
               selectedObject={selectedObject}
               onCanvasReady={setCanvas}
               onObjectSelected={setSelectedObject}
+              onModelLoaded={handleModelLoaded}
             />
 
             {/* Price block — mobile only */}
