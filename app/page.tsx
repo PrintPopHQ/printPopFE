@@ -1,4 +1,5 @@
 import { Hero } from "@/app/landing/Hero";
+import { DynamicBanner } from "@/app/landing/DynamicBanner";
 import { TrustedBy } from "@/app/landing/TrustedBy";
 import { TrendingStyles } from "@/app/landing/TrendingStyles";
 import { Locations } from "@/app/landing/Locations";
@@ -14,6 +15,7 @@ export default function Home() {
   return (
     <div className="min-h-screen w-full bg-background">
       <Hero />
+      <DynamicBanner />
       <TrustedBy />
       <TrendingStyles />
       <Locations />
