@@ -134,16 +134,16 @@
 
   /* Reusable glow shadow presets */
   --glow-cyan-text:
+    0 0 1px var(--neon-cyan),
     0 0 2px var(--neon-cyan),
     0 0 4px var(--neon-cyan),
-    0 0 8px var(--neon-cyan),
-    0 0 16px var(--neon-cyan);
+    0 0 8px var(--neon-cyan);
 
   --glow-red-text:
+    0 0 1px var(--neon-red),
     0 0 2px var(--neon-red),
     0 0 4px var(--neon-red),
-    0 0 8px var(--neon-red),
-    0 0 16px var(--neon-red-outer);
+    0 0 8px var(--neon-red-outer);
 
   --glow-box-cyan: 0px 0px 7.5px 0px color-mix(in srgb, var(--neon-cyan) 30%, transparent);
   --glow-box-red: 0px 0px 11.25px 0px color-mix(in srgb, var(--neon-red) 40%, transparent);
