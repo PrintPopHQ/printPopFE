@@ -14,6 +14,7 @@ import SelectionModals from '@/components/modals/SelectionModals';
 import { GuestEmailModal } from '@/components/modals/GuestEmailModal';
 import { useGetModels } from '@/packages/Queries';
 import { isLoggedIn, getUser, getGuestEmail } from '@/lib/auth-store';
+import { TrendingStyles } from '@/app/landing/TrendingStyles';
 
 // ─── Shared Primitives ────────────────────────────────────────────────────────
 
@@ -212,7 +213,7 @@ function CustomizeSection({
 
       <div className="space-y-4">
         <p className="text-[9px] text-muted-foreground font-bold uppercase tracking-wider mb-2">
-          Base Color
+          Text Colour
         </p>
         <div className="flex gap-2 mb-6">
           {swatches.map((color) => (
@@ -683,7 +684,7 @@ function CustomizeContent() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col items-center py-16 md:py-24 xl:py-32 px-4 md:px-8 relative overflow-x-hidden">
+    <div className="min-h-screen bg-background text-foreground flex flex-col items-center pt-16 md:pt-24 xl:pt-32 px-4 md:px-8 relative overflow-x-hidden">
 
       {/* Ambient background glows */}
       <div className="absolute inset-0 z-0 pointer-events-none">
@@ -797,6 +798,9 @@ function CustomizeContent() {
           <Spinner label="Preparing your Design Lab…" />
         </div>
       )}
+
+      {/* Inserted Trending Styles Section */}
+      <TrendingStyles title={<><span className="text-neon-blue">OUR CUSTOMER</span> LIKE THESE</>} />
 
       <SelectionModals
         brand={brand}

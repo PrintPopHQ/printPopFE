@@ -13,37 +13,27 @@ export const Customization = () => {
                 Create Your Own
               </span>
               <h2 className="font-neon text-3xl md:text-4xl font-bold text-white mb-6 uppercase leading-tight">
-                <span className="text-shadow-[0_0_30px_rgba(92,225,230,0.8)]">Customize Your</span> <br />
-                <span className="text-shadow-[0_0_30px_rgba(92,225,230,0.8)] text-neon-blue">Mobile Phone</span>
+                <span className="text-shadow-[0_0_30px_rgba(92,225,230,0.8)]">We’re Here to Help You Create</span> <br />
+                <span className="text-shadow-[0_0_30px_rgba(92,225,230,0.8)] text-neon-blue">the Perfect Case</span>
               </h2>
             </div>
 
-            <p className="text-gray-400 font-comic text-lg leading-relaxed max-w-md">
-              Upload your art, choose your neon accents, and build a case that is uniquely yours.
-              Our high-quality printing ensures your design glows as bright as your ideas.
-            </p>
-
-            <ul className="space-y-4 font-comic text-gray-300">
-              <li className="flex items-center group/item transition-colors">
-                <span className="material-symbols-outlined text-secondary mr-3 text-xl group-hover:scale-110 transition-transform">check_circle</span>
-                <span className="group-hover:text-white transition-colors">Military-grade drop protection</span>
-              </li>
-              <li className="flex items-center group/item transition-colors">
-                <span className="material-symbols-outlined text-secondary mr-3 text-xl group-hover:scale-110 transition-transform">check_circle</span>
-                <span className="group-hover:text-white transition-colors">Scratch-resistant glossy finish</span>
-              </li>
-              <li className="flex items-center group/item transition-colors">
-                <span className="material-symbols-outlined text-secondary mr-3 text-xl group-hover:scale-110 transition-transform">check_circle</span>
-                <span className="group-hover:text-white transition-colors">Lifetime print warranty</span>
-              </li>
-            </ul>
+            <div className="space-y-4 text-gray-400 font-comic text-lg leading-relaxed max-w-lg">
+              <p>
+                Designing a personalised phone case should feel easy and intuitive. Upload your artwork, adjust your layout, and preview the result in real time. We guide you through finishes, positioning, and resolution so your custom phone cases look clean and professionally executed.
+              </p>
+              <p>
+                At PrintPOP, we respond quickly and focus on solutions. Whether you’re creating one meaningful design or many bold pieces, we help you get it right. You can feel confident and stress-free.
+              </p>
+            </div>
 
             <div className="pt-4">
               <Link
-                href="/customize"
-                className="inline-block px-10 py-4 btn-brand-gradient text-white font-black rounded-[8px] shadow-[0_0_20px_rgba(92,225,230,0.3)] hover:shadow-[0_0_35px_rgba(92,225,230,0.6)] transition-all duration-300 uppercase tracking-widest text-sm"
+                href="/contact"
+                className="inline-flex items-center px-10 py-4 btn-brand-gradient text-white font-black rounded-[8px] shadow-[0_0_20px_rgba(92,225,230,0.3)] hover:shadow-[0_0_35px_rgba(92,225,230,0.6)] transition-all duration-300 uppercase tracking-widest text-sm group"
               >
-                Start Designing
+                Get in Touch
+                <span className="ml-2 font-bold group-hover:translate-x-1 transition-transform">&rarr;</span>
               </Link>
             </div>
           </div>

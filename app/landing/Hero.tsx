@@ -14,14 +14,15 @@ export const Hero = () => {
                 <div className="text-left space-y-6">
                     <span
                         className="inline-block px-4 py-1 border border-primary text-primary rounded-full text-sm font-bold tracking-wider uppercase bg-primary/10 shadow-[0_0_10px_rgba(92,225,230,0.3)]">
-                        New Collection Drop
+                        Do-It Yourself
                     </span>
                     <h1
                         className="font-neon text-4xl md:text-6xl font-black text-transparent bg-clip-text bg-linear-to-r from-white via-gray-200 to-gray-500 leading-tight drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]">
-                        Your phone <br /><span className="bg-linear-to-r from-[#5CE1E6] to-[#FF3131] bg-clip-text text-transparent">Your Vibe.</span>
+                        Personalised <br /><span className="bg-linear-to-r from-[#5CE1E6] to-[#FF3131] bg-clip-text text-transparent">Phone Case?</span>
                     </h1>
                     <p className="text-xl md:text-2xl text-gray-300 font-comic max-w-lg leading-relaxed">
-                        Custom cases that turn your device into a statement piece. Durable protection meets electric style.
+                        That’s so you, Mate! <br />
+                        Design your own personalised phone cases with Printpop. Our easy tools let you craft a unique custom phone case using photos, names or artwork. Printpop delivers vibrant, durable prints that turn everyday phones into stylish, meaningful accessories made for you.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 pt-4">
                         {/* <Link href="/shop" className="px-8 py-4 btn-brand-gradient text-white font-bold text-base rounded-full shadow-[0_0_20px_rgba(255,49,49,0.5)] hover:shadow-[0_0_30px_rgba(255,49,49,0.8)] transition-all duration-300 text-center uppercase tracking-wider">

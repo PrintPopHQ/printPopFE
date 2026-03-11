@@ -15,7 +15,7 @@ export const PopularProducts = () => {
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-20 animate-in fade-in slide-in-from-bottom-4 duration-1000">
           <h2 className="font-neon text-3xl md:text-4xl font-bold text-white mb-6 tracking-tighter">
-            <span className="text-neon-red">POPULAR</span> <span className="text-shadow-[0_0_30px_#FF2E63]">PRODUCTS</span>
+                <span className="text-neon-red">POPULAR</span> <span className="text-shadow-[0_0_30px_#FF2E63]">PRODUCTS</span>
           </h2>
           <div className="h-1.5 w-24 bg-linear-to-r from-primary to-secondary mx-auto rounded-full shadow-[0_0_10px_rgba(92,225,230,0.5)]"></div>
         </div>
@@ -32,10 +32,10 @@ export const PopularProducts = () => {
 
             <div className="absolute bottom-0 left-0 p-10 w-full transform transition-transform duration-500">
               <h3 className="font-neon text-3xl text-white mb-3 group-hover:text-primary transition-colors duration-300">
-                Group of 2
+                TWO-PAIR
               </h3>
               <p className="text-gray-300 font-comic text-sm mb-6 opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500 line-clamp-2">
-                High-tech, low-life aesthetics for the modern rebel.
+                (Prices For non magnetic (60$) and magnetic (70$))
               </p>
               <Link href="/customize?g=2&c=1" className="inline-flex items-center text-primary font-bold uppercase tracking-widest text-xs border-b-2 border-primary/30 hover:border-primary pb-1 transition-all duration-300">
                 start designing <span className="material-symbols-outlined text-sm ml-2">arrow_forward</span>
@@ -58,10 +58,10 @@ export const PopularProducts = () => {
 
             <div className="absolute bottom-0 left-0 p-10 w-full">
               <h3 className="font-neon text-3xl text-white mb-3 group-hover:text-secondary transition-colors duration-300">
-                Group of 3
+                THREE OF A KIND
               </h3>
               <p className="text-gray-300 font-comic text-sm mb-6 opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500 line-clamp-2">
-                Retro-futuristic nostalgia glitch art gems.
+                Non magnetic (90$) and magnetic (105$)
               </p>
               <Link href="/customize?g=3&c=1" className="inline-flex items-center text-secondary font-bold uppercase tracking-widest text-xs border-b-2 border-secondary/30 hover:border-secondary pb-1 transition-all duration-300">
                 start designing <span className="material-symbols-outlined text-sm ml-2">arrow_forward</span>
@@ -80,10 +80,10 @@ export const PopularProducts = () => {
 
             <div className="absolute bottom-0 left-0 p-10 w-full">
               <h3 className="font-neon text-3xl text-white mb-3 group-hover:text-primary transition-colors duration-300">
-                Group of 4
+                FAMILY DEAL
               </h3>
               <p className="text-gray-300 font-comic text-sm mb-6 opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500 line-clamp-2">
-                Clean lines with a striking electric punch.
+                Non magnetic (115$) and magnetic (135$)
               </p>
               <Link href="/customize?g=4&c=1" className="inline-flex items-center text-primary font-bold uppercase tracking-widest text-xs border-b-2 border-primary/30 hover:border-primary pb-1 transition-all duration-300">
                 start designing <span className="material-symbols-outlined text-sm ml-2">arrow_forward</span>

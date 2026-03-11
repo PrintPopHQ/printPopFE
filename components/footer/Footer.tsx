@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Twitter, Instagram, Linkedin } from "lucide-react";
+import { Twitter, Instagram, Linkedin, Facebook, Youtube } from "lucide-react";
 import { Newsletter } from "@/components/footer/Newsletter";
 
 export function Footer() {
@@ -21,8 +21,7 @@ export function Footer() {
               />
             </Link>
             <p className="text-gray-400 text-sm leading-relaxed max-w-xs">
-              We don't just protect phones; we turn them into glowing artifacts of
-              your personality. Designed in Tokyo, shipped worldwide.
+              Create personalised phone cases with Printpop. Design your custom phone case easily and stylishly. 📱✨
             </p>
           </div>
 
@@ -35,7 +34,7 @@ export function Footer() {
               </h3>
             </div>
             <ul className="space-y-4">
-              {["New Arrivals", "Best Sellers", "Neon Series", "Gift Cards"].map(
+              {["Design", "Trending Styles", "Packs", "Coupons"].map(
                 (item) => (
                   <li key={item}>
                     <Link
@@ -65,7 +64,7 @@ export function Footer() {
               {[
                 "Shipping & Returns",
                 "Track Order",
-                "FAQ",
+                "Privacy Policy",
                 "Contact Us",
               ].map((item) => (
                 <li key={item}>
@@ -94,6 +93,12 @@ export function Footer() {
             <div className="flex gap-4">
               {[
                 {
+                  icon: Facebook,
+                  href: "#",
+                  hoverClass:
+                    "hover:bg-[#1877F2] hover:text-white shadow-[#1877F2]/25",
+                },
+                {
                   icon: Twitter,
                   href: "#",
                   hoverClass:
@@ -104,6 +109,12 @@ export function Footer() {
                   href: "#",
                   hoverClass:
                     "hover:bg-[#FF3131] hover:text-white shadow-[#FF3131]/25",
+                },
+                {
+                  icon: Youtube,
+                  href: "#",
+                  hoverClass:
+                    "hover:bg-[#FF0000] hover:text-white shadow-[#FF0000]/25",
                 },
                 {
                   icon: Linkedin,

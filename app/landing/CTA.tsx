@@ -9,37 +9,27 @@ export const CTA = () => {
         <SectionCard className="flex flex-col md:flex-row items-center gap-16">
           <div className="md:w-1/2 space-y-8 animate-in fade-in slide-in-from-left-4 duration-1000">
             <span className="text-primary font-bold tracking-widest uppercase text-sm mb-2 block">
-              Create Your Own
+              Inspiration & Ideas
             </span>
             <h2 className="font-neon text-3xl md:text-4xl font-bold text-white mb-6">
-              <span className="text-shadow-[0_0_30px_#5CE1E6]">UNLEASH YOUR </span> <span className="text-neon-blue">CREATIVITY</span>
+              <span className="text-shadow-[0_0_30px_#5CE1E6]">Personalised</span> <br />
+              <span className="text-neon-blue">Phone Case</span>
             </h2>
-            <p className="text-gray-400 font-comic text-lg mb-8 leading-relaxed">
-              Upload your art, choose your neon accents, and build a case that is uniquely yours.
-              Our high-quality printing ensures your design glows as bright as your ideas.
-            </p>
-
-            <ul className="space-y-4 font-comic text-gray-300">
-              <li className="flex items-center group/item transition-colors">
-                <span className="material-symbols-outlined text-secondary mr-3 text-xl group-hover:scale-110 transition-transform">check_circle</span>
-                <span className="group-hover:text-white transition-colors">Military-grade drop protection</span>
-              </li>
-              <li className="flex items-center group/item transition-colors">
-                <span className="material-symbols-outlined text-secondary mr-3 text-xl group-hover:scale-110 transition-transform">check_circle</span>
-                <span className="group-hover:text-white transition-colors">Scratch-resistant glossy finish</span>
-              </li>
-              <li className="flex items-center group/item transition-colors">
-                <span className="material-symbols-outlined text-secondary mr-3 text-xl group-hover:scale-110 transition-transform">check_circle</span>
-                <span className="group-hover:text-white transition-colors">Lifetime print warranty</span>
-              </li>
-            </ul>
+            <div className="space-y-6">
+              <p className="text-gray-400 font-comic text-lg leading-relaxed">
+                At PrintPOP, every personalised phone case starts with a clear idea and a strong vibe. Our blog shares design trends, colour pairings, and layout tips. It also includes real examples to help you create custom phone cases that stand out. We break things down so you can design with clarity, not guesswork.
+              </p>
+              <p className="text-gray-400 font-comic text-lg leading-relaxed">
+                You’ll find bold concepts, clean typography ideas, and creative direction that feels fresh and relevant. Whether you love minimal aesthetics or expressive graphics, we help you turn everyday tech into something powerful and personal.
+              </p>
+            </div>
 
             <div className="pt-4">
               <Link
-                href="/customize"
+                href="/blogs"
                 className="inline-block px-10 py-4 btn-brand-gradient text-white font-black rounded-[8px] shadow-[0_0_20px_rgba(92,225,230,0.3)] hover:shadow-[0_0_35px_rgba(92,225,230,0.6)] transition-all duration-300 uppercase tracking-widest text-sm"
               >
-                Start Designing
+                Read More &rarr;
               </Link>
             </div>
           </div>

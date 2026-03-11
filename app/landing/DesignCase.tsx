@@ -23,40 +23,28 @@ export const DesignCase = () => {
           <div className="md:w-1/2 space-y-8 animate-in fade-in slide-in-from-right-4 duration-1000 order-1 md:order-2">
             <div>
               <span className="text-secondary font-bold tracking-widest uppercase text-sm mb-2 block">
-                Create Your Own
+                Franchise
               </span>
-              <h2 className="font-neon text-3xl md:text-4xl font-bold text-white mb-6">
-                <span className="text-shadow-[0_0_30px_#FF2E63]">DESIGN YOUR </span>
-                <span className="text-neon-red">OWN</span>
+              <h2 className="font-neon text-3xl md:text-3xl lg:text-4xl font-bold text-white mb-6">
+                <span className="text-shadow-[0_0_30px_#FF2E63]">Join the Future of </span>
+                <span className="text-neon-red">Automated Retail Franchising</span>
               </h2>
             </div>
 
-            <p className="text-gray-400 font-comic text-lg mb-8 leading-relaxed">
-              Upload your art, choose your neon accents, and build a case that is uniquely yours.
-              Our high-quality printing ensures your design glows as bright as your ideas.
+            <p className="text-gray-400 font-comic text-lg leading-relaxed">
+              Retail is evolving fast, and automated personalisation is part of that shift. PrintPOP vending machines deliver personalised phone case products in high-traffic spaces with precision and efficiency. Each unit operates independently while producing premium custom phone cases on demand.
             </p>
 
-            <ul className="space-y-4 font-comic text-gray-300">
-              <li className="flex items-center group/item transition-colors">
-                <span className="material-symbols-outlined text-secondary mr-3 text-xl group-hover:scale-110 transition-transform">check_circle</span>
-                <span className="group-hover:text-white transition-colors">Military-grade drop protection</span>
-              </li>
-              <li className="flex items-center group/item transition-colors">
-                <span className="material-symbols-outlined text-secondary mr-3 text-xl group-hover:scale-110 transition-transform">check_circle</span>
-                <span className="group-hover:text-white transition-colors">Scratch-resistant glossy finish</span>
-              </li>
-              <li className="flex items-center group/item transition-colors">
-                <span className="material-symbols-outlined text-secondary mr-3 text-xl group-hover:scale-110 transition-transform">check_circle</span>
-                <span className="group-hover:text-white transition-colors">Lifetime print warranty</span>
-              </li>
-            </ul>
+            <p className="text-gray-400 font-comic text-lg mb-8 leading-relaxed">
+              Our franchise model gives you structure, operational support, and scalable growth potential. You step into a modern, tech-enabled retail format built for visibility, speed, and strong consumer demand. It’s a smart and future-ready opportunity.
+            </p>
 
             <div className="pt-4">
               <Link
-                href="/customize"
+                href="/franchise"
                 className="inline-block px-10 py-4 btn-brand-gradient text-white font-black rounded-[8px] shadow-[0_0_20px_rgba(255,49,49,0.3)] hover:shadow-[0_0_35px_rgba(255,49,49,0.6)] transition-all duration-300 uppercase tracking-widest text-sm"
               >
-                Start Designing
+                View Opportunities &rarr;
               </Link>
             </div>
           </div>

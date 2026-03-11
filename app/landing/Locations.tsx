@@ -11,45 +11,36 @@ export const Locations = () => {
               <span className="text-shadow-[0_0_30px_#FF3131]">PRINTPOP</span> <span className="text-neon-red">LOCATIONS</span>
             </h2>
             <p className="text-gray-400 font-comic text-lg mb-8 leading-relaxed">
-              Experience the glow in person. Visit one of our flagship "SnapShell" kiosks
-              to feel the texture, see the design under blacklight, and get your case
-              printed on the spot in under 15 minutes.
+              Find Printpop locations near you for personalised phone cases. Visit a local Printpop store to design a custom phone case with expert help, fast service, and high-quality printing. Discover where Printpop operates and start creating your unique phone case today. 📍📱
             </p>
             <div className="space-y-4">
-              {/* Tokyo Location */}
-              <div className="flex items-center p-4 rounded-xl bg-gray-900/50 border border-gray-800 hover:border-secondary group transition-all duration-300 cursor-pointer">
+              {/* Green Hills Location */}
+              <a
+                href="https://www.google.com/maps/search/?api=1&query=Stockland+Green+Hills,+1+Molly+Morgan+Dr,+East+Maitland+NSW+2323"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center p-4 rounded-xl bg-gray-900/50 border border-gray-800 hover:border-secondary group transition-all duration-300 cursor-pointer"
+              >
                 <div className="w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center text-secondary mr-4 group-hover:bg-secondary group-hover:text-black transition-colors duration-300">
                   <span className="material-symbols-outlined">location_on</span>
                 </div>
                 <div className="flex-1">
-                  <h4 className="text-white font-bold text-lg">Tokyo, Shibuya Crossing</h4>
-                  <p className="text-gray-500 text-sm">Neon District, Floor 2</p>
+                  <h4 className="text-white font-bold text-lg">Green Hills Shopping Center</h4>
+                  <p className="text-gray-500 text-sm">Stockland Green Hills, 1 Molly Morgan Dr, East Maitland NSW 2323</p>
                 </div>
                 <span className="text-secondary text-sm font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-300">OPEN</span>
-              </div>
+              </a>
 
-              {/* New York Location */}
-              <div className="flex items-center p-4 rounded-xl bg-gray-900/50 border border-gray-800 hover:border-primary group transition-all duration-300 cursor-pointer">
+              {/* UoN Location */}
+              <div className="flex items-center p-4 rounded-xl bg-gray-900/50 border border-gray-800 hover:border-primary group transition-all duration-300">
                 <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary mr-4 group-hover:bg-primary group-hover:text-white transition-colors duration-300">
                   <span className="material-symbols-outlined">location_on</span>
                 </div>
                 <div className="flex-1">
-                  <h4 className="text-white font-bold text-lg">New York, SoHo</h4>
-                  <p className="text-gray-500 text-sm">424 Broadway, Pop-up Space</p>
+                  <h4 className="text-white font-bold text-lg">University of Newcastle – Callaghan Campus</h4>
+                  <p className="text-gray-500 text-sm">University Drive, Callaghan, NSW 2308, Australia</p>
                 </div>
-                <span className="text-primary text-sm font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-300">OPEN</span>
-              </div>
-
-              {/* London Location */}
-              <div className="flex items-center p-4 rounded-xl bg-gray-900/50 border border-gray-800 hover:border-purple-500 group transition-all duration-300 cursor-pointer">
-                <div className="w-12 h-12 rounded-full bg-purple-500/10 flex items-center justify-center text-purple-500 mr-4 group-hover:bg-purple-500 group-hover:text-white transition-colors duration-300">
-                  <span className="material-symbols-outlined">location_on</span>
-                </div>
-                <div className="flex-1">
-                  <h4 className="text-white font-bold text-lg">London, Shoreditch</h4>
-                  <p className="text-gray-500 text-sm">Boxpark Unit 29</p>
-                </div>
-                <span className="text-purple-500 text-sm font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-300">OPEN</span>
+                <span className="text-primary text-sm font-bold opacity-100 transition-opacity duration-300 uppercase">Opening Soon</span>
               </div>
             </div>
           </div>
@@ -76,11 +67,18 @@ export const Locations = () => {
             </div>
 
             {/* Pins */}
-            <div className="absolute top-[30%] left-[50%] transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group/pin">
+            {/* Green Hills Pin */}
+            <a
+              href="https://www.google.com/maps/search/?api=1&query=Stockland+Green+Hills,+1+Molly+Morgan+Dr,+East+Maitland+NSW+2323"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="absolute top-[30%] left-[50%] transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group/pin cursor-pointer"
+            >
               <div className="w-4 h-4 bg-secondary rounded-full shadow-[0_0_15px_#FF3131] animate-pulse"></div>
               <div className="h-16 w-1 bg-linear-to-b from-secondary to-transparent"></div>
-            </div>
+            </a>
 
+            {/* UoN Pin */}
             <div className="absolute top-[40%] left-[20%] transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group/pin">
               <div
                 className="w-4 h-4 bg-primary rounded-full shadow-[0_0_15px_#5CE1E6] animate-pulse"
