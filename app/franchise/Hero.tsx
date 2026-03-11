@@ -44,14 +44,14 @@ export const Hero = () => {
                         className="relative w-80 h-[500px] bg-linear-to-br from-gray-900 to-black rounded-[3rem] border-4 border-gray-800 shadow-[0_0_50px_rgba(92,225,230,0.3)] transform -rotate-12 hover:rotate-0 transition-all duration-700 z-10">
                         <img alt="Phone Case Black - YEAH NAH"
                             className="w-full h-full object-cover rounded-[2.8rem] opacity-80 hover:opacity-100 transition-opacity"
-                            src="/images/hero-case-black.png" />
+                            src="/images/chuchking-sickie-black.png" />
                         <div className="absolute inset-0 rounded-[2.8rem] ring-1 ring-white/10"></div>
                     </div>
                     <div
                         className="absolute top-20 right-10 w-72 h-[450px] bg-linear-to-br from-gray-900 to-black rounded-[2.5rem] border-4 border-gray-800 shadow-[0_0_50px_rgba(255,49,49,0.3)] transform rotate-6 hover:rotate-0 transition-all duration-700 z-0">
                         <img alt="Phone Case White - NAH YEAH"
                             className="w-full h-full object-cover rounded-[2.3rem] opacity-80 hover:opacity-100 transition-opacity"
-                            src="/images/hero-case-white.png" />
+                            src="/images/chuchking-sickie.png" />
                     </div>
                 </div>
             </div>

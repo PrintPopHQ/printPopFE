@@ -47,30 +47,30 @@ export default function ContactPage() {
             <div className="flex items-center gap-4">
               <MapPin className="w-6 h-6 text-white mt-1 shrink-0" strokeWidth={1.5} />
               <div className="text-gray-300 font-medium text-[15px]">
-                <p>We are right in the heart of Sydney & Adelaide</p>
+                <p>We are right in the heart of Australia</p>
               </div>
             </div>
 
             <div className="flex items-center gap-4">
               <Mail className="w-6 h-6 text-white shrink-0" strokeWidth={1.5} />
-              <a href="mailto:info@printpop.contactus" className="text-gray-300 font-medium text-[15px] hover:text-white transition-colors">
-                info@printpop.contactus
+              <a href="mailto:Support@printpop.com.au" className="text-gray-300 font-medium text-[15px] hover:text-white transition-colors">
+                Support@printpop.com.au
               </a>
             </div>
 
             <div className="flex items-center gap-4">
               <Phone className="w-6 h-6 text-white shrink-0" strokeWidth={1.5} />
-              <a href="tel:+71456677888" className="text-gray-300 font-medium text-[15px] hover:text-white transition-colors">
-                +71 456 677 888
+              <a href="tel:+61421304776" className="text-gray-300 font-medium text-[15px] hover:text-white transition-colors">
+                +61421304776
               </a>
             </div>
 
             <div className="flex items-start gap-4">
               <Clock className="w-6 h-6 text-white mt-1 shrink-0" strokeWidth={1.5} />
               <div>
-                <h4 className="font-bold text-white text-[15px] mb-1">Bussiness Hours</h4>
+                <h4 className="font-bold text-white text-[15px] mb-1">Business hours</h4>
                 <p className="text-gray-400 text-sm">Monday to Friday</p>
-                <p className="text-gray-400 text-sm">From 9 AM to 12 pM</p>
+                <p className="text-gray-400 text-sm">From 9Am to 5pm</p>
               </div>
             </div>
           </div>

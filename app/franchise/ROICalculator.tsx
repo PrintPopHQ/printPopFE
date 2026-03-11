@@ -129,7 +129,7 @@ export const ROICalculator = () => {
 
             <InputField
               id="investment"
-              label="A · Initial Investment ($) *"
+              label="Initial Investment ($) *"
               value={A}
               onChange={setA}
               prefix="$"
@@ -137,7 +137,7 @@ export const ROICalculator = () => {
             />
             <InputField
               id="retailPrice"
-              label="B · Final Retail Price per Case ($) *"
+              label="Final Retail Price per Case ($) *"
               value={B}
               onChange={setB}
               prefix="$"
@@ -145,7 +145,7 @@ export const ROICalculator = () => {
             />
             <InputField
               id="unitsSold"
-              label="C · Expected Units Sold per Month *"
+              label="Expected Units Sold per Month *"
               value={C}
               onChange={setC}
               suffix="units"
@@ -153,7 +153,7 @@ export const ROICalculator = () => {
             />
             <InputField
               id="productionCost"
-              label="D · Unit Production Cost ($) *"
+              label="Unit Production Cost ($) *"
               value={D}
               onChange={setD}
               prefix="$"
@@ -161,7 +161,7 @@ export const ROICalculator = () => {
             />
             <InputField
               id="overhead"
-              label="E · Average Overhead Cost / Month ($) *"
+              label="Average Overhead Cost / Month ($) *"
               value={E}
               onChange={setE}
               prefix="$"
@@ -169,7 +169,7 @@ export const ROICalculator = () => {
             />
             <InputField
               id="royalty"
-              label="I · Royalty Paid to PrintPop (%) *"
+              label="Royalty Paid to PrintPop (%) *"
               value={I}
               onChange={setI}
               suffix="%"
@@ -184,16 +184,16 @@ export const ROICalculator = () => {
               <p className="text-gray-400 font-comic text-sm mb-6">Based on your numbers, here's what your franchise could earn.</p>
 
               <div className="space-y-0">
-                <SummaryRow label="F · Total Monthly Revenue (C × B)" value={fmt(results.F)} />
-                <SummaryRow label="G · Total Monthly Production Cost (C × D)" value={fmt(results.G)} />
-                <SummaryRow label="H · Total Monthly Overhead Cost" value={fmt(results.H)} />
-                <SummaryRow label={`I · Royalty to PrintPop (${I}% of Revenue)`} value={fmt(results.royalty)} />
+                <SummaryRow label="Total Monthly Revenue" value={fmt(results.F)} />
+                <SummaryRow label="Total Monthly Production Cost" value={fmt(results.G)} />
+                <SummaryRow label="Total Monthly Overhead Cost" value={fmt(results.H)} />
+                <SummaryRow label={`Royalty to PrintPop (${I}% of Revenue)`} value={fmt(results.royalty)} />
               </div>
 
               {/* Profit highlight */}
               <div className="mt-6 rounded-xl overflow-hidden">
                 <div className="bg-primary text-white px-6 py-4 flex justify-between items-center">
-                  <span className="font-neon font-bold text-base tracking-wide uppercase">J · Total Monthly Profit</span>
+                  <span className="font-neon font-bold text-base tracking-wide uppercase">Total Monthly Profit</span>
                   <span className="font-neon font-black text-lg">{fmt(results.J)}</span>
                 </div>
               </div>
@@ -201,7 +201,7 @@ export const ROICalculator = () => {
               {/* Break-even months */}
               <div className="mt-3 rounded-xl overflow-hidden">
                 <div className="bg-secondary text-white px-6 py-4 flex justify-between items-center">
-                  <span className="font-neon font-bold text-base tracking-wide uppercase leading-tight">Months to Recoup<br />Investment (A ÷ J)</span>
+                  <span className="font-neon font-bold text-base tracking-wide uppercase leading-tight">Months to Recoup<br />Investment</span>
                   <span className="font-neon font-black text-lg">{fmtMonths(results.months)} <span className="text-sm font-normal">mo</span></span>
                 </div>
               </div>
