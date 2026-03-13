@@ -72,6 +72,8 @@ export interface OrderItem {
   modelid: string;
   customimage: string;
   quantity: number;
+  material: string;
+  designimage: string;
 }
 
 export interface CreateOrderPayload {

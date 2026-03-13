@@ -93,8 +93,10 @@ export const useCreateOrderMutation = () => {
 
 interface CheckoutItem {
   id: string;
-  image: string; // base64 data-URL
+  image: string; // full canvas mockup with phone frame (→ customimage in API)
+  customImage: string; // artwork only: user images + text, no phone frame (→ designimage in API)
   phoneModelId: string;
+  caseType: string;
   quantity: number;
   guestEmail?: string;
   userEmail?: string;
@@ -110,15 +112,27 @@ interface CheckoutPayload {
 export const useCheckoutMutation = () => {
   return useMutation({
     mutationFn: async ({ cartItems, email, accessToken }: CheckoutPayload) => {
-      // 1. Upload all images in parallel
-      const uploadedUrls = await Promise.all(
+      // 1. Upload both images (custom & design) for each item
+      const itemImages = await Promise.all(
         cartItems.map(async (item) => {
-          const res = await fetch(item.image);
-          const blob = await res.blob();
-          const file = new File([blob], `${item.id}.png`, { type: "image/png" });
-          const uploadRes = await ApiService.getInstance().uploadImage(file);
-          const result = handleApiResponse(uploadRes.data);
-          return result.data.url as string;
+          // Upload design image (canvas export)
+          const designRes = await fetch(item.image);
+          const designBlob = await designRes.blob();
+          const designFile = new File([designBlob], `${item.id}_design.png`, { type: "image/png" });
+          const designUploadRes = await ApiService.getInstance().uploadImage(designFile);
+          const designUrl = handleApiResponse(designUploadRes.data).data.url;
+
+          // Upload custom image (user upload) if it exists
+          let customUrl = "";
+          if (item.customImage) {
+            const customRes = await fetch(item.customImage);
+            const customBlob = await customRes.blob();
+            const customFile = new File([customBlob], `${item.id}_custom.png`, { type: "image/png" });
+            const customUploadRes = await ApiService.getInstance().uploadImage(customFile);
+            customUrl = handleApiResponse(customUploadRes.data).data.url;
+          }
+
+          return { designUrl, customUrl };
         })
       );
 
@@ -126,8 +140,10 @@ export const useCheckoutMutation = () => {
       const orderPayload: CreateOrderPayload = {
         items: cartItems.map((item, idx) => ({
           modelid: item.phoneModelId,
-          customimage: uploadedUrls[idx],
+          customimage: itemImages[idx].designUrl,
+          designimage: itemImages[idx].customUrl,
           quantity: item.quantity,
+          material: item.caseType,
         })),
         email,
       };

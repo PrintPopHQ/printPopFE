@@ -448,3 +448,65 @@ export const exportCanvasAsImage = (
     multiplier: 2, // 2x resolution for better print quality
   });
 };
+
+/**
+ * Exports only the user's artwork (images + text) cropped to the safe area (phone model bounds).
+ *
+ * Strategy: directly read the underlying HTML canvas element (bypasses all Fabric toDataURL
+ * multiplier/crop bugs), hide the phone overlay, render, then draw the exact safe-area region
+ * onto an offscreen canvas scaled up to 2× for print quality.
+ *
+ * Returns a Promise resolving to a data-URL of the cropped artwork.
+ */
+export const exportArtworkOnly = (
+  canvas: any,
+  format: 'png' | 'jpeg' = 'png',
+  quality: number = 1
+): Promise<string> => {
+  if (!canvas) return Promise.resolve('');
+
+  const safeArea = (canvas as any).safeArea as SafeArea | undefined;
+  const objects = canvas.getObjects();
+  const overlay = objects.find((obj: any) => obj.id === 'phone-overlay');
+  const safeAreaObj = objects.find((obj: any) => obj.id === 'safe-area');
+
+  // Hide phone overlay and safe-area outline so only user artwork is visible
+  const originalOverlayVisible = overlay?.visible;
+  const originalSafeAreaVisible = safeAreaObj?.visible;
+  if (overlay) overlay.set({ visible: false });
+  if (safeAreaObj) safeAreaObj.set({ visible: false });
+  canvas.renderAll();
+
+  // Get the underlying HTML canvas element – Fabric renders into this
+  const sourceEl: HTMLCanvasElement = canvas.getElement();
+
+  // Determine crop region in the SOURCE canvas pixel space.
+  // sourceEl.width / canvas.width gives the device-pixel-ratio that Fabric uses.
+  const dpRatio = sourceEl.width / canvas.width;
+
+  const cropX = (safeArea?.left ?? 0) * dpRatio;
+  const cropY = (safeArea?.top ?? 0) * dpRatio;
+  const cropW = (safeArea?.width ?? canvas.width) * dpRatio;
+  const cropH = (safeArea?.height ?? canvas.height) * dpRatio;
+
+  // Build an offscreen canvas at 2× the safe-area size for high print quality
+  const outputW = Math.round(cropW * 2);
+  const outputH = Math.round(cropH * 2);
+  const offscreen = document.createElement('canvas');
+  offscreen.width = outputW;
+  offscreen.height = outputH;
+  const ctx = offscreen.getContext('2d');
+
+  if (ctx) {
+    ctx.drawImage(sourceEl, cropX, cropY, cropW, cropH, 0, 0, outputW, outputH);
+  }
+
+  const result = offscreen.toDataURL(`image/${format}`, quality);
+
+  // Restore phone overlay
+  if (overlay) overlay.set({ visible: originalOverlayVisible });
+  if (safeAreaObj) safeAreaObj.set({ visible: originalSafeAreaVisible });
+  canvas.renderAll();
+
+  return Promise.resolve(result);
+};

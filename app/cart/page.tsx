@@ -19,7 +19,8 @@ interface CartItem {
   caseType: string;
   textColor: string;
   price: number;
-  image: string;       // base64 data-URL from canvas export
+  image: string;       // base64 data-URL (design preview)
+  customImage: string; // base64 data-URL (user upload)
   quantity: number;
   guestEmail?: string;
   userEmail?: string;

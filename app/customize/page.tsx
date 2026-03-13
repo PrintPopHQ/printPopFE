@@ -7,7 +7,7 @@ import { Palette, Maximize, Info } from 'lucide-react';
 import { PhoneModel } from '@/types/phone';
 import CanvasEditor from '@/components/CanvasEditor';
 import EditorControls from '@/components/EditorControls';
-import { exportCanvasAsImage, fitImageToCanvas, fitSelectedImageToSafeArea, clearCanvas } from '@/lib/canvas-utils';
+import { exportCanvasAsImage, fitImageToCanvas, fitSelectedImageToSafeArea, clearCanvas, exportArtworkOnly } from '@/lib/canvas-utils';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import SelectionModals from '@/components/modals/SelectionModals';
@@ -579,20 +579,24 @@ function CustomizeContent() {
 
   const currentPrice = caseType === 'Magnetic' ? 40 : 35;
 
-  const buildCartItem = (email?: string) => ({
-    id: crypto.randomUUID(),
-    phoneModel: phoneModel!.name,
-    phoneModelId: phoneModel!.id,
-    caseType,
-    textColor,
-    price: currentPrice,
-    // Compressed preview for cart display (JPEG 100% @ 1x — keeps localStorage lean)
-    image: exportCanvasAsImage(canvas, 'jpeg', 1),
-    quantity: 1,
-    // attach user email (logged-in or guest) for order tracking
-    ...(email ? { guestEmail: email } : {}),
-    ...(getUser() ? { userEmail: getUser()!.email } : {}),
-  });
+  const buildCartItem = async (email?: string) => {
+    return {
+      id: crypto.randomUUID(),
+      phoneModel: phoneModel!.name,
+      phoneModelId: phoneModel!.id,
+      caseType,
+      textColor,
+      price: currentPrice,
+      // image: full canvas preview/mockup (complete design)
+      image: exportCanvasAsImage(canvas, 'jpeg', 1),
+      // customImage: the artwork itself (user upload + text, no phone frame)
+      customImage: await exportArtworkOnly(canvas, 'png', 1),
+      quantity: 1,
+      // attach user email (logged-in or guest) for order tracking
+      ...(email ? { guestEmail: email } : {}),
+      ...(getUser() ? { userEmail: getUser()!.email } : {}),
+    };
+  };
 
   const commitToCart = (item: any) => {
     const existingCartRaw = localStorage.getItem('printpop_cart');
@@ -627,18 +631,18 @@ function CustomizeContent() {
     }
   };
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     if (!canvas || !phoneModel) return;
 
     if (isLoggedIn()) {
       // ── Logged-in path: go straight to cart ──────────────────────────────
-      commitToCart(buildCartItem());
+      commitToCart(await buildCartItem());
       return;
     }
 
     // ── Guest path ────────────────────────────────────────────────────────
     const existingGuestEmail = getGuestEmail();
-    const cartItem = buildCartItem(existingGuestEmail ?? undefined);
+    const cartItem = await buildCartItem(existingGuestEmail ?? undefined);
 
     if (existingGuestEmail) {
       // Email already captured for a previous item — reuse it
