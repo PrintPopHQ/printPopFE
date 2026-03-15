@@ -19,11 +19,16 @@ export default function SelectionModals({ brand, modelId, models, isLoadingModel
   const isBrandModalOpen = !brand || !validBrands.includes(brand);
 
   const handleBrandSelect = (selectedBrand: string) => {
-    const g = searchParams.get('g');
-    const c = searchParams.get('c');
-    const extra = g && c ? `&g=${g}&c=${c}` : '';
-    router.push(`/customize?brand=${selectedBrand}${extra}`);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('brand', selectedBrand);
+    router.push(`/customize?${params.toString()}`);
   };
+
+  const g = searchParams.get('g');
+  const c = searchParams.get('c');
+  const groupSize = g ? parseInt(g, 10) : 1;
+  const currentIteration = c ? parseInt(c, 10) : 1;
+  const isGroupOrder = groupSize > 1;
 
   return (
     <>
@@ -105,7 +110,7 @@ export default function SelectionModals({ brand, modelId, models, isLoadingModel
                 <div className="flex flex-col items-center justify-center translate-y-[-10px] md:translate-y-0 relative z-10">
                   {b.icon}
                 </div>
-                <span className={cn("absolute bottom-4 md:relative md:bottom-auto md:mt-4 text-[10px] md:text-xs text-gray-500 md:text-gray-600 uppercase tracking-widest font-black opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all duration-300 transform translate-y-0 md:translate-y-2 md:group-hover:translate-y-0 text-center relative z-10", b.textHover)}>
+                <span className={cn("absolute bottom-4 md:relative md:bottom-auto md:mt-4 text-[10px] md:text-xs text-gray-500 md:text-gray-600 uppercase tracking-widest font-black opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all duration-300 transform translate-y-0 md:translate-y-2 md:group-hover:translate-y-0 text-center z-10", b.textHover)}>
                   {b.name}
                 </span>
               </div>

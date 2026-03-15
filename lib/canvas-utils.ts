@@ -191,7 +191,12 @@ export const addImageToCanvas = (
       reject(new Error('Failed to load image'));
     };
 
-    img.src = imageUrl;
+    // Use proxy for external URLs to avoid CORS issues
+    if (imageUrl.startsWith('http')) {
+      img.src = `/api/proxy?url=${encodeURIComponent(imageUrl)}`;
+    } else {
+      img.src = imageUrl;
+    }
   });
 };
 
@@ -336,27 +341,33 @@ export const fitImageToCanvas = (
     img.crossOrigin = 'anonymous';
 
     img.onload = () => {
-      const fabricImg = new fabric.Image(img);
+      // Use naturalWidth/Height for true pixel dimensions
+      const natW = img.naturalWidth || img.width;
+      const natH = img.naturalHeight || img.height;
 
-      // Scale to COVER the safe area (like CSS object-fit: cover)
-      const scaleX = safeArea.width / img.width;
-      const scaleY = safeArea.height / img.height;
+      // Scale to COVER the safe area (CSS object-fit: cover)
+      const scaleX = safeArea.width / natW;
+      const scaleY = safeArea.height / natH;
       const scale = Math.max(scaleX, scaleY);
 
-      fabricImg.set({
+      // Calculate the top-left position so the image is CENTERED in the safe area.
+      // Using explicit pixel math avoids Fabric.js originX/originY quirks.
+      const scaledW = natW * scale;
+      const scaledH = natH * scale;
+      const left = safeArea.left + (safeArea.width - scaledW) / 2;
+      const top  = safeArea.top  + (safeArea.height - scaledH) / 2;
+
+      const fabricImg = new fabric.Image(img, {
+        left,
+        top,
         scaleX: scale,
         scaleY: scale,
-        left: safeArea.left + safeArea.width / 2,
-        top: safeArea.top + safeArea.height / 2,
-        originX: 'center',
-        originY: 'center',
-        cornerColor: '#4f46e5',
-        cornerSize: 10,
-        transparentCorners: false,
+        selectable: false,
+        evented: false,
       });
 
-      // Apply safe area clipping
-      const clipPath = new fabric.Rect({
+      // Clip to the safe area bounds
+      fabricImg.clipPath = new fabric.Rect({
         left: safeArea.left,
         top: safeArea.top,
         width: safeArea.width,
@@ -366,20 +377,24 @@ export const fitImageToCanvas = (
         absolutePositioned: true,
       });
 
-      fabricImg.clipPath = clipPath;
-
       canvas.add(fabricImg);
-      canvas.setActiveObject(fabricImg);
       reorderLayers(canvas);
+      canvas.renderAll();
 
       resolve(fabricImg);
     };
 
-    img.onerror = () => {
+    img.onerror = (err) => {
+      console.error('fitImageToCanvas: failed to load', imageUrl, err);
       reject(new Error('Failed to load image'));
     };
 
-    img.src = imageUrl;
+    // Use proxy for external URLs to avoid CORS issues
+    if (imageUrl.startsWith('http')) {
+      img.src = `/api/proxy?url=${encodeURIComponent(imageUrl)}`;
+    } else {
+      img.src = imageUrl;
+    }
   });
 };
 

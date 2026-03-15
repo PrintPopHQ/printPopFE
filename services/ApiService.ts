@@ -15,6 +15,7 @@ const ENDPOINTS = {
   BLOGS: "/api/blogs",
   CONTACT: "/api/contact",
   UPDATE_PROFILE: "/api/auth/profile",
+  GET_COVER_DESIGNS: "/cover-designs",
 };
 
 export interface SignUpPayload {
@@ -92,6 +93,22 @@ export interface UpdateProfilePayload {
   full_name: string;
   phone: string;
   profile_pic: string;
+}
+
+export interface CoverDesign {
+  id: string;
+  name: string;
+  image_url: string;
+  design_image_url: string;
+  price: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CoverDesignResponse {
+  responseCode: number;
+  message: string;
+  data: CoverDesign[];
 }
 
 export class ApiService {
@@ -180,5 +197,9 @@ export class ApiService {
     return this.axiosInstance.patch(ENDPOINTS.UPDATE_PROFILE, payload, {
       headers: { Authorization: `Bearer ${bearerToken}` },
     });
+  }
+
+  public getCoverDesigns() {
+    return this.axiosInstance.get<CoverDesignResponse>(ENDPOINTS.GET_COVER_DESIGNS);
   }
 }

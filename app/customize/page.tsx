@@ -248,12 +248,14 @@ function PriceActionBlock({
   onAddToCart,
   className,
   selectedObject,
+  isPreMadeDesign,
 }: {
   price: number;
   canvas: any;
   onAddToCart: () => void;
   className?: string;
   selectedObject: any;
+  isPreMadeDesign?: boolean;
 }) {
   return (
     <div
@@ -281,7 +283,7 @@ function PriceActionBlock({
         size="lg"
         className="w-full h-14 text-xs font-neon font-black btn-brand-gradient text-white rounded-xl shadow-[0_0_25px_rgba(255,49,49,0.3)] hover:shadow-[0_0_40px_rgba(255,49,49,0.5)] transition-all duration-500 group uppercase tracking-[0.2em]"
         onClick={onAddToCart}
-        disabled={!canvas || !selectedObject}
+        disabled={!canvas || (!isPreMadeDesign && !selectedObject)}
       >
         ADD TO CART
         <svg
@@ -308,6 +310,7 @@ function CanvasPreviewArea({
   onCanvasReady,
   onObjectSelected,
   onModelLoaded,
+  isPreMadeDesign,
 }: {
   phoneModel: PhoneModel;
   caseType: string;
@@ -316,6 +319,7 @@ function CanvasPreviewArea({
   onCanvasReady: (instance: any) => void;
   onObjectSelected: (obj: any) => void;
   onModelLoaded?: (canvas: any) => void;
+  isPreMadeDesign?: boolean;
 }) {
   const isMagnetic = caseType === 'Magnetic';
   const fitFileInputRef = useRef<HTMLInputElement>(null);
@@ -408,18 +412,22 @@ function CanvasPreviewArea({
 
         <div className="w-px h-6 bg-white/10 mx-1 hidden lg:block" />
         <p className="text-primary text-xs font-bold tracking-widest uppercase hidden lg:block">Device Settings</p>
-        <div className="w-px h-6 bg-white/10 mx-1" />
-
+        
         {/* Fit to Model button */}
-        <button
-          onClick={handleFitToModel}
-          disabled={!selectedObject || selectedObject.type !== 'image' || selectedObject.id === 'phone-overlay'}
-          className="p-2.5 text-white/60 hover:text-primary hover:bg-primary/20 rounded-xl transition-all duration-300 group/fit flex items-center gap-1.5 disabled:opacity-30 disabled:pointer-events-none"
-          title={selectedObject?.type === 'image' && selectedObject?.id !== 'phone-overlay' ? 'Fit image to fill the model' : 'Select an image first'}
-        >
-          <Maximize className="w-4 h-4" />
-          <span className="text-[10px] font-black tracking-widest uppercase hidden sm:inline">Fit to Model</span>
-        </button>
+        {!isPreMadeDesign && (
+          <>
+            <div className="w-px h-6 bg-white/10 mx-1" />
+            <button
+              onClick={handleFitToModel}
+              disabled={!selectedObject || selectedObject.type !== 'image' || selectedObject.id === 'phone-overlay'}
+              className="p-2.5 text-white/60 hover:text-primary hover:bg-primary/20 rounded-xl transition-all duration-300 group/fit flex items-center gap-1.5 disabled:opacity-30 disabled:pointer-events-none"
+              title={selectedObject?.type === 'image' && selectedObject?.id !== 'phone-overlay' ? 'Fit image to fill the model' : 'Select an image first'}
+            >
+              <Maximize className="w-4 h-4" />
+              <span className="text-[10px] font-black tracking-widest uppercase hidden sm:inline">Fit to Model</span>
+            </button>
+          </>
+        )}
       </div>
 
       {/* Canvas */}
@@ -625,7 +633,9 @@ function CustomizeContent() {
     if (isGroupOrder && currentIteration < groupSize) {
       // More items in the group — go back to brand selector for the next item
       const nextIteration = currentIteration + 1;
-      router.push(`/customize?g=${groupSize}&c=${nextIteration}`);
+      const params = new URLSearchParams(searchParams.toString());
+      params.set('c', nextIteration.toString());
+      router.push(`/customize?${params.toString()}`);
     } else {
       router.push('/cart');
     }
@@ -669,6 +679,16 @@ function CustomizeContent() {
   const handleModelLoaded = (loadedCanvas: any) => {
     const safeArea = (loadedCanvas as any).safeArea;
     if (!safeArea) return;
+
+    // ── Auto-load pre-made design ──────────────────────────────────────────
+    const designUrl = searchParams.get('design_url');
+    if (designUrl) {
+      // Clear any existing user content before adding the pre-made design
+      clearCanvas(loadedCanvas, true);
+      fitImageToCanvas(loadedCanvas, designUrl, safeArea);
+      return;
+    }
+
     const uploadedImg = loadedCanvas.getObjects().find(
       (obj: any) => obj.type === 'image' && obj.id !== 'phone-overlay'
     );
@@ -678,6 +698,7 @@ function CustomizeContent() {
   };
 
   // ── Render ────────────────────────────────────────────────────────────────
+  const isPreMadeDesign = !!searchParams.get('design_url');
 
   if (!isMounted) {
     return (
@@ -758,12 +779,14 @@ function CustomizeContent() {
             />
 
             {/* Step 3 — Customize */}
-            <CustomizeSection
-              canvas={canvas}
-              selectedObject={selectedObject}
-              textColor={textColor}
-              onColorChange={setTextColor}
-            />
+            {!isPreMadeDesign && (
+              <CustomizeSection
+                canvas={canvas}
+                selectedObject={selectedObject}
+                textColor={textColor}
+                onColorChange={setTextColor}
+              />
+            )}
 
             {/* Price block — desktop only */}
             <PriceActionBlock
@@ -772,6 +795,7 @@ function CustomizeContent() {
               onAddToCart={handleAddToCart}
               className="hidden lg:block"
               selectedObject={selectedObject}
+              isPreMadeDesign={isPreMadeDesign}
             />
           </div>
 
@@ -785,6 +809,7 @@ function CustomizeContent() {
               onCanvasReady={setCanvas}
               onObjectSelected={setSelectedObject}
               onModelLoaded={handleModelLoaded}
+              isPreMadeDesign={isPreMadeDesign}
             />
 
             {/* Price block — mobile only */}
@@ -794,6 +819,7 @@ function CustomizeContent() {
               onAddToCart={handleAddToCart}
               className="lg:hidden mt-4"
               selectedObject={selectedObject}
+              isPreMadeDesign={isPreMadeDesign}
             />
           </div>
         </div>
