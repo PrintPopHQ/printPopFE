@@ -414,20 +414,16 @@ function CanvasPreviewArea({
         <p className="text-primary text-xs font-bold tracking-widest uppercase hidden lg:block">Device Settings</p>
         
         {/* Fit to Model button */}
-        {!isPreMadeDesign && (
-          <>
-            <div className="w-px h-6 bg-white/10 mx-1" />
-            <button
-              onClick={handleFitToModel}
-              disabled={!selectedObject || selectedObject.type !== 'image' || selectedObject.id === 'phone-overlay'}
-              className="p-2.5 text-white/60 hover:text-primary hover:bg-primary/20 rounded-xl transition-all duration-300 group/fit flex items-center gap-1.5 disabled:opacity-30 disabled:pointer-events-none"
-              title={selectedObject?.type === 'image' && selectedObject?.id !== 'phone-overlay' ? 'Fit image to fill the model' : 'Select an image first'}
-            >
-              <Maximize className="w-4 h-4" />
-              <span className="text-[10px] font-black tracking-widest uppercase hidden sm:inline">Fit to Model</span>
-            </button>
-          </>
-        )}
+        <div className="w-px h-6 bg-white/10 mx-1" />
+        <button
+          onClick={handleFitToModel}
+          disabled={!selectedObject || selectedObject.type !== 'image' || selectedObject.id === 'phone-overlay'}
+          className="p-2.5 text-white/60 hover:text-primary hover:bg-primary/20 rounded-xl transition-all duration-300 group/fit flex items-center gap-1.5 disabled:opacity-30 disabled:pointer-events-none"
+          title={selectedObject?.type === 'image' && selectedObject?.id !== 'phone-overlay' ? 'Fit image to fill the model' : 'Select an image first'}
+        >
+          <Maximize className="w-4 h-4" />
+          <span className="text-[10px] font-black tracking-widest uppercase hidden sm:inline">Fit to Model</span>
+        </button>
       </div>
 
       {/* Canvas */}
@@ -779,14 +775,12 @@ function CustomizeContent() {
             />
 
             {/* Step 3 — Customize */}
-            {!isPreMadeDesign && (
-              <CustomizeSection
-                canvas={canvas}
-                selectedObject={selectedObject}
-                textColor={textColor}
-                onColorChange={setTextColor}
-              />
-            )}
+            <CustomizeSection
+              canvas={canvas}
+              selectedObject={selectedObject}
+              textColor={textColor}
+              onColorChange={setTextColor}
+            />
 
             {/* Price block — desktop only */}
             <PriceActionBlock

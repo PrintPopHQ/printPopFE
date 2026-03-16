@@ -103,10 +103,17 @@ export default function EditorControls({
     }
   }, [canvas, selectedObject, textColor]);
 
-  // ── Sync font when selected object changes ──────────────────────────────────
+  // ── Sync font and transform when selected object changes ──────────────────
   useEffect(() => {
-    if (selectedObject && (selectedObject.type === 'i-text' || selectedObject.type === 'text')) {
-      setFontFamily(selectedObject.fontFamily || 'Arial');
+    if (selectedObject) {
+      if (selectedObject.type === 'i-text' || selectedObject.type === 'text') {
+        setFontFamily(selectedObject.fontFamily || 'Arial');
+      }
+      // Sync scale (zoom) and rotation
+      // Note: scale is multiplier, so 1.0 = 100%
+      const currentScale = selectedObject.scaleX || 1;
+      setZoom(Math.round(currentScale * 100));
+      setRotation(Math.round(selectedObject.angle || 0));
     }
   }, [selectedObject]);
 

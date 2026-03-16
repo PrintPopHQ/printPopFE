@@ -362,8 +362,8 @@ export const fitImageToCanvas = (
         top,
         scaleX: scale,
         scaleY: scale,
-        selectable: false,
-        evented: false,
+        selectable: true,
+        evented: true,
       });
 
       // Clip to the safe area bounds
@@ -378,6 +378,7 @@ export const fitImageToCanvas = (
       });
 
       canvas.add(fabricImg);
+      canvas.setActiveObject(fabricImg);
       reorderLayers(canvas);
       canvas.renderAll();
 
