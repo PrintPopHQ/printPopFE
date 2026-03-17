@@ -20,7 +20,7 @@ export const TrendingStyles = ({ title }: { title?: ReactNode }) => {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
           {/* Chucking a Sickie Card */}
-          <div className="group relative rounded-3xl overflow-hidden cursor-pointer h-[350px] xl:h-[400px] transition-all duration-500 hover:shadow-[0_0_30px_rgba(92,225,230,0.2)] border border-white/5">
+          <Link href="/customize" className="group relative rounded-3xl overflow-hidden cursor-pointer h-[350px] xl:h-[400px] transition-all duration-500 hover:shadow-[0_0_30px_rgba(92,225,230,0.2)] border border-white/5 block">
             <img
               alt="Chucking a Sickie"
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 bg-white"
@@ -40,10 +40,10 @@ export const TrendingStyles = ({ title }: { title?: ReactNode }) => {
             <div className="absolute top-6 right-6 bg-black/60 backdrop-blur-xl px-4 py-1.5 rounded-full border border-white/10 shadow-2xl">
               <span className="text-[10px] font-black text-white uppercase tracking-[0.2em]">Best Seller</span>
             </div>
-          </div>
+          </Link>
 
           {/* Aussie Black Card - Elevated */}
-          <div className="group relative rounded-3xl overflow-hidden cursor-pointer h-[400px] xl:h-[500px] md:-mt-12 transition-all duration-500 hover:shadow-[0_0_40px_rgba(255,49,49,0.2)] border-2 border-transparent hover:border-secondary/30 z-20">
+          <Link href="/customize" className="group relative rounded-3xl overflow-hidden cursor-pointer h-[400px] xl:h-[500px] md:-mt-12 transition-all duration-500 hover:shadow-[0_0_40px_rgba(255,49,49,0.2)] border-2 border-transparent hover:border-secondary/30 z-20 block">
             <img
               alt="Aussie Black"
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
@@ -62,10 +62,10 @@ export const TrendingStyles = ({ title }: { title?: ReactNode }) => {
                 View Collection <span className="material-symbols-outlined text-sm ml-2">arrow_forward</span>
               </Link>
             </div>
-          </div>
+          </Link>
 
           {/* White Batman Card */}
-          <div className="group relative rounded-3xl overflow-hidden cursor-pointer h-[350px] xl:h-[400px] transition-all duration-500 hover:shadow-[0_0_30px_rgba(92,225,230,0.2)] border border-white/5">
+          <Link href="/customize" className="group relative rounded-3xl overflow-hidden cursor-pointer h-[350px] xl:h-[400px] transition-all duration-500 hover:shadow-[0_0_30px_rgba(92,225,230,0.2)] border border-white/5 block">
             <img
               alt="White Batman"
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
@@ -81,7 +81,7 @@ export const TrendingStyles = ({ title }: { title?: ReactNode }) => {
                 The dark knight in bright white.
               </p>
             </div>
-          </div>
+          </Link>
         </div>
       </div>
     </section>
