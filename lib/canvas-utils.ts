@@ -350,16 +350,9 @@ export const fitImageToCanvas = (
       const scaleY = safeArea.height / natH;
       const scale = Math.max(scaleX, scaleY);
 
-      // Calculate the top-left position so the image is CENTERED in the safe area.
-      // Using explicit pixel math avoids Fabric.js originX/originY quirks.
-      const scaledW = natW * scale;
-      const scaledH = natH * scale;
-      const left = safeArea.left + (safeArea.width - scaledW) / 2;
-      const top  = safeArea.top  + (safeArea.height - scaledH) / 2;
-
       const fabricImg = new fabric.Image(img, {
-        left,
-        top,
+        originX: 'center',
+        originY: 'center',
         scaleX: scale,
         scaleY: scale,
         selectable: true,
@@ -378,6 +371,7 @@ export const fitImageToCanvas = (
       });
 
       canvas.add(fabricImg);
+      canvas.centerObject(fabricImg);
       canvas.setActiveObject(fabricImg);
       reorderLayers(canvas);
       canvas.renderAll();

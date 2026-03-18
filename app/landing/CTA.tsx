@@ -38,15 +38,8 @@ export const CTA = () => {
             <div className="absolute inset-0 bg-linear-to-tr from-primary to-secondary blur-[80px] opacity-20 rounded-full group-hover:opacity-40 transition-opacity duration-700"></div>
             <img alt="Custom Case Builder"
               className="relative z-10 w-full rounded-2xl border-2 border-gray-700 shadow-2xl transform rotate-3 hover:rotate-0 transition-transform duration-500"
-              src={ctaCover.src} />
+              src="/assets/home-assets/1.webp" />
 
-            {/* Decorative Badge */}
-            {/* <div className="absolute -bottom-6 -right-6 bg-black/80 backdrop-blur-xl border border-white/10 p-5 rounded-2xl shadow-2xl z-20 hidden md:block group-hover:scale-110 transition-transform duration-500">
-              <div className="flex flex-col items-center gap-1">
-                <span className="text-primary font-black text-xl">100%</span>
-                <span className="text-white text-[10px] font-bold uppercase tracking-widest text-center">Satisfaction<br />Guaranteed</span>
-              </div>
-            </div> */}
           </div>
         </SectionCard>
       </div>

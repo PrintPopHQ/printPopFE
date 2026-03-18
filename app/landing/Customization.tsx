@@ -43,7 +43,7 @@ export const Customization = () => {
             <img
               alt="Custom Phone Case Builder - Create Your Own Design"
               className="relative z-10 w-full rounded-2xl border-2 border-gray-700 shadow-2xl transform rotate-3 hover:rotate-0 transition-transform duration-500"
-              src={customizationCover.src}
+              src="/assets/home-assets/3.webp"
             />
           </div>
         </SectionCard>

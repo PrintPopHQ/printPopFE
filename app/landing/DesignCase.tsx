@@ -13,7 +13,7 @@ export const DesignCase = () => {
             <div className="absolute inset-0 bg-linear-to-tr from-primary to-secondary blur-[80px] opacity-20 rounded-full group-hover:opacity-40 transition-opacity duration-700"></div>
             <img alt="Custom Case Builder"
               className="relative z-10 w-full object-cover h-[537px] rounded-2xl border-2 border-gray-700 shadow-2xl transform rotate-3 hover:rotate-0 transition-transform duration-500"
-              src={designCase.src} />
+              src="/assets/home-assets/2.webp" />
           </div>
 
           {/* Center Line (Desktop Only) */}

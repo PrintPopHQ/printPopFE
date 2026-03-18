@@ -15,7 +15,7 @@ export const PopularProducts = () => {
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-20 animate-in fade-in slide-in-from-bottom-4 duration-1000">
           <h2 className="font-neon text-3xl md:text-4xl font-bold text-white mb-6 tracking-tighter">
-                <span className="text-neon-red">POPULAR</span> <span className="text-shadow-[0_0_30px_#FF2E63]">PRODUCTS</span>
+            <span className="text-neon-red">POPULAR</span> <span className="text-shadow-[0_0_30px_#FF2E63]">PRODUCTS</span>
           </h2>
           <div className="h-1.5 w-24 bg-linear-to-r from-primary to-secondary mx-auto rounded-full shadow-[0_0_10px_rgba(92,225,230,0.5)]"></div>
         </div>
@@ -26,7 +26,7 @@ export const PopularProducts = () => {
             <img
               alt="Cyberpunk Collection"
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-              src={printpop_popular_group1.src}
+              src="/assets/pair-assets/1.webp"
             />
             <div className="absolute inset-0 bg-linear-to-t from-black via-black/60 to-transparent opacity-90 transition-opacity group-hover:opacity-100"></div>
 
@@ -37,7 +37,7 @@ export const PopularProducts = () => {
               <p className="text-gray-300 font-comic text-sm mb-6 opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500 line-clamp-2">
                 (Prices For non magnetic (60$) and magnetic (70$))
               </p>
-              <Link href="/customize?g=2&c=1" className="inline-flex items-center text-primary font-bold uppercase tracking-widest text-xs border-b-2 border-primary/30 hover:border-primary pb-1 transition-all duration-300">
+              <Link href="/customize?g=2&c=1&fresh=1" className="inline-flex items-center text-primary font-bold uppercase tracking-widest text-xs border-b-2 border-primary/30 hover:border-primary pb-1 transition-all duration-300">
                 start designing <span className="material-symbols-outlined text-sm ml-2">arrow_forward</span>
               </Link>
             </div>
@@ -52,7 +52,7 @@ export const PopularProducts = () => {
             <img
               alt="Vaporwave Collection"
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-              src={printpop_popular_group2.src}
+              src="/assets/pair-assets/2.webp"
             />
             <div className="absolute inset-0 bg-linear-to-t from-black via-black/60 to-transparent opacity-90 transition-opacity group-hover:opacity-100"></div>
 
@@ -63,7 +63,7 @@ export const PopularProducts = () => {
               <p className="text-gray-300 font-comic text-sm mb-6 opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500 line-clamp-2">
                 Non magnetic (90$) and magnetic (105$)
               </p>
-              <Link href="/customize?g=3&c=1" className="inline-flex items-center text-secondary font-bold uppercase tracking-widest text-xs border-b-2 border-secondary/30 hover:border-secondary pb-1 transition-all duration-300">
+              <Link href="/customize?g=3&c=1&fresh=1" className="inline-flex items-center text-secondary font-bold uppercase tracking-widest text-xs border-b-2 border-secondary/30 hover:border-secondary pb-1 transition-all duration-300">
                 start designing <span className="material-symbols-outlined text-sm ml-2">arrow_forward</span>
               </Link>
             </div>
@@ -74,7 +74,7 @@ export const PopularProducts = () => {
             <img
               alt="Minimal Neon Collection"
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-              src={printpop_popular_group3.src}
+              src="/assets/pair-assets/3.webp"
             />
             <div className="absolute inset-0 bg-linear-to-t from-black via-black/60 to-transparent opacity-90 transition-opacity group-hover:opacity-100"></div>
 
@@ -85,7 +85,7 @@ export const PopularProducts = () => {
               <p className="text-gray-300 font-comic text-sm mb-6 opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500 line-clamp-2">
                 Non magnetic (115$) and magnetic (135$)
               </p>
-              <Link href="/customize?g=4&c=1" className="inline-flex items-center text-primary font-bold uppercase tracking-widest text-xs border-b-2 border-primary/30 hover:border-primary pb-1 transition-all duration-300">
+              <Link href="/customize?g=4&c=1&fresh=1" className="inline-flex items-center text-primary font-bold uppercase tracking-widest text-xs border-b-2 border-primary/30 hover:border-primary pb-1 transition-all duration-300">
                 start designing <span className="material-symbols-outlined text-sm ml-2">arrow_forward</span>
               </Link>
             </div>

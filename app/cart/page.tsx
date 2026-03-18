@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import RemoveCartItemModal from '@/components/modals/RemoveCartItemModal';
+import OrderSuccessModal from '@/components/modals/OrderSuccessModal';
 import { isLoggedIn, getUser, getGuestEmail, getAccessToken } from '@/lib/auth-store';
 import { toast } from 'sonner';
 import { useCheckoutMutation } from '@/packages/Mutations';
@@ -30,6 +31,7 @@ export default function CartPage() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isMounted, setIsMounted] = useState(false);
   const [itemToRemove, setItemToRemove] = useState<string | null>(null);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const checkoutMutation = useCheckoutMutation();
 
   useEffect(() => {
@@ -98,31 +100,32 @@ export default function CartPage() {
       { cartItems, email, accessToken: getAccessToken() ?? undefined },
       {
         onSuccess: ({ checkoutUrl }) => {
+          toast.dismiss('checkout');
           localStorage.removeItem('printpop_cart');
           window.dispatchEvent(new Event('cart_updated'));
           setCartItems([]);
           if (!isLoggedIn()) localStorage.removeItem('printpop_guest_email');
 
-          toast.success('Order created!', {
-            id: 'checkout',
-            description: 'Redirecting you to checkout…',
-          });
-
-          // Programmatic anchor click avoids popup-blocker issues after async work
-          const a = document.createElement('a');
-          a.href = checkoutUrl;
-          a.target = '_blank';
-          a.rel = 'noopener noreferrer';
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
+          setShowSuccessModal(true);
+          
+          // Delay redirect slightly to ensure modal is visible
+          setTimeout(() => {
+            const a = document.createElement('a');
+            a.href = checkoutUrl;
+            a.target = '_blank';
+            a.rel = 'noopener noreferrer';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+          }, 800);
         },
         onError: (err: unknown) => {
+          toast.dismiss('checkout');
           const message =
             (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
             (err as Error)?.message ||
             'Something went wrong.';
-          toast.error('Checkout failed', { id: 'checkout', description: message });
+          toast.error('Checkout failed', { description: message });
         },
       }
     );
@@ -286,6 +289,11 @@ export default function CartPage() {
             setItemToRemove(null);
           }
         }}
+      />
+
+      <OrderSuccessModal
+        isOpen={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
       />
     </div>
   );

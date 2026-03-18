@@ -18,7 +18,7 @@ export function PageHeader({ head, description }: PageHeaderProps) {
         <h1 className="text-5xl md:text-7xl font-bold font-neon tracking-wide mb-2 text-transparent bg-clip-text" style={{ backgroundImage: "linear-gradient(90deg, #FFFFFF 0%, #9CA3AF 100%)" }}>
           {head}
         </h1>
-        <p className="text-[#4B5563] font-comic text-sm md:text-base tracking-wide opacity-80 leading-relaxed">
+        <p className="text-[#9CA3AF] font-comic text-sm md:text-base tracking-wide opacity-70 leading-relaxed">
           {description}
         </p>
       </div>

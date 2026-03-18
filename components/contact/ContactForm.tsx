@@ -15,14 +15,15 @@ export function ContactForm() {
       firstName: "",
       lastName: "",
       email: "",
-      orderNumber: "",
+      referenceType: "order",
+      referenceNumber: "",
       description: "",
     },
     validationSchema: Yup.object({
       firstName: Yup.string().required("First Name is required"),
       lastName: Yup.string().required("Last Name is required"),
       email: Yup.string().email("Invalid email address").required("Email is required"),
-      orderNumber: Yup.string().required("Order Number is required"),
+      referenceNumber: Yup.string(),
       description: Yup.string().required("Description is required"),
     }),
     onSubmit: async (values) => {
@@ -30,7 +31,8 @@ export function ContactForm() {
         const payload = {
           full_name: `${values.firstName} ${values.lastName}`.trim(),
           email: values.email,
-          order_number: values.orderNumber,
+          order_number: values.referenceNumber,
+          reference_type: values.referenceType,
           description: values.description,
         };
 
@@ -95,18 +97,37 @@ export function ContactForm() {
       </div>
 
       <div className="space-y-1">
-        <label className="text-sm font-medium text-white">Order Number*</label>
-        <Input
-          name="orderNumber"
-          type="text"
-          placeholder="Enter your Order Number"
-          className="bg-[#0B1C32] border-[#494949] h-12 rounded-xl text-white placeholder:text-gray-500 focus-visible:ring-primary"
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          value={formik.values.orderNumber}
-        />
-        {formik.touched.orderNumber && formik.errors.orderNumber ? (
-          <div className="text-red-500 text-xs mt-1">{formik.errors.orderNumber}</div>
+        <label className="text-sm font-medium text-white">
+          {formik.values.referenceType === "order" ? "Order Number" : "Franchise Number"}
+        </label>
+        <div className="flex gap-2">
+          <div className="relative w-36 shrink-0">
+            <select
+              name="referenceType"
+              className="w-full bg-[#0B1C32] border border-[#494949] h-12 rounded-xl text-white pl-4 pr-8 focus:outline-none focus:ring-1 focus:ring-primary focus:border-[#494949] text-xs appearance-none cursor-pointer"
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              value={formik.values.referenceType}
+            >
+              <option value="order" className="bg-[#0B1C32]">Order #</option>
+              <option value="franchise" className="bg-[#0B1C32]">Franchise #</option>
+            </select>
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+               <span className="material-symbols-outlined text-base">keyboard_arrow_down</span>
+            </div>
+          </div>
+          <Input
+            name="referenceNumber"
+            type="text"
+            placeholder={`Enter ${formik.values.referenceType === "order" ? "Order" : "Franchise"} Number`}
+            className="bg-[#0B1C32] border-[#494949] h-12 rounded-xl text-white placeholder:text-gray-500 focus-visible:ring-primary flex-1"
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            value={formik.values.referenceNumber}
+          />
+        </div>
+        {formik.touched.referenceNumber && formik.errors.referenceNumber ? (
+          <div className="text-red-500 text-xs mt-1">{formik.errors.referenceNumber}</div>
         ) : null}
       </div>
 

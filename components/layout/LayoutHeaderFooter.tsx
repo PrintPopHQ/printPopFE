@@ -12,9 +12,9 @@ export function LayoutHeaderFooter({ children }: { children: React.ReactNode }) 
 
   return (
     <>
-      {!isAuthRoute && <Navbar />}
+      <Navbar />
       {children}
-      {!isAuthRoute && <Footer />}
+      <Footer />
     </>
   );
 }

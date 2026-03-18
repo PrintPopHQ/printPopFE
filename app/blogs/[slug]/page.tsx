@@ -4,14 +4,15 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Search, Flame, ArrowLeft, Calendar, User } from 'lucide-react';
+import { BlogSidebar } from '@/components/blogs/BlogSidebar';
 import type { Blog } from '@/services/ApiService';
 
 /* ─── Constants ──────────────────────────────────────────────────────── */
 const BASE_URL = 'https://printpop-be.onrender.com';
 
-const trendingTopics = [
-  '#NeonVibes', '#PhoneSafety', '#CustomArt', '#AndroidMods', '#iPhone15', '#Sustainable',
-];
+// const trendingTopics = [
+//   '#NeonVibes', '#PhoneSafety', '#CustomArt', '#AndroidMods', '#iPhone15', '#Sustainable',
+// ];
 
 /* ─── Fetch helper ───────────────────────────────────────────────────── */
 async function fetchBlog(slug: string): Promise<Blog | null> {
@@ -149,68 +150,7 @@ export default async function BlogDetailPage({
           </article>
 
           {/* ── Sidebar ── */}
-          <aside className="w-full lg:w-[280px] shrink-0">
-            <div className="sticky top-24 space-y-5">
-
-              {/* Search */}
-              <div className="bg-white rounded-2xl p-5 shadow-lg border border-gray-100">
-                <h3 className="text-black font-bold text-sm mb-3 tracking-widest uppercase">
-                  Search Posts
-                </h3>
-                <form action="/blogs/search" method="GET">
-                  <div className="relative">
-                    <Search
-                      className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
-                      size={15}
-                    />
-                    <input
-                      type="text"
-                      name="q"
-                      placeholder="Keywords..."
-                      className="w-full pl-9 pr-4 h-10 rounded-xl bg-gray-50 border border-gray-200 text-black text-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-[#5CE1E6]"
-                    />
-                  </div>
-                </form>
-              </div>
-
-              {/* Trending Topics */}
-              <div className="bg-white rounded-2xl p-5 shadow-lg border border-gray-100 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-24 h-24 bg-linear-to-br from-[#5CE1E6]/20 to-[#FF3366]/20 blur-3xl rounded-full -mr-12 -mt-12 pointer-events-none" />
-                <div className="absolute bottom-0 left-0 w-24 h-24 bg-linear-to-tr from-[#5CE1E6]/20 to-[#FF3366]/20 blur-3xl rounded-full -ml-12 -mb-12 pointer-events-none" />
-                <h3 className="text-black font-bold text-sm mb-3 tracking-widest uppercase flex items-center gap-2 relative z-10">
-                  <Flame className="text-[#FF3366]" size={16} />
-                  Trending Topics
-                </h3>
-                <div className="flex flex-wrap gap-2 relative z-10">
-                  {trendingTopics.map((topic) => (
-                    <span
-                      key={topic}
-                      className="text-xs font-semibold text-gray-600 bg-gray-100 px-2.5 py-1 rounded-full hover:bg-gray-200 hover:text-black transition-colors cursor-pointer"
-                    >
-                      {topic}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              {/* Back to all posts CTA */}
-              <div className="bg-[#1A1A1A] rounded-2xl p-5 border border-[#2D2D2D] relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-28 h-28 bg-[#FF3366]/10 blur-3xl rounded-full pointer-events-none" />
-                <p className="text-white font-bold text-sm mb-1.5 relative z-10">Explore More Posts</p>
-                <p className="text-[#9CA3AF] text-xs font-comic mb-4 relative z-10">
-                  Discover more tips, trends, and stories from the PrintPop world.
-                </p>
-                <Link
-                  href="/blogs"
-                  className="relative z-10 inline-flex items-center gap-2 bg-[#FF3366] hover:bg-[#FF3366]/85 text-white text-xs font-bold px-4 py-2 rounded-xl transition-colors shadow-[0_0_12px_rgba(255,51,102,0.3)]"
-                >
-                  <ArrowLeft size={13} />
-                  All Posts
-                </Link>
-              </div>
-
-            </div>
-          </aside>
+          <BlogSidebar showBackCTA />
 
         </div>
       </div>

@@ -3,6 +3,7 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Search, Flame } from 'lucide-react';
+import { BlogSidebar } from '@/components/blogs/BlogSidebar';
 import type { Blog, BlogMeta } from '@/services/ApiService';
 
 /* ─── SEO ────────────────────────────────────────────────────────────── */
@@ -22,9 +23,9 @@ export const metadata: Metadata = {
 const LIMIT = 6;
 const BASE_URL = 'https://printpop-be.onrender.com';
 
-const trendingTopics = [
-  '#NeonVibes', '#PhoneSafety', '#CustomArt', '#AndroidMods', '#iPhone15', '#Sustainable',
-];
+// const trendingTopics = [
+//   '#NeonVibes', '#PhoneSafety', '#CustomArt', '#AndroidMods', '#iPhone15', '#Sustainable',
+// ];
 
 /* ─── Fetch helper ───────────────────────────────────────────────────── */
 async function fetchBlogs(
@@ -211,71 +212,7 @@ export default async function BlogPage({
           </div>
 
           {/* ── Right Column: Sidebar ── */}
-          <div className="w-full lg:w-[320px] shrink-0 space-y-6">
-            <div className="sticky top-24 space-y-6">
-
-              {/* Search Widget */}
-              <div className="bg-white rounded-2xl p-6 shadow-lg shadow-white/5 border border-gray-100">
-                <h3 className="text-black font-bold text-lg mb-4 tracking-wider uppercase">Search Posts</h3>
-                <form action="/blogs/search" method="GET">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={18} />
-                    <input
-                      type="text"
-                      name="q"
-                      placeholder="Keywords..."
-                      className="w-full pl-10 pr-4 h-11 rounded-xl bg-gray-50 border border-gray-200 text-black placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-[#5CE1E6]"
-                    />
-                  </div>
-                </form>
-              </div>
-
-              {/* Trending Topics */}
-              <div className="bg-white rounded-2xl p-6 shadow-lg shadow-white/5 border border-gray-100 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-linear-to-br from-[#5CE1E6]/20 to-[#FF3366]/20 blur-3xl rounded-full -mr-16 -mt-16 pointer-events-none" />
-                <div className="absolute bottom-0 left-0 w-32 h-32 bg-linear-to-tr from-[#5CE1E6]/20 to-[#FF3366]/20 blur-3xl rounded-full -ml-16 -mb-16 pointer-events-none" />
-                <h3 className="text-black font-bold text-lg mb-4 tracking-wider uppercase flex items-center gap-2 relative z-10">
-                  <Flame className="text-[#FF3366]" size={20} />
-                  Trending Topics
-                </h3>
-                <div className="flex flex-wrap gap-2 relative z-10">
-                  {trendingTopics.map((topic) => (
-                    <span
-                      key={topic}
-                      className="text-xs font-semibold text-gray-600 bg-gray-100 px-3 py-1.5 rounded-full hover:bg-gray-200 hover:text-black transition-colors cursor-pointer"
-                    >
-                      {topic}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              {/* Newsletter – client island */}
-              {/* <NewsletterWidget /> */}
-
-              {/* Social Widget */}
-              {/* <div className="bg-white rounded-2xl p-6 shadow-lg shadow-white/5 border border-gray-100">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-black font-bold text-lg tracking-wider uppercase">@PRINTPOP</h3>
-                  <Camera className="text-[#FF3366]" size={20} />
-                </div>
-                <div className="grid grid-cols-3 gap-2">
-                  {[1, 2, 3, 4, 5, 6].map((idx) => (
-                    <div key={idx} className="aspect-square bg-gray-200 rounded-lg overflow-hidden group relative cursor-pointer">
-                      <Image
-                        src={`https://images.unsplash.com/photo-${1500000000000 + idx}?q=80&w=200&auto=format&fit=crop`}
-                        alt={`Social post ${idx}`}
-                        fill
-                        className="object-cover transition-transform duration-500 group-hover:scale-110"
-                      />
-                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
-                    </div>
-                  ))}
-                </div>
-              </div> */}
-
-            </div>
-          </div>
+          <BlogSidebar />
 
         </div>
       </div>
