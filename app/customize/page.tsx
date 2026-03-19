@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import SelectionModals from '@/components/modals/SelectionModals';
 import { GuestEmailModal } from '@/components/modals/GuestEmailModal';
+import { toast } from 'sonner';
 import { useGetModels } from '@/packages/Queries';
 import { isLoggedIn, getUser, getGuestEmail } from '@/lib/auth-store';
 import { TrendingStyles } from '@/app/landing/TrendingStyles';
@@ -249,6 +250,7 @@ function PriceActionBlock({
   className,
   selectedObject,
   isPreMadeDesign,
+  hasCustomization,
 }: {
   price: number;
   canvas: any;
@@ -256,6 +258,7 @@ function PriceActionBlock({
   className?: string;
   selectedObject: any;
   isPreMadeDesign?: boolean;
+  hasCustomization: boolean;
 }) {
   return (
     <div
@@ -283,7 +286,7 @@ function PriceActionBlock({
         size="lg"
         className="w-full h-14 text-xs font-neon font-black btn-brand-gradient text-white rounded-xl shadow-[0_0_25px_rgba(255,49,49,0.3)] hover:shadow-[0_0_40px_rgba(255,49,49,0.5)] transition-all duration-500 group uppercase tracking-[0.2em]"
         onClick={onAddToCart}
-        disabled={!canvas || (!isPreMadeDesign && !selectedObject)}
+        disabled={!canvas || (!isPreMadeDesign && !hasCustomization)}
       >
         ADD TO CART
         <svg
@@ -412,7 +415,7 @@ function CanvasPreviewArea({
 
         <div className="w-px h-6 bg-white/10 mx-1 hidden lg:block" />
         <p className="text-primary text-xs font-bold tracking-widest uppercase hidden lg:block">Device Settings</p>
-        
+
         {/* Fit to Model button */}
         <div className="w-px h-6 bg-white/10 mx-1" />
         <button
@@ -512,6 +515,7 @@ function CustomizeContent() {
   const [showGuestModal, setShowGuestModal] = useState(false);
   // Holds a pending cart item while waiting for guest email
   const [pendingCartItem, setPendingCartItem] = useState<any | null>(null);
+  const [hasCustomization, setHasCustomization] = useState(false);
 
   const loadingDesignRef = useRef<string | null>(null);
 
@@ -597,6 +601,18 @@ function CustomizeContent() {
 
   const currentPrice = caseType === 'Magnetic' ? 40 : 35;
 
+  const updateCustomizationState = (c: any) => {
+    const objects = c.getObjects();
+    const userObjects = objects.filter(
+      (obj: any) =>
+        obj.id !== 'phone-overlay' &&
+        obj.id !== 'background-layer' &&
+        obj.id !== 'safe-area' &&
+        obj.id !== 'safe-area-outline'
+    );
+    setHasCustomization(userObjects.length > 0);
+  };
+
   const buildCartItem = async (email?: string) => {
     return {
       id: crypto.randomUUID(),
@@ -606,9 +622,11 @@ function CustomizeContent() {
       textColor,
       price: currentPrice,
       // image: full canvas preview/mockup (complete design)
-      image: exportCanvasAsImage(canvas, 'jpeg', 1),
+      // Use lower resolution (1x) and JPEG for localStorage to save space (prevents QuotaExceededError)
+      image: exportCanvasAsImage(canvas, 'jpeg', 0.7, 1),
       // customImage: the artwork itself (user upload + text, no phone frame)
-      customImage: await exportArtworkOnly(canvas, 'png', 1),
+      // Use lower resolution (1x) and JPEG for localStorage to save space
+      customImage: await exportArtworkOnly(canvas, 'jpeg', 0.7, 1),
       quantity: 1,
       // attach user email (logged-in or guest) for order tracking
       ...(email ? { guestEmail: email } : {}),
@@ -627,11 +645,17 @@ function CustomizeContent() {
       } catch (e) {
         // Storage quota hit — clear stale cart and retry with just this item
         console.warn('Cart storage full, clearing old items and retrying.', e);
+        toast.error('Cart Storage Full', {
+          description: 'Clearing old items to make room for your new design.',
+        });
         try {
           localStorage.removeItem('printpop_cart');
           localStorage.setItem('printpop_cart', JSON.stringify([item]));
         } catch (e2) {
           console.error('Could not save cart item even after clearing storage.', e2);
+          toast.error('Storage Exhausted', {
+            description: 'Your design is too large to save. Try using a smaller image.',
+          });
           return;
         }
       }
@@ -699,7 +723,7 @@ function CustomizeContent() {
 
       // Clear any existing user content before adding the pre-made design
       clearCanvas(loadedCanvas, true);
-      
+
       fitImageToCanvas(loadedCanvas, designUrl, safeArea).finally(() => {
         // Reset ref after load completes (or fails) so it can be re-loaded if needed later
         // Use a timeout to prevent immediate double-triggering if effect runs twice
@@ -716,6 +740,12 @@ function CustomizeContent() {
     if (uploadedImg) {
       fitSelectedImageToSafeArea(loadedCanvas, uploadedImg, safeArea);
     }
+
+    // Attach listeners to track customization
+    loadedCanvas.on('object:added', () => updateCustomizationState(loadedCanvas));
+    loadedCanvas.on('object:removed', () => updateCustomizationState(loadedCanvas));
+    // Initial check
+    updateCustomizationState(loadedCanvas);
   };
 
   // ── Render ────────────────────────────────────────────────────────────────
@@ -815,6 +845,7 @@ function CustomizeContent() {
               className="hidden lg:block"
               selectedObject={selectedObject}
               isPreMadeDesign={isPreMadeDesign}
+              hasCustomization={hasCustomization}
             />
           </div>
 
@@ -839,6 +870,7 @@ function CustomizeContent() {
               className="lg:hidden mt-4"
               selectedObject={selectedObject}
               isPreMadeDesign={isPreMadeDesign}
+              hasCustomization={hasCustomization}
             />
           </div>
         </div>

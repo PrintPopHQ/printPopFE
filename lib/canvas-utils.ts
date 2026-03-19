@@ -453,12 +453,13 @@ export const updateObjectFontFamily = (
 export const exportCanvasAsImage = (
   canvas: any,
   format: 'png' | 'jpeg' = 'png',
-  quality: number = 1
+  quality: number = 1,
+  multiplier: number = 2
 ): string => {
   return canvas.toDataURL({
     format,
     quality,
-    multiplier: 2, // 2x resolution for better print quality
+    multiplier, // Default to 2x for print, can be lowered for preview
   });
 };
 
@@ -474,7 +475,8 @@ export const exportCanvasAsImage = (
 export const exportArtworkOnly = (
   canvas: any,
   format: 'png' | 'jpeg' = 'png',
-  quality: number = 1
+  quality: number = 1,
+  resolutionMultiplier: number = 2
 ): Promise<string> => {
   if (!canvas) return Promise.resolve('');
 
@@ -502,9 +504,9 @@ export const exportArtworkOnly = (
   const cropW = (safeArea?.width ?? canvas.width) * dpRatio;
   const cropH = (safeArea?.height ?? canvas.height) * dpRatio;
 
-  // Build an offscreen canvas at 2× the safe-area size for high print quality
-  const outputW = Math.round(cropW * 2);
-  const outputH = Math.round(cropH * 2);
+  // Build an offscreen canvas at the requested scale
+  const outputW = Math.round(cropW * resolutionMultiplier);
+  const outputH = Math.round(cropH * resolutionMultiplier);
   const offscreen = document.createElement('canvas');
   offscreen.width = outputW;
   offscreen.height = outputH;

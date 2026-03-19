@@ -32,9 +32,6 @@ export default function CartPage() {
   const [isMounted, setIsMounted] = useState(false);
   const [itemToRemove, setItemToRemove] = useState<string | null>(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [postcode, setPostcode] = useState('');
-  const [shipping, setShipping] = useState<number | null>(null);
-  const [isCalculatingShipping, setIsCalculatingShipping] = useState(false);
   const checkoutMutation = useCheckoutMutation();
 
   useEffect(() => {
@@ -78,40 +75,6 @@ export default function CartPage() {
     });
   };
 
-  // ── Shipping Calculation ────────────────────────────────────────────────────
-
-  const calculateShipping = async (code: string) => {
-    if (code.length !== 4) return;
-    
-    setIsCalculatingShipping(true);
-    try {
-      const resp = await fetch('/api/shipping/calculate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ postcode: code }),
-      });
-      const result = await resp.json();
-      if (resp.ok && result?.data?.shippingCost !== undefined) {
-        setShipping(result.data.shippingCost);
-      } else {
-        toast.error(result?.message || 'Failed to calculate shipping');
-        setShipping(null);
-      }
-    } catch (err) {
-      console.error('Shipping calc error:', err);
-      toast.error('Connection error while calculating shipping');
-    } finally {
-      setIsCalculatingShipping(false);
-    }
-  };
-
-  useEffect(() => {
-    if (postcode.length === 4) {
-      calculateShipping(postcode);
-    } else {
-      setShipping(null);
-    }
-  }, [postcode]);
 
   // ── Checkout ────────────────────────────────────────────────────────────────
 
@@ -145,7 +108,7 @@ export default function CartPage() {
           if (!isLoggedIn()) localStorage.removeItem('printpop_guest_email');
 
           setShowSuccessModal(true);
-          
+
           // Delay redirect slightly to ensure modal is visible
           setTimeout(() => {
             const a = document.createElement('a');
@@ -172,8 +135,7 @@ export default function CartPage() {
   // ── Derived totals ───────────────────────────────────────────────────────────
 
   const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
-  const currentShipping = shipping || 0;
-  const total = subtotal + currentShipping;
+  const total = subtotal;
 
   if (!isMounted) return <div className="min-h-screen bg-[#000000]" />;
 
@@ -284,31 +246,6 @@ export default function CartPage() {
                     <span className="text-[#9CA3AF]">${subtotal.toFixed(2)}</span>
                   </div>
 
-                  <div className="space-y-3 pt-4 border-t border-[#333333]">
-                    <div className="flex justify-between items-center text-sm">
-                      <span className="text-[#9CA3AF]">Shipping (AUS Post)</span>
-                      {isCalculatingShipping ? (
-                        <Loader2 size={16} className="animate-spin text-[#5CE1E6]" />
-                      ) : (
-                        <span className={cn("font-medium", shipping !== null ? "text-[#5CE1E6]" : "text-gray-600 italic")}>
-                          {shipping !== null ? `$${shipping.toFixed(2)}` : "Enter Postcode"}
-                        </span>
-                      )}
-                    </div>
-                    
-                    <div className="relative group/postcode">
-                      <input
-                        type="text"
-                        placeholder="Enter Postcode (e.g. 2000)"
-                        value={postcode}
-                        onChange={(e) => setPostcode(e.target.value.replace(/\D/g, '').slice(0, 4))}
-                        className="w-full h-10 bg-transparent border border-[#333333] rounded-lg px-4 text-sm text-white focus:outline-none focus:border-[#5CE1E6] transition-colors placeholder:text-gray-600"
-                      />
-                      <div className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-gray-500 font-bold uppercase tracking-tight pointer-events-none group-focus-within/postcode:text-[#5CE1E6] transition-colors">
-                        Postcode
-                      </div>
-                    </div>
-                  </div>
 
                   <div className="h-px w-full bg-[#333333] my-6" />
 
@@ -321,10 +258,10 @@ export default function CartPage() {
                 <Button
                   size="lg"
                   onClick={handleCheckout}
-                  disabled={checkoutMutation.isPending || shipping === null || cartItems.length === 0}
+                  disabled={checkoutMutation.isPending || cartItems.length === 0}
                   className={cn(
                     "w-full h-12 text-sm font-semibold capitalize tracking-wide rounded-xl text-white transition-opacity hover:opacity-90",
-                    (shipping === null || cartItems.length === 0) ? "bg-gray-800 text-gray-400" : "bg-linear-to-r from-[#5CE1E6] to-[#FF3131]"
+                    cartItems.length === 0 ? "bg-gray-800 text-gray-400" : "bg-linear-to-r from-[#5CE1E6] to-[#FF3131]"
                   )}
                 >
                   {checkoutMutation.isPending ? (
@@ -332,7 +269,7 @@ export default function CartPage() {
                       <Loader2 size={16} className="animate-spin" />
                       Processing…
                     </span>
-                  ) : shipping === null && cartItems.length > 0 ? 'Enter Postcode' : 'checkout'}
+                  ) : 'checkout'}
                 </Button>
               </div>
             </div>
