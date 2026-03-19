@@ -26,7 +26,7 @@ export const PopularProducts = () => {
             <img
               alt="Cyberpunk Collection"
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-              src="/assets/pair-assets/1.webp"
+              src="/assets/pair-assets/2.webp"
             />
             <div className="absolute inset-0 bg-linear-to-t from-black via-black/60 to-transparent opacity-90 transition-opacity group-hover:opacity-100"></div>
 
@@ -52,7 +52,7 @@ export const PopularProducts = () => {
             <img
               alt="Vaporwave Collection"
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-              src="/assets/pair-assets/2.webp"
+              src="/assets/pair-assets/1.webp"
             />
             <div className="absolute inset-0 bg-linear-to-t from-black via-black/60 to-transparent opacity-90 transition-opacity group-hover:opacity-100"></div>
 

@@ -357,7 +357,7 @@ function CanvasPreviewArea({
   };
 
   return (
-    <div className="flex-1 bg-black/40 border border-border-subtle rounded-[2.5rem] relative flex flex-col items-center justify-center p-8 backdrop-blur-sm overflow-hidden min-h-[600px] shadow-inner">
+    <div className="flex-1 bg-black/40 border border-border-subtle rounded-[2.5rem] relative flex flex-col items-center justify-center p-8 backdrop-blur-sm min-h-[600px] shadow-inner">
       {/* Corner glow accents */}
       <div className="absolute top-10 left-10 w-16 h-16 border-t-2 border-l-2 border-primary/40 rounded-tl-2xl shadow-[-10px_-10px_30px_-10px_rgba(92,225,230,0.4)]" />
       <div className="absolute top-10 right-10 w-16 h-16 border-t-2 border-r-2 border-secondary/40 rounded-tr-2xl shadow-[10px_-10px_30px_-10px_rgba(255,49,49,0.4)]" />
@@ -428,8 +428,7 @@ function CanvasPreviewArea({
 
       {/* Canvas */}
       <div
-        className="scale-[0.80] sm:scale-[0.85] md:scale-90 transition-transform relative bg-transparent overflow-hidden my-16 z-20"
-        style={{ borderRadius: phoneModel.safeArea.rx }}
+        className="scale-[0.80] sm:scale-[0.85] md:scale-90 transition-transform relative bg-transparent my-16 z-20"
       >
         <CanvasEditor
           phoneModel={phoneModel}
@@ -514,6 +513,8 @@ function CustomizeContent() {
   // Holds a pending cart item while waiting for guest email
   const [pendingCartItem, setPendingCartItem] = useState<any | null>(null);
 
+  const loadingDesignRef = useRef<string | null>(null);
+
   const { data: modelsResponse, isLoading: isLoadingModels } = useGetModels(brand || '');
   const models = (modelsResponse as any)?.data ?? [];
 
@@ -554,7 +555,10 @@ function CustomizeContent() {
 
     if (!selected) return;
 
-    if (!localModelId) setLocalModelId(selected.id);
+    if (!localModelId) {
+      setLocalModelId(selected.id);
+      return; // Wait for next tick with selected ID
+    }
 
     const newSafeArea = {
       left: 0,
@@ -565,18 +569,28 @@ function CustomizeContent() {
       ry: selected.model_radius,
     };
 
-    setPhoneModel({
-      id: selected.id,
-      name: selected.name,
-      displayName: selected.name,
-      image: selected.model_pic,
-      canvasWidth: 320,
-      canvasHeight: 720,
-      safeArea: newSafeArea,
-      price: 35.0,
+    // Use functional update or equality check to prevent redundant re-renders
+    setPhoneModel((prev) => {
+      const next = {
+        id: selected.id,
+        name: selected.name,
+        displayName: selected.name,
+        image: selected.model_pic,
+        canvasWidth: 320,
+        canvasHeight: 720,
+        safeArea: newSafeArea,
+        price: 35.0,
+      };
+      // Simple shallow equality check for the relevant parts
+      if (prev?.id === next.id && prev?.image === next.image) return prev;
+      return next;
     });
 
-    setCaseType(selected.case_types?.[0] ?? 'Non-Magnetic');
+    setCaseType((prev) => {
+      const nextType = selected.case_types?.[0] ?? 'Non-Magnetic';
+      if (prev === nextType) return prev;
+      return nextType;
+    });
   }, [localModelId, models]);
 
   // ── Handlers ─────────────────────────────────────────────────────────────
@@ -679,9 +693,20 @@ function CustomizeContent() {
     // ── Auto-load pre-made design ──────────────────────────────────────────
     const designUrl = searchParams.get('design_url');
     if (designUrl) {
+      // Prevent concurrent loads of the same design URL
+      if (loadingDesignRef.current === designUrl) return;
+      loadingDesignRef.current = designUrl;
+
       // Clear any existing user content before adding the pre-made design
       clearCanvas(loadedCanvas, true);
-      fitImageToCanvas(loadedCanvas, designUrl, safeArea);
+      
+      fitImageToCanvas(loadedCanvas, designUrl, safeArea).finally(() => {
+        // Reset ref after load completes (or fails) so it can be re-loaded if needed later
+        // Use a timeout to prevent immediate double-triggering if effect runs twice
+        setTimeout(() => {
+          loadingDesignRef.current = null;
+        }, 500);
+      });
       return;
     }
 

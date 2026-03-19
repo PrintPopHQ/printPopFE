@@ -4,6 +4,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { MapPin, Mail, Phone, Clock, Linkedin, Facebook, Instagram, Youtube } from "lucide-react";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { ContactForm } from "@/components/contact/ContactForm";
+import { LocationsSection } from "./LocationsSection";
+
 
 export default function ContactPage() {
   return (
@@ -20,14 +22,11 @@ export default function ContactPage() {
         />
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 w-full pt-16 pb-24 flex flex-col lg:flex-row gap-16 justify-between items-center">
+      <LocationsSection />
 
+      <div className="max-w-7xl mx-auto px-4 w-full pt-16 pb-24 flex flex-col lg:flex-row gap-16 justify-between items-center">
         {/* Left Form Section */}
         <div className="w-full lg:w-[55%] flex flex-col relative">
-          <h2 className="text-4xl font-black tracking-widest font-neon mb-6 z-10">
-            <span className="text-shadow-[0_0_30px_#FF3131]">PRINTPOP</span> <span className="text-neon-red">LOCATIONS</span>
-          </h2>
-
           <Card className="bg-[#112238] border-none shadow-2xl rounded-2xl w-full grow">
             <CardContent className="p-8 md:p-10 font-sans">
               <div className="space-y-2 mb-2">
@@ -43,6 +42,9 @@ export default function ContactPage() {
         {/* Right Info Section */}
         <div className="w-full lg:w-[45%] flex flex-col justify-start lg:pl-8 pt-16 lg:pt-24 mt-4 lg:mt-0 font-montserrat">
 
+          <h2 className="text-4xl font-black tracking-widest font-neon mb-6 z-10">
+            <span className="text-shadow-[0_0_30px_#FF3131]">CONTACT</span> <span className="text-neon-red">US</span>
+          </h2>
           <div className="space-y-8">
             <div className="flex items-center gap-4">
               <MapPin className="w-6 h-6 text-white mt-1 shrink-0" strokeWidth={1.5} />

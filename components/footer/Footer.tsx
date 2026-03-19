@@ -34,21 +34,24 @@ export function Footer() {
               </h3>
             </div>
             <ul className="space-y-4">
-              {["Design", "Trending Styles", "Packs", "Coupons"].map(
-                (item) => (
-                  <li key={item}>
-                    <Link
-                      href="#"
-                      className="text-gray-400 hover:text-[#FF3131] transition-colors text-sm flex items-center gap-2 group"
-                    >
-                      <span className="text-gray-400 group-hover:text-[#FF3131] transition-colors">
-                        ›
-                      </span>
-                      {item}
-                    </Link>
-                  </li>
-                )
-              )}
+              {[
+                { name: "Design", href: "/customize" },
+                { name: "Trending Styles", href: "/#trending-styles" },
+                { name: "Blogs", href: "/blogs" },
+                { name: "Franchise", href: "/franchise" },
+              ].map((item) => (
+                <li key={item.name}>
+                  <Link
+                    href={item.href}
+                    className="text-gray-400 hover:text-[#FF3131] transition-colors text-sm flex items-center gap-2 group"
+                  >
+                    <span className="text-gray-400 group-hover:text-[#FF3131] transition-colors">
+                      ›
+                    </span>
+                    {item.name}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
@@ -57,25 +60,25 @@ export function Footer() {
             <div className="flex items-center gap-3">
               <div className="w-1 h-6 bg-linear-to-b from-[#5CE1E6] to-[#5CE1E6]/0 rounded-full" />
               <h3 className="text-sm font-semibold tracking-wider uppercase">
-                Support
+                Policies
               </h3>
             </div>
             <ul className="space-y-4">
               {[
-                "Shipping & Returns",
-                "Track Order",
-                "Privacy Policy",
-                "Contact Us",
+                { name: "Shipping & Returns", href: "/shipping-returns" },
+                { name: "Terms of Use", href: "/terms-of-use" },
+                { name: "Privacy Policy", href: "/privacy-policy" },
+                { name: "Contact Us", href: "/contact" },
               ].map((item) => (
-                <li key={item}>
+                <li key={item.name}>
                   <Link
-                    href="#"
+                    href={item.href}
                     className="text-gray-400 hover:text-[#5CE1E6] transition-colors text-sm flex items-center gap-2 group"
                   >
                     <span className="text-gray-400 group-hover:text-[#5CE1E6] transition-colors">
                       ›
                     </span>
-                    {item}
+                    {item.name}
                   </Link>
                 </li>
               ))}
@@ -144,16 +147,16 @@ export function Footer() {
           </p>
           <div className="flex gap-6">
             <Link
-              href="#"
+              href="/privacy-policy"
               className="text-gray-600 hover:text-gray-200 text-xs transition-colors"
             >
               Privacy Policy
             </Link>
             <Link
-              href="#"
+              href="/terms-of-use"
               className="text-gray-600 hover:text-gray-200 text-xs transition-colors"
             >
-              Terms of Service
+              Terms of Use
             </Link>
           </div>
         </div>

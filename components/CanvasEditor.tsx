@@ -51,7 +51,10 @@ export default function CanvasEditor({
     canvasElRef.current = canvasEl;
     wrapperRef.current.appendChild(canvasEl);
 
-    const canvas = initializeCanvas(canvasEl, 320, 720);
+    const CANVAS_PADDING = 100;
+    const width = (phoneModel?.canvasWidth || 520) + CANVAS_PADDING * 1;
+    const height = (phoneModel?.canvasHeight || 720) + CANVAS_PADDING * 1;
+    const canvas = initializeCanvas(canvasEl, width, height);
     fabricCanvasRef.current = canvas;
 
     canvas.on('selection:created', (e: any) => {
@@ -99,7 +102,7 @@ export default function CanvasEditor({
       setIsLoading(false);
       // Notify parent that the model has fully loaded with the real safeArea
       onModelLoadedRef.current?.(canvas);
-    }).catch((err) => {
+    }, phoneModel.canvasWidth || 320).catch((err) => {
       console.error('Failed to load case image:', err);
       setIsLoading(false);
     });

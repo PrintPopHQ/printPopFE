@@ -20,25 +20,28 @@ export const loadCaseImage = (
   canvas: any,
   imageUrl: string,
   borderRadius?: number,
-  onLoaded?: (safeArea: SafeArea) => void
+  onLoaded?: (safeArea: SafeArea) => void,
+  targetWidth?: number
 ): Promise<any> => {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.crossOrigin = 'anonymous';
-    
+
     img.onload = () => {
       const fabricImg = new fabric.Image(img, {
         selectable: false,
         evented: false,
       });
 
-      // Scale image to fit canvas (same logic as HTML example)
+      // Scale image to fit specified targetWidth or canvas (same logic as HTML example)
       let scale: number;
+      const effectiveWidth = targetWidth || canvas.width;
+
       if (img.width > img.height) {
-        fabricImg.scaleToWidth(canvas.width);
-        scale = canvas.width / img.width;
+        fabricImg.scaleToWidth(effectiveWidth);
+        scale = effectiveWidth / img.width;
       } else {
-        scale = Math.min(canvas.width / img.width, canvas.height / img.height);
+        scale = Math.min(effectiveWidth / img.width, canvas.height / img.height);
         fabricImg.scale(scale);
       }
 
@@ -48,7 +51,7 @@ export const loadCaseImage = (
       // Calculate safe area based on scaled image dimensions (like HTML example)
       const scaledWidth = img.width * scale;
       const scaledHeight = img.height * scale;
-      
+
       // Use provided border radius or default to 8% of width
       const radius = borderRadius !== undefined ? borderRadius : scaledWidth * 0.08;
 
@@ -63,7 +66,7 @@ export const loadCaseImage = (
 
       canvas.add(fabricImg);
       fabricImg.set('id', 'phone-overlay');
-      
+
       reorderLayers(canvas);
       canvas.renderAll();
 
@@ -90,21 +93,21 @@ export const reorderLayers = (canvas: any): void => {
   const backgroundLayer = objects.find((obj: any) => obj.id === 'background-layer');
   const phoneCase = objects.find((obj: any) => obj.id === 'phone-overlay');
   const safeArea = objects.find((obj: any) => obj.id === 'safe-area');
-  
+
   if (backgroundLayer) {
     canvas.sendObjectToBack(backgroundLayer);
   }
 
   // Ensure other objects (user content) are above background but below phone case
-  
+
   if (phoneCase) {
     canvas.bringObjectToFront(phoneCase);
   }
-  
+
   if (safeArea) {
     canvas.bringObjectToFront(safeArea);
   }
-  
+
   canvas.renderAll();
 };
 
@@ -183,7 +186,7 @@ export const addImageToCanvas = (
       canvas.add(fabricImg);
       canvas.setActiveObject(fabricImg);
       reorderLayers(canvas);
-      
+
       resolve(fabricImg);
     };
 
@@ -319,9 +322,9 @@ export const clearCanvas = (
   if (keepCaseImage) {
     const objects = canvas.getObjects();
     const objectsToRemove = objects.filter(
-      (obj: any) => 
-        obj.id !== 'phone-overlay' && 
-        obj.id !== 'background-layer' && 
+      (obj: any) =>
+        obj.id !== 'phone-overlay' &&
+        obj.id !== 'background-layer' &&
         obj.id !== 'safe-area'
     );
     objectsToRemove.forEach((obj: any) => canvas.remove(obj));
