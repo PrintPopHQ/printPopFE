@@ -431,7 +431,7 @@ function CanvasPreviewArea({
 
       {/* Canvas */}
       <div
-        className="scale-[0.80] sm:scale-[0.85] md:scale-90 transition-transform relative bg-transparent my-16 z-20"
+        className="scale-[0.80] sm:scale-[0.85] md:scale-90 transition-transform relative bg-transparent my-16 lg:my-28 z-20"
       >
         <CanvasEditor
           phoneModel={phoneModel}

@@ -11,6 +11,8 @@ export const initializeCanvas = (
     height,
     backgroundColor: 'transparent',
     preserveObjectStacking: true,
+    allowTouchScrolling: true,
+    stopContextMenu: true,
   });
 
   return canvas;
