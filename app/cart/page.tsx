@@ -6,9 +6,9 @@ import { Minus, Plus, Loader2 } from 'lucide-react';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import RemoveCartItemModal from '@/components/modals/RemoveCartItemModal';
-import OrderSuccessModal from '@/components/modals/OrderSuccessModal';
 import { isLoggedIn, getUser, getGuestEmail, getAccessToken } from '@/lib/auth-store';
 import { toast } from 'sonner';
 import { useCheckoutMutation } from '@/packages/Mutations';
@@ -28,10 +28,10 @@ interface CartItem {
 }
 
 export default function CartPage() {
+  const router = useRouter();
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isMounted, setIsMounted] = useState(false);
   const [itemToRemove, setItemToRemove] = useState<string | null>(null);
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const checkoutMutation = useCheckoutMutation();
 
   useEffect(() => {
@@ -100,25 +100,17 @@ export default function CartPage() {
     checkoutMutation.mutate(
       { cartItems, email, accessToken: getAccessToken() ?? undefined },
       {
-        onSuccess: ({ checkoutUrl }) => {
+        onSuccess: ({ orderId, checkoutUrl }) => {
           toast.dismiss('checkout');
-          localStorage.removeItem('printpop_cart');
-          window.dispatchEvent(new Event('cart_updated'));
-          setCartItems([]);
-          if (!isLoggedIn()) localStorage.removeItem('printpop_guest_email');
 
-          setShowSuccessModal(true);
-
-          // Delay redirect slightly to ensure modal is visible
-          setTimeout(() => {
-            const a = document.createElement('a');
-            a.href = checkoutUrl;
-            a.target = '_blank';
-            a.rel = 'noopener noreferrer';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-          }, 800);
+          // If we have an orderId, go to our new checkout page. Fallback to checkoutUrl if not.
+          if (orderId) {
+            router.push(`/checkout/${orderId}`);
+          } else if (checkoutUrl) {
+            window.open(checkoutUrl, '_blank');
+          } else {
+            router.push('/checkout');
+          }
         },
         onError: (err: unknown) => {
           toast.dismiss('checkout');
@@ -286,11 +278,6 @@ export default function CartPage() {
             setItemToRemove(null);
           }
         }}
-      />
-
-      <OrderSuccessModal
-        isOpen={showSuccessModal}
-        onClose={() => setShowSuccessModal(false)}
       />
     </div>
   );

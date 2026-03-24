@@ -1,17 +1,8 @@
 import { useMutation } from "@tanstack/react-query";
-import {
-  ApiService,
-  SignInPayload,
-  SignUpPayload,
-  CreateOrderPayload,
-  ForgotPasswordPayload,
-  ResetPasswordPayload,
-  ChangePasswordPayload,
-  ContactPayload,
-  UpdateProfilePayload,
-} from "../services/ApiService";
+import { ApiService, SignInPayload, SignUpPayload, CreateOrderPayload, ForgotPasswordPayload, ResetPasswordPayload, ChangePasswordPayload, ContactPayload, UpdateProfilePayload, PaymentIntentPayload } from "../services/ApiService";
 import { handleApiResponse } from "./HandleResponse";
 import { saveUser } from "../lib/auth-store";
+import { useQuery } from "@tanstack/react-query";
 
 export const useSignUpMutation = () => {
   return useMutation({
@@ -150,7 +141,41 @@ export const useCheckoutMutation = () => {
 
       const orderRes = await ApiService.getInstance().createOrder(orderPayload, accessToken);
       const orderResult = handleApiResponse(orderRes.data);
-      return orderResult.data as { checkoutUrl: string };
+      return orderResult.data as { checkoutUrl: string; orderId: string };
+    },
+  });
+};
+
+export const useShippingCostQuery = (postcode: string) => {
+  return useQuery({
+    queryKey: ["shippingCost", postcode],
+    queryFn: async () => {
+      const response = await ApiService.getInstance().getShippingCost(postcode);
+      return handleApiResponse((response as any).data).data as { name: string; price: number }[];
+    },
+    enabled: !!postcode && postcode.length > 2,
+  });
+};
+
+export const useCreatePaymentIntentMutation = () => {
+  return useMutation({
+    mutationFn: async ({ payload, token }: { payload: PaymentIntentPayload; token?: string }) => {
+      const response = await ApiService.getInstance().createPaymentIntent(payload, token);
+      return handleApiResponse((response as any).data).data as { clientSecret: string };
+    },
+  });
+};
+
+export const useValidateCouponMutation = () => {
+  return useMutation({
+    mutationFn: async (code: string) => {
+      const response = await ApiService.getInstance().validateCoupon(code);
+      // Let it bypass strict handleApiResponse if it returns 4000 manually instead of dropping errors
+      const data: any = response.data;
+      if (data.responseCode !== 2000) {
+        throw new Error(data.message || 'Invalid or inactive promotion code');
+      }
+      return data;
     },
   });
 };

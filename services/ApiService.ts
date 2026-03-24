@@ -17,6 +17,9 @@ const ENDPOINTS = {
   UPDATE_PROFILE: "/api/auth/profile",
   GET_COVER_DESIGNS: "/cover-designs",
   GET_BANNER_IMAGES: "/api/banner-images",
+  GET_SHIPPING_COST: "/api/orders/shipping-cost",
+  VALIDATE_COUPON: "/api/payment/validate-coupon",
+  CREATE_PAYMENT_INTENT: "/api/payment/create-intent",
 };
 
 export interface SignUpPayload {
@@ -110,6 +113,44 @@ export interface CoverDesignResponse {
   responseCode: number;
   message: string;
   data: CoverDesign[];
+}
+
+export interface ShippingCostResponse {
+  responseCode: number;
+  message: string;
+  data: { name: string; price: number }[];
+}
+
+export interface CouponDetails {
+  id: string;
+  amount_off: number | null;
+  percent_off: number | null;
+  valid: boolean;
+  name: string;
+}
+
+export interface ValidateCouponResponse {
+  responseCode: number;
+  message: string;
+  data: {
+    code: string;
+    coupon: CouponDetails;
+  } | null;
+}
+
+export interface PaymentIntentPayload {
+  orderId: string;
+  billingAddress: any;
+  shippingAddress: any;
+  shippingDetails: any;
+  totalCost: number;
+  couponCode: string;
+}
+
+export interface PaymentIntentResponse {
+  responseCode: number;
+  message: string;
+  data: { clientSecret: string; id: string };
 }
 
 export class ApiService {
@@ -206,5 +247,20 @@ export class ApiService {
 
   public getBannerImages() {
     return this.axiosInstance.get(ENDPOINTS.GET_BANNER_IMAGES);
+  }
+
+  public getShippingCost(postcode: string) {
+    return this.axiosInstance.get<ShippingCostResponse>(ENDPOINTS.GET_SHIPPING_COST, {
+      params: { postcode }
+    });
+  }
+
+  public validateCoupon(code: string) {
+    return this.axiosInstance.get<ValidateCouponResponse>(`${ENDPOINTS.VALIDATE_COUPON}/${code}`);
+  }
+
+  public createPaymentIntent(payload: PaymentIntentPayload, bearerToken?: string) {
+    const headers = bearerToken ? { Authorization: `Bearer ${bearerToken}` } : undefined;
+    return this.axiosInstance.post<PaymentIntentResponse>(ENDPOINTS.CREATE_PAYMENT_INTENT, payload, { headers });
   }
 }
