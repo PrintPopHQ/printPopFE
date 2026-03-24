@@ -16,6 +16,7 @@ const ENDPOINTS = {
   CONTACT: "/api/contact",
   UPDATE_PROFILE: "/api/auth/profile",
   GET_COVER_DESIGNS: "/cover-designs",
+  GET_BANNER_IMAGES: "/api/banner-images",
 };
 
 export interface SignUpPayload {
@@ -201,5 +202,9 @@ export class ApiService {
 
   public getCoverDesigns() {
     return this.axiosInstance.get<CoverDesignResponse>(ENDPOINTS.GET_COVER_DESIGNS);
+  }
+
+  public getBannerImages() {
+    return this.axiosInstance.get(ENDPOINTS.GET_BANNER_IMAGES);
   }
 }
