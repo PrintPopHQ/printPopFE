@@ -53,6 +53,8 @@ export default function CheckoutPage() {
     lastName: shippingData.lastName,
     email: shippingData.email,
     phone: shippingData.phone,
+    shippingMethodName: shippingMethodName,
+    shippingCost: shippingCost,
   };
 
   const shippingAddress = {
