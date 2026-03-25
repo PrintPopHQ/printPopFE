@@ -15,8 +15,20 @@ interface ShippingDetailsProps {
 export function ShippingDetails({ onChange, onShippingCostChange }: ShippingDetailsProps) {
   const [postcode, setPostcode] = useState('');
   const [searchTrigger, setSearchTrigger] = useState('');
+  const [selectedOption, setSelectedOption] = useState<string | null>(null);
 
   const { data: shippingOptions, isLoading } = useShippingCostQuery(searchTrigger);
+
+  // Filter for only Parcel Post and Express Post
+  const filteredOptions = shippingOptions?.reduce((acc: any[], opt: any) => {
+    const name = opt.name.toLowerCase();
+    if (name.includes('parcel post') && !acc.find(a => a.name === 'Parcel Post')) {
+      acc.push({ ...opt, name: 'Parcel Post' });
+    } else if (name.includes('express post') && !acc.find(a => a.name === 'Express Post')) {
+      acc.push({ ...opt, name: 'Express Post' });
+    }
+    return acc;
+  }, []) || [];
 
   const handlePostcodeSearch = () => {
     if (postcode.trim().length >= 2) {
@@ -25,17 +37,33 @@ export function ShippingDetails({ onChange, onShippingCostChange }: ShippingDeta
   };
 
   useEffect(() => {
-    if (shippingOptions && shippingOptions.length > 0) {
-      // Find the Parcel Post pricing specifically
-      const parcelPost = shippingOptions.find(opt => opt.name.toLowerCase().includes('parcel post'));
-      if (parcelPost) {
-        onShippingCostChange(parcelPost.price, 'Parcel Post');
+    if (filteredOptions.length > 0) {
+      // Find Parcel Post as default
+      const parcelPost = filteredOptions.find(opt => opt.name === 'Parcel Post');
+      const expressPost = filteredOptions.find(opt => opt.name === 'Express Post');
+      
+      if (!selectedOption) {
+        if (parcelPost) {
+          setSelectedOption('Parcel Post');
+          onShippingCostChange(parcelPost.price, 'Parcel Post');
+        } else if (expressPost) {
+          setSelectedOption('Express Post');
+          onShippingCostChange(expressPost.price, 'Express Post');
+        }
       } else {
-        // Fallback if not exactly named Parcel Post
-        onShippingCostChange(shippingOptions[0].price, shippingOptions[0].name);
+        // If an option was already selected, update its price if it changed in new data
+        const current = filteredOptions.find(opt => opt.name === selectedOption);
+        if (current) {
+          onShippingCostChange(current.price, current.name);
+        }
       }
     }
-  }, [shippingOptions]);
+  }, [filteredOptions, selectedOption, onShippingCostChange]);
+
+  const handleOptionSelect = (name: string, price: number) => {
+    setSelectedOption(name);
+    onShippingCostChange(price, name);
+  };
 
   return (
     <div className="space-y-6">
@@ -58,6 +86,11 @@ export function ShippingDetails({ onChange, onShippingCostChange }: ShippingDeta
                   handlePostcodeSearch();
                 }
               }}
+              onBlur={() => {
+                if (postcode.trim()) {
+                  handlePostcodeSearch();
+                }
+              }}
               placeholder="44000"
               className="bg-[#112238] border-none text-white h-12 pr-12 focus-visible:ring-1 focus-visible:ring-[#5CE1E6]"
             />
@@ -75,6 +108,37 @@ export function ShippingDetails({ onChange, onShippingCostChange }: ShippingDeta
           <div className="flex items-center gap-2 text-[#5CE1E6] py-1 text-sm">
             <Loader2 size={16} className="animate-spin" />
             <span>Calculating shipping cost...</span>
+          </div>
+        )}
+
+        {!isLoading && filteredOptions.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+            {filteredOptions.map((option) => (
+              <button
+                key={option.name}
+                type="button"
+                onClick={() => handleOptionSelect(option.name, option.price)}
+                className={cn(
+                  "flex items-center justify-between p-4 rounded-lg border transition-all duration-200",
+                  selectedOption === option.name
+                    ? "bg-[#112238] border-[#5CE1E6] text-white"
+                    : "bg-[#0A1628] border-gray-800 text-gray-400 hover:border-gray-700"
+                )}
+              >
+                <div className="flex items-center gap-3">
+                  <div className={cn(
+                    "w-4 h-4 rounded-full border flex items-center justify-center",
+                    selectedOption === option.name ? "border-[#5CE1E6]" : "border-gray-600"
+                  )}>
+                    {selectedOption === option.name && (
+                      <div className="w-2 h-2 rounded-full bg-[#5CE1E6]" />
+                    )}
+                  </div>
+                  <span className="font-medium">{option.name}</span>
+                </div>
+                <span className="font-bold text-[#5CE1E6]">${option.price.toFixed(2)}</span>
+              </button>
+            ))}
           </div>
         )}
 
