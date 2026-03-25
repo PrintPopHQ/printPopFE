@@ -42,7 +42,17 @@ export default function CanvasEditor({
     onModelLoadedRef.current = onModelLoaded;
   });
 
-  // 1. Mount canvas element and initialize Fabric ONCE
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Sync isMobile state with window width
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile(); // Check on mount
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // 1. Mount canvas element and initialize Fabric ONCE (re-init on model or mobile-view change)
   useEffect(() => {
     if (!wrapperRef.current || fabricCanvasRef.current) return;
 
@@ -51,8 +61,9 @@ export default function CanvasEditor({
     canvasElRef.current = canvasEl;
     wrapperRef.current.appendChild(canvasEl);
 
-    const width = phoneModel?.canvasWidth || 320;
-    const height = phoneModel?.canvasHeight || 720;
+    const CANVAS_PADDING = isMobile ? 20 : 140;
+    const width = (phoneModel?.canvasWidth || 320) + CANVAS_PADDING * 2;
+    const height = (phoneModel?.canvasHeight || 720) + CANVAS_PADDING * 2;
     const canvas = initializeCanvas(canvasEl, width, height);
     fabricCanvasRef.current = canvas;
 
@@ -78,7 +89,7 @@ export default function CanvasEditor({
       }).catch(console.error);
       fabricCanvasRef.current = null;
     };
-  }, []);
+  }, [isMobile]);
 
   // 2. Reload image whenever phoneModel changes
   useEffect(() => {
@@ -93,41 +104,9 @@ export default function CanvasEditor({
     setIsLoading(true);
 
     loadCaseImage(canvas, phoneModel.image, phoneModel.safeArea.rx, (safeArea) => {
-      // In Fabric 6+, canvas.getCenter() was removed or changed. Use manual calculation.
-      const oldCenter = { left: canvas.width / 2, top: canvas.height / 2 };
-
-      // Resize canvas to precisely match the phone model dimensions
-      canvas.setDimensions({
-        width: safeArea.width,
-        height: safeArea.height,
-      });
-
-      const newCenter = { left: canvas.width / 2, top: canvas.height / 2 };
-      const dx = newCenter.left - oldCenter.left;
-      const dy = newCenter.top - oldCenter.top;
-
-      // Shift all user objects (images, text) by the center difference
-      canvas.getObjects().forEach((obj: any) => {
-        if (obj.id !== 'phone-overlay' && obj.id !== 'safe-area') {
-          obj.set({
-            left: (obj.left || 0) + dx,
-            top: (obj.top || 0) + dy,
-          });
-          obj.setCoords();
-        }
-      });
-
-      const overlay = canvas.getObjects().find((obj: any) => obj.id === 'phone-overlay');
-      if (overlay) {
-        canvas.centerObject(overlay);
-        overlay.setCoords();
-      }
-
       const outline = createSafeAreaOutline(safeArea);
       canvas.add(outline);
-      canvas.centerObject(outline);
       canvas.bringObjectToFront(outline);
-
       (canvas as any).safeArea = safeArea;
       canvas.renderAll();
       setIsLoading(false);

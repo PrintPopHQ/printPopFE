@@ -2,13 +2,14 @@
 
 import { useState, useEffect, Suspense, useRef } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Palette, Maximize, Info } from 'lucide-react';
+import { Palette, Maximize, Info, Eye } from 'lucide-react';
 
 import { PhoneModel } from '@/types/phone';
 import CanvasEditor from '@/components/CanvasEditor';
 import EditorControls from '@/components/EditorControls';
 import { exportCanvasAsImage, fitImageToCanvas, fitSelectedImageToSafeArea, clearCanvas, exportArtworkOnly } from '@/lib/canvas-utils';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 import SelectionModals from '@/components/modals/SelectionModals';
 import { GuestEmailModal } from '@/components/modals/GuestEmailModal';
@@ -260,6 +261,16 @@ function PriceActionBlock({
   isPreMadeDesign?: boolean;
   hasCustomization: boolean;
 }) {
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  const handlePreview = () => {
+    if (!canvas) return;
+    const url = exportCanvasAsImage(canvas, 'png', 1, 2);
+    setPreviewUrl(url);
+    setIsPreviewOpen(true);
+  };
+
   return (
     <div
       className={cn(
@@ -282,24 +293,45 @@ function PriceActionBlock({
         </div>
       </div>
 
-      <Button
-        size="lg"
-        className="w-full h-14 text-xs font-neon font-black btn-brand-gradient text-white rounded-xl shadow-[0_0_25px_rgba(255,49,49,0.3)] hover:shadow-[0_0_40px_rgba(255,49,49,0.5)] transition-all duration-500 group uppercase tracking-[0.2em]"
-        onClick={onAddToCart}
-        disabled={!canvas || (!isPreMadeDesign && !hasCustomization)}
-      >
-        ADD TO CART
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="4"
-          className="w-4 h-4 ml-3 group-hover:translate-x-1.5 transition-transform duration-300"
+      <div className="flex flex-col gap-3">
+        <Button
+          size="lg"
+          variant="outline"
+          className="w-full h-12 text-xs font-neon font-black border-transparent bg-white/5 hover:bg-white/10 text-white rounded-xl transition-all duration-300 uppercase tracking-[0.2em]"
+          onClick={handlePreview}
+          disabled={!canvas || (!isPreMadeDesign && !hasCustomization)}
         >
-          <line x1="5" y1="12" x2="19" y2="12" />
-          <polyline points="12 5 19 12 12 19" />
-        </svg>
-      </Button>
+          <Eye className="w-4 h-4 mr-2" />
+          PREVIEW
+        </Button>
+
+        <Button
+          size="lg"
+          className="w-full h-14 text-xs font-neon font-black btn-brand-gradient text-white rounded-xl shadow-[0_0_25px_rgba(255,49,49,0.3)] hover:shadow-[0_0_40px_rgba(255,49,49,0.5)] transition-all duration-500 group uppercase tracking-[0.2em]"
+          onClick={onAddToCart}
+          disabled={!canvas || (!isPreMadeDesign && !hasCustomization)}
+        >
+          ADD TO CART
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="4"
+            className="w-4 h-4 ml-3 group-hover:translate-x-1.5 transition-transform duration-300"
+          >
+            <line x1="5" y1="12" x2="19" y2="12" />
+            <polyline points="12 5 19 12 12 19" />
+          </svg>
+        </Button>
+      </div>
+
+      <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
+        <DialogContent className="max-w-md w-[85vw] bg-[#0a0f18] p-4 overflow-hidden border border-white/10 rounded-3xl flex justify-center items-center">
+          {previewUrl && (
+            <img src={previewUrl} alt="Design Preview" className="w-auto h-auto max-h-[75vh]" />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -168,7 +168,8 @@ export const addImageToCanvas = (
         left: canvas.width / 2 - fabricImg.getScaledWidth() / 2,
         top: canvas.height / 2 - fabricImg.getScaledHeight() / 2,
         cornerColor: '#4f46e5',
-        cornerSize: 10,
+        cornerSize: 12,
+        padding: 20,
         transparentCorners: false,
       });
 
@@ -221,7 +222,8 @@ export const addTextToCanvas = (
     originX: 'center',
     originY: 'center',
     cornerColor: '#4f46e5',
-    cornerSize: 10,
+    cornerSize: 12,
+    padding: 20,
     transparentCorners: false,
     ...options,
   });
@@ -362,6 +364,10 @@ export const fitImageToCanvas = (
         scaleY: scale,
         selectable: true,
         evented: true,
+        cornerColor: '#4f46e5',
+        cornerSize: 12,
+        padding: 20,
+        transparentCorners: false,
       });
 
       // Clip to the safe area bounds
@@ -432,6 +438,10 @@ export const fitSelectedImageToSafeArea = (
     scaleY: scale,
     originX: 'center',
     originY: 'center',
+    cornerColor: '#4f46e5',
+    cornerSize: 12,
+    padding: 20,
+    transparentCorners: false,
     clipPath,
   });
 
