@@ -38,7 +38,7 @@ export function SignInForm() {
             toast.success("Welcome back!", {
               description: data.message || "You have signed in successfully.",
             });
-            router.push("/");
+            router.push("/profile");
           },
           onError: (error: any) => {
             toast.error("Sign In Failed", {

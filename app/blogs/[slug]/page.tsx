@@ -70,25 +70,29 @@ export default async function BlogDetailPage({
 
   if (!blog) notFound();
 
+  const isPolicyPage = ['terms-conditions', 'privacy-policy', 'refund-returns-policy'].includes(slug);
+
   return (
     <div className="min-h-screen bg-[#111111] font-sans pb-24">
       {/* Header */}
       <div className="bg-[#161616]">
         <PageHeader
-          head="BLOG DETAILS"
-          description="Fresh drops, style hacks, and everything needed to keep your tech protected and looking 🔥"
+          head={isPolicyPage ? blog.title.toUpperCase() : "BLOG DETAILS"}
+          description={isPolicyPage ? "" : "Fresh drops, style hacks, and everything needed to keep your tech protected and looking 🔥"}
         />
       </div>
 
       <div className="max-w-7xl mx-auto px-4 w-full pt-10">
         {/* Back link */}
-        <Link
-          href="/blogs"
-          className="inline-flex items-center gap-2 text-[#9CA3AF] hover:text-[#5CE1E6] text-sm font-semibold mb-8 transition-colors group"
-        >
-          <ArrowLeft size={15} className="group-hover:-translate-x-1 transition-transform" />
-          Back to Blog
-        </Link>
+        {!isPolicyPage && (
+          <Link
+            href="/blogs"
+            className="inline-flex items-center gap-2 text-[#9CA3AF] hover:text-[#5CE1E6] text-sm font-semibold mb-8 transition-colors group"
+          >
+            <ArrowLeft size={15} className="group-hover:-translate-x-1 transition-transform" />
+            Back to Blog
+          </Link>
+        )}
 
         <div className="flex flex-col lg:flex-row gap-10">
 
@@ -121,17 +125,19 @@ export default async function BlogDetailPage({
             </div> */}
 
             {/* ② Meta row */}
-            <div className="flex flex-wrap items-center gap-1 text-xs text-[#9CA3AF] mb-5 font-comic">
-              <span className="flex items-center gap-1">
-                <User size={12} className="text-[#5CE1E6]" />
-                {blog.author_name}
-              </span>
-              <span className="mx-1.5 text-[#555]">•</span>
-              <span className="flex items-center gap-1">
-                <Calendar size={12} className="text-[#5CE1E6]" />
-                {formatDate(blog.created_at)}
-              </span>
-            </div>
+            {!isPolicyPage && (
+              <div className="flex flex-wrap items-center gap-1 text-xs text-[#9CA3AF] mb-5 font-comic">
+                <span className="flex items-center gap-1">
+                  <User size={12} className="text-[#5CE1E6]" />
+                  {blog.author_name}
+                </span>
+                <span className="mx-1.5 text-[#555]">•</span>
+                <span className="flex items-center gap-1">
+                  <Calendar size={12} className="text-[#5CE1E6]" />
+                  {formatDate(blog.created_at)}
+                </span>
+              </div>
+            )}
 
             {/* ③ Article title (large, outside the hero) */}
             {/* <h1 className="text-2xl md:text-3xl font-extrabold text-white uppercase leading-tight mb-6 tracking-wide">
@@ -139,7 +145,9 @@ export default async function BlogDetailPage({
             </h1> */}
 
             {/* ④ Thin gradient divider */}
-            <div className="h-px bg-linear-to-r from-[#FF3366]/50 via-[#5CE1E6]/40 to-transparent mb-8" />
+            {!isPolicyPage && (
+              <div className="h-px bg-linear-to-r from-[#FF3366]/50 via-[#5CE1E6]/40 to-transparent mb-8" />
+            )}
 
             {/* ⑤ HTML Content */}
             <div
@@ -150,7 +158,7 @@ export default async function BlogDetailPage({
           </article>
 
           {/* ── Sidebar ── */}
-          <BlogSidebar showBackCTA />
+          {!isPolicyPage && <BlogSidebar showBackCTA />}
 
         </div>
       </div>

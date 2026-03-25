@@ -13,8 +13,10 @@ const DEFAULT_IMAGES = [
 ];
 
 export function DynamicBanner() {
-  const [images, setImages] = useState<string[]>(DEFAULT_IMAGES);
+  const [images, setImages] = useState<string[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isLoadingApi, setIsLoadingApi] = useState(true);
+  const [loadedImages, setLoadedImages] = useState<Record<number, boolean>>({});
 
   useEffect(() => {
     const fetchBanners = async () => {
@@ -23,21 +25,28 @@ export function DynamicBanner() {
         const res = await api.getBannerImages();
         if (res.data.data && res.data.data.length > 0) {
           setImages(res.data.data.map((img: any) => img.image_url));
+        } else {
+          setImages(DEFAULT_IMAGES);
         }
       } catch (error) {
         console.error("Failed to fetch banner images", error);
+        setImages(DEFAULT_IMAGES);
+      } finally {
+        setIsLoadingApi(false);
       }
     };
     fetchBanners();
   }, []);
 
   const nextSlide = useCallback(() => {
+    if (images.length === 0) return;
     setCurrentIndex((prevIndex) =>
       prevIndex === images.length - 1 ? 0 : prevIndex + 1
     );
   }, [images.length]);
 
   const prevSlide = () => {
+    if (images.length === 0) return;
     setCurrentIndex((prevIndex) =>
       prevIndex === 0 ? images.length - 1 : prevIndex - 1
     );
@@ -60,17 +69,30 @@ export function DynamicBanner() {
             className="flex transition-transform duration-700 ease-in-out"
             style={{ transform: `translateX(-${currentIndex * 100}%)` }}
           >
-            {images.map((src, index) => (
-              <div key={index} className="min-w-full aspect-video md:aspect-21/9 relative shrink-0 bg-linear-to-br from-zinc-100 to-zinc-200">
-                <Image
-                  src={src}
-                  alt={`Banner ${index + 1}`}
-                  fill
-                  className="object-contain p-4 md:object-cover md:p-0"
-                  priority={index === 0}
-                />
+            {isLoadingApi ? (
+              <div className="min-w-full aspect-video md:aspect-21/9 relative shrink-0 bg-[#161616] flex items-center justify-center">
+                <div className="absolute inset-0 bg-black/40 backdrop-blur-md" />
+                <div className="w-10 h-10 border-4 border-[#FF3131] border-t-transparent rounded-full animate-spin relative z-10" />
               </div>
-            ))}
+            ) : (
+              images.map((src, index) => (
+                <div key={index} className="min-w-full aspect-video md:aspect-21/9 relative shrink-0 bg-[#161616]">
+                  {!loadedImages[index] && (
+                    <div className="absolute inset-0 flex items-center justify-center z-10 bg-black/40 backdrop-blur-md">
+                      <div className="w-10 h-10 border-4 border-[#FF3131] border-t-transparent rounded-full animate-spin" />
+                    </div>
+                  )}
+                  <Image
+                    src={src}
+                    alt={`Banner ${index + 1}`}
+                    fill
+                    className={`object-contain p-4 md:object-cover md:p-0 transition-opacity duration-500 ${loadedImages[index] ? "opacity-100" : "opacity-0"}`}
+                    priority={index === 0}
+                    onLoad={() => setLoadedImages(prev => ({ ...prev, [index]: true }))}
+                  />
+                </div>
+              ))
+            )}
           </div>
 
           {/* Left Arrow Controls */}

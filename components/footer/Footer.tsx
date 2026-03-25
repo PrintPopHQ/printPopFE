@@ -83,7 +83,7 @@ export function Footer() {
               {[
                 { name: "Terms of Use", href: "/blogs/terms-conditions" },
                 { name: "Privacy Policy", href: "/blogs/privacy-policy" },
-                { name: "Returns and Refunds", href: "/blogs/returns-and-refunds" },
+                { name: "Returns and Refunds", href: "/blogs/refund-returns-policy" },
                 { name: "Contact Us", href: "/contact" },
               ].map((item) => (
                 <li key={item.name}>
@@ -109,7 +109,7 @@ export function Footer() {
                 Connect
               </h3>
             </div>
-            <div className="flex flex-wrap gap-4">
+            <div className="grid grid-cols-3 gap-4 w-fit mx-auto md:mx-0">
               {[
                 {
                   icon: Facebook,

@@ -2,7 +2,7 @@ import { Hero } from "@/app/landing/Hero";
 import { DynamicBanner } from "@/app/landing/DynamicBanner";
 import { TrustedBy } from "@/app/landing/TrustedBy";
 import { TrendingStyles } from "@/app/landing/TrendingStyles";
-import { Locations } from "@/app/landing/Locations";
+import { LocationsSection } from "@/app/contact/LocationsSection";
 import { CTA } from "@/app/landing/CTA";
 import { DesignCase } from "@/app/landing/DesignCase";
 import { Customization } from "@/app/landing/Customization";
@@ -18,7 +18,7 @@ export default function Home() {
       <DynamicBanner />
       <TrustedBy />
       <TrendingStyles />
-      <Locations />
+      <LocationsSection />
       <CTA />
       <DesignCase />
       <Testimonials />

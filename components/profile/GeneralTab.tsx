@@ -9,6 +9,7 @@ import { useUpdateProfileMutation } from '@/packages/Mutations';
 import { ApiService } from '@/services/ApiService';
 import { handleApiResponse } from '@/packages/HandleResponse';
 import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 
 export function GeneralTab() {
   const [userEmail, setUserEmail] = useState('');
@@ -22,6 +23,7 @@ export function GeneralTab() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const updateProfileMutation = useUpdateProfileMutation();
+  const router = useRouter();
 
   useEffect(() => {
     const user = getUser();
@@ -192,7 +194,7 @@ export function GeneralTab() {
         </div>
       </div>
 
-      <div className="pt-6">
+      <div className="pt-6 space-y-4">
         <Button
           onClick={handleSave}
           disabled={isBusy}
@@ -207,6 +209,14 @@ export function GeneralTab() {
           ) : (
             'SAVE PROFILE'
           )}
+        </Button>
+
+        <Button
+          onClick={() => router.push('/orders')}
+          className="w-full text-white font-bold h-12 rounded-xl font-neon tracking-widest shadow-glow-red hover:opacity-90 transition-opacity"
+          style={{ background: 'linear-gradient(90deg, #5CE1E6 0%, #FF3131 100%)' }}
+        >
+          ORDER HISTORY
         </Button>
       </div>
     </div>
