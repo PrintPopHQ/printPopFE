@@ -30,23 +30,59 @@ const BASE_URL = 'https://printpop-be.onrender.com';
 /* ─── Fetch helper ───────────────────────────────────────────────────── */
 async function fetchBlogs(
   page: number,
+  search?: string,
 ): Promise<{ blogs: Blog[]; meta: BlogMeta } | null> {
   try {
     const url = new URL('/api/blogs', BASE_URL);
-    url.searchParams.set('page', String(page));
-    url.searchParams.set('limit', String(LIMIT));
-    url.searchParams.set('published', 'true');
+    
+    if (search) {
+      // If searching, fetch a large enough set to filter locally
+      url.searchParams.set('page', '1');
+      url.searchParams.set('limit', '500'); // Assuming max 500 blogs for search
+      url.searchParams.set('published', 'true');
 
-    const res = await fetch(url.toString(), {
-      next: { revalidate: 60 }, // ISR – revalidate every 60 s
-    });
+      const res = await fetch(url.toString(), {
+        next: { revalidate: 60 },
+      });
 
-    if (!res.ok) return null;
+      if (!res.ok) return null;
+      const json = await res.json();
+      if (json.responseCode !== 2000) return null;
 
-    const json = await res.json();
-    if (json.responseCode !== 2000) return null;
+      const allBlogs = json.data.blogs as Blog[];
+      const filteredBlogs = allBlogs.filter((blog) =>
+        blog.title.toLowerCase().includes(search.toLowerCase())
+      );
 
-    return json.data as { blogs: Blog[]; meta: BlogMeta };
+      const total = filteredBlogs.length;
+      const totalPages = Math.ceil(total / LIMIT);
+      const start = (page - 1) * LIMIT;
+      const paginatedBlogs = filteredBlogs.slice(start, start + LIMIT);
+
+      return {
+        blogs: paginatedBlogs,
+        meta: {
+          total,
+          page,
+          limit: LIMIT,
+          totalPages,
+        },
+      };
+    } else {
+      url.searchParams.set('page', String(page));
+      url.searchParams.set('limit', String(LIMIT));
+      url.searchParams.set('published', 'true');
+
+      const res = await fetch(url.toString(), {
+        next: { revalidate: 60 },
+      });
+
+      if (!res.ok) return null;
+      const json = await res.json();
+      if (json.responseCode !== 2000) return null;
+
+      return json.data as { blogs: Blog[]; meta: BlogMeta };
+    }
   } catch {
     return null;
   }
@@ -65,12 +101,12 @@ function formatDate(dateStr: string) {
 export default async function BlogPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string }>;
+  searchParams: Promise<{ page?: string; search?: string }>;
 }) {
-  const { page: pageParam } = await searchParams;
+  const { page: pageParam, search } = await searchParams;
   const page = Math.max(1, Number(pageParam ?? 1));
 
-  const result = await fetchBlogs(page);
+  const result = await fetchBlogs(page, search);
   const blogs: Blog[] = result?.blogs ?? [];
   const meta: BlogMeta = result?.meta ?? { total: 0, page, limit: LIMIT, totalPages: 1 };
 
@@ -178,7 +214,7 @@ export default async function BlogPage({
             {meta.totalPages > 1 && (
               <div className="flex items-center justify-center gap-2 pt-8">
                 <Link
-                  href={`/blogs?page=${page - 1}`}
+                  href={`/blogs?page=${page - 1}${search ? `&search=${search}` : ''}`}
                   aria-disabled={page === 1}
                   className={`h-10 px-4 rounded-lg font-semibold text-sm inline-flex items-center bg-white text-black hover:bg-gray-200 transition-colors ${page === 1 ? 'pointer-events-none opacity-40' : ''
                     }`}
@@ -189,7 +225,7 @@ export default async function BlogPage({
                 {Array.from({ length: meta.totalPages }, (_, i) => i + 1).map((p) => (
                   <Link
                     key={p}
-                    href={`/blogs?page=${p}`}
+                    href={`/blogs?page=${p}${search ? `&search=${search}` : ''}`}
                     className={`h-10 w-10 rounded-lg font-semibold text-sm inline-flex items-center justify-center transition-colors ${p === page
                       ? 'bg-[#FF3366] text-white shadow-[0_0_15px_rgba(255,51,102,0.5)]'
                       : 'bg-white text-black hover:bg-gray-200'
@@ -200,7 +236,7 @@ export default async function BlogPage({
                 ))}
 
                 <Link
-                  href={`/blogs?page=${page + 1}`}
+                  href={`/blogs?page=${page + 1}${search ? `&search=${search}` : ''}`}
                   aria-disabled={page === meta.totalPages}
                   className={`h-10 px-4 rounded-lg font-semibold text-sm inline-flex items-center bg-white text-black hover:bg-gray-200 transition-colors ${page === meta.totalPages ? 'pointer-events-none opacity-40' : ''
                     }`}
