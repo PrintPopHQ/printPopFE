@@ -253,6 +253,7 @@ function CustomizeSection({
 /** Price display + Add-to-Cart CTA. Pass `className` for responsive show/hide. */
 function PriceActionBlock({
   price,
+  originalPrice,
   canvas,
   onAddToCart,
   className,
@@ -261,6 +262,7 @@ function PriceActionBlock({
   hasCustomization,
 }: {
   price: number;
+  originalPrice?: number;
   canvas: any;
   onAddToCart: () => void;
   className?: string;
@@ -290,9 +292,16 @@ function PriceActionBlock({
           <p className="text-[9px] text-muted-foreground font-black uppercase tracking-[0.2em]">
             Total Price
           </p>
-          <h2 className="text-4xl font-neon font-black text-white">
-            $ {price.toFixed(2)}
-          </h2>
+          <div className="flex items-baseline gap-3">
+            <h2 className="text-4xl font-neon font-black text-white">
+              ${price.toFixed(2)}
+            </h2>
+            {originalPrice && originalPrice > price && (
+              <span className="text-xl font-neon text-white/40 line-through decoration-secondary/60 decoration-2">
+                ${originalPrice.toFixed(2)}
+              </span>
+            )}
+          </div>
         </div>
         <div className="flex items-center gap-1.5 bg-green-500/10 text-green-400 px-3 py-1.5 rounded-full text-[9px] font-black tracking-widest border border-green-500/20">
           <div className="w-1 h-1 bg-green-400 rounded-full animate-pulse shadow-[0_0_5px_rgba(74,222,128,0.5)]" />
@@ -702,8 +711,10 @@ function CustomizeContent() {
   }, [localModelId, models]);
 
   // ── Handlers ─────────────────────────────────────────────────────────────
-
-  const currentPrice = caseType === 'Magnetic' ? 40 : 35;
+  const basePrice = groupSize > 1 ? 30 : 35;
+  const originalBasePrice = 35;
+  const currentPrice = caseType === 'Magnetic' ? basePrice + 5 : basePrice;
+  const originalPrice = caseType === 'Magnetic' ? originalBasePrice + 5 : originalBasePrice;
 
   const updateCustomizationState = (c: any) => {
     const objects = c.getObjects();
@@ -946,6 +957,7 @@ function CustomizeContent() {
             {/* Price block — desktop only */}
             <PriceActionBlock
               price={currentPrice}
+              originalPrice={originalPrice}
               canvas={canvas}
               onAddToCart={handleAddToCart}
               className="hidden lg:block"
@@ -972,6 +984,7 @@ function CustomizeContent() {
             {/* Price block — mobile only */}
             <PriceActionBlock
               price={currentPrice}
+              originalPrice={originalPrice}
               canvas={canvas}
               onAddToCart={handleAddToCart}
               className="lg:hidden mt-4"
