@@ -58,9 +58,11 @@ export default function CheckoutPage() {
   };
 
   const shippingAddress = {
-    address: shippingData.address,
-    city: shippingData.city,
-    postcode: shippingData.postcode,
+    streetAddress1: shippingData.streetAddress1,
+    streetAddress2: shippingData.streetAddress2,
+    suburb: shippingData.suburb,
+    state: shippingData.state,
+    postal: shippingData.postal,
     country: shippingData.country,
   };
 

@@ -69,41 +69,61 @@ export function BillingDetails({ useSameAsShipping, setUseSameAsShipping, onChan
             />
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-white">Address</label>
-            <Input
-              placeholder="house Npo 123 Streat no 1234"
-              className="bg-[#112238] border-none text-white h-12"
-              onChange={(e) => onChange((prev: any) => ({ ...prev, address: e.target.value }))}
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-white">Suburb</label>
+              <Input
+                placeholder="Surry Hills"
+                className="bg-[#112238] border-none text-white h-12"
+                onChange={(e) => onChange((prev: any) => ({ ...prev, suburb: e.target.value }))}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-white">State</label>
+              <Input
+                placeholder="NSW"
+                className="bg-[#112238] border-none text-white h-12"
+                onChange={(e) => onChange((prev: any) => ({ ...prev, state: e.target.value }))}
+              />
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-white">Street Address 1</label>
+              <Input
+                placeholder="123 Example Street"
+                className="bg-[#112238] border-none text-white h-12"
+                onChange={(e) => onChange((prev: any) => ({ ...prev, streetAddress1: e.target.value }))}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-white">Street Address 2</label>
+              <Input
+                placeholder="Apartment 4, Suite 10"
+                className="bg-[#112238] border-none text-white h-12"
+                onChange={(e) => onChange((prev: any) => ({ ...prev, streetAddress2: e.target.value }))}
+              />
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-white">City</label>
+              <label className="text-sm font-medium text-white">Postal Code</label>
               <Input
-                placeholder="Delhi"
+                placeholder="4400"
                 className="bg-[#112238] border-none text-white h-12"
-                onChange={(e) => onChange((prev: any) => ({ ...prev, city: e.target.value }))}
+                onChange={(e) => onChange((prev: any) => ({ ...prev, postal: e.target.value }))}
               />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium text-white">Postal Code</label>
+              <label className="text-sm font-medium text-white">Country</label>
               <Input
-                placeholder="44000"
+                placeholder="Australia"
                 className="bg-[#112238] border-none text-white h-12"
-                onChange={(e) => onChange((prev: any) => ({ ...prev, postcode: e.target.value }))}
+                onChange={(e) => onChange((prev: any) => ({ ...prev, country: e.target.value }))}
               />
             </div>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-white">Country</label>
-            <Input
-              placeholder="India"
-              className="bg-[#112238] border-none text-white h-12"
-              onChange={(e) => onChange((prev: any) => ({ ...prev, country: e.target.value }))}
-            />
           </div>
         </div>
       )}

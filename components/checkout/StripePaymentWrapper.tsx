@@ -94,7 +94,7 @@ function CheckoutForm({ shippingAddress, shippingDetails, billingAddress, onComp
 
   const handleSubmit = async () => {
     if (!stripe || !elements) return;
-    if (!shippingDetails.email || !shippingDetails.firstName || !shippingAddress.address) {
+    if (!shippingDetails.email || !shippingDetails.firstName || !shippingAddress.streetAddress1) {
       toast.error('Incomplete Details', { description: 'Please fill out missing shipping/billing details.' });
       return;
     }
@@ -111,10 +111,12 @@ function CheckoutForm({ shippingAddress, shippingDetails, billingAddress, onComp
             email: billingAddress.email || shippingDetails.email,
             phone: billingAddress.phone || shippingDetails.phone,
             address: {
-              line1: billingAddress.address || shippingAddress.address,
-              city: billingAddress.city || shippingAddress.city,
+              line1: billingAddress.streetAddress1 || shippingAddress.streetAddress1,
+              line2: billingAddress.streetAddress2 || shippingAddress.streetAddress2,
+              city: billingAddress.suburb || shippingAddress.suburb,
+              state: billingAddress.state || shippingAddress.state,
               country: billingAddress.country || shippingAddress.country,
-              postal_code: billingAddress.postcode || shippingAddress.postcode,
+              postal_code: billingAddress.postal || shippingAddress.postal,
             }
           }
         }
