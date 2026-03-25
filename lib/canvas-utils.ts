@@ -94,14 +94,13 @@ export const reorderLayers = (canvas: any): void => {
   const objects = canvas.getObjects();
   const backgroundLayer = objects.find((obj: any) => obj.id === 'background-layer');
   const phoneCase = objects.find((obj: any) => obj.id === 'phone-overlay');
-  const safeArea = objects.find((obj: any) => obj.id === 'safe-area');
+  const safeArea = objects.find((obj: any) => obj.id === 'safe-area-outline');
 
   if (backgroundLayer) {
     canvas.sendObjectToBack(backgroundLayer);
   }
 
   // Ensure other objects (user content) are above background but below phone case
-
   if (phoneCase) {
     canvas.bringObjectToFront(phoneCase);
   }
@@ -130,7 +129,7 @@ export const createSafeAreaOutline = (
     selectable: false,
     evented: false,
     absolutePositioned: true,
-    id: 'safe-area',
+    id: 'safe-area-outline',
   });
 };
 
@@ -352,21 +351,20 @@ export const fitImageToCanvas = (
       const natW = img.naturalWidth || img.width;
       const natH = img.naturalHeight || img.height;
 
-      // Scale to COVER the safe area (CSS object-fit: cover)
+      // Scale to MATCH the safe area dimensions (stretch-to-fill)
       const scaleX = safeArea.width / natW;
       const scaleY = safeArea.height / natH;
-      const scale = Math.max(scaleX, scaleY);
 
       const fabricImg = new fabric.Image(img, {
         originX: 'center',
         originY: 'center',
-        scaleX: scale,
-        scaleY: scale,
+        scaleX: scaleX,
+        scaleY: scaleY,
         selectable: true,
         evented: true,
         cornerColor: '#4f46e5',
         cornerSize: 12,
-        padding: 20,
+        padding: 0,
         transparentCorners: false,
       });
 
@@ -420,7 +418,6 @@ export const fitSelectedImageToSafeArea = (
 
   const scaleX = safeArea.width / imgNatW;
   const scaleY = safeArea.height / imgNatH;
-  const scale = Math.max(scaleX, scaleY);
 
   // Re-clip so the image is bounded by the safe area
   const clipPath = new fabric.Rect({
@@ -434,13 +431,13 @@ export const fitSelectedImageToSafeArea = (
   });
 
   object.set({
-    scaleX: scale,
-    scaleY: scale,
+    scaleX: scaleX,
+    scaleY: scaleY,
     originX: 'center',
     originY: 'center',
     cornerColor: '#4f46e5',
     cornerSize: 12,
-    padding: 20,
+    padding: 0,
     transparentCorners: false,
     clipPath,
   });
@@ -449,6 +446,9 @@ export const fitSelectedImageToSafeArea = (
   canvas.centerObject(object);
   object.setCoords();
   canvas.renderAll();
+  // Fire modification event so history is saved
+  canvas.fire('object:modified', { target: object });
+  reorderLayers(canvas);
 };
 
 export const updateObjectFontFamily = (

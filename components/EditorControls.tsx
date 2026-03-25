@@ -28,7 +28,6 @@ import {
   clearCanvas,
 } from '@/lib/canvas-utils';
 import { cn } from '@/lib/utils';
-import ImageCropper from './ImageCropper';
 import ClearDesignModal from './modals/ClearDesignModal';
 
 // ─── Font options ─────────────────────────────────────────────────────────────
@@ -65,6 +64,7 @@ interface EditorControlsProps {
   selectedObject: any | null;
   textColor?: string;
   onObjectAdded?: () => void;
+  onImageUpload?: (file: File) => void;
 }
 
 export default function EditorControls({
@@ -72,18 +72,16 @@ export default function EditorControls({
   selectedObject,
   textColor,
   onObjectAdded,
+  onImageUpload,
 }: EditorControlsProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [zoom, setZoom] = useState(100);
   const [rotation, setRotation] = useState(0);
   const [fontFamily, setFontFamily] = useState('Arial');
 
-  // Cropper State
-  const [cropperOpen, setCropperOpen] = useState(false);
-  const [selectedImageSrc, setSelectedImageSrc] = useState<string | null>(null);
-
   // Clear modal state
   const [isClearModalOpen, setIsClearModalOpen] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
 
   // ── Load Google Fonts once on mount ────────────────────────────────────────
   useEffect(() => {
@@ -95,13 +93,6 @@ export default function EditorControls({
     link.href = `https://fonts.googleapis.com/css2?family=${GOOGLE_FONTS.map((f) => `${f}:wght@400;700`).join('&family=')}&display=swap`;
     document.head.appendChild(link);
   }, []);
-
-  // ── Sync text color ─────────────────────────────────────────────────────────
-  useEffect(() => {
-    if (canvas && selectedObject && selectedObject.type === 'i-text' && textColor) {
-      updateObjectColor(canvas, selectedObject, textColor);
-    }
-  }, [canvas, selectedObject, textColor]);
 
   // ── Sync font and transform when selected object changes ──────────────────
   useEffect(() => {
@@ -128,33 +119,28 @@ export default function EditorControls({
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (reader.result) {
-        setSelectedImageSrc(reader.result as string);
-        setCropperOpen(true);
-      }
-    };
-    reader.readAsDataURL(file);
+    if (file && onImageUpload) {
+      onImageUpload(file);
+    }
     e.target.value = '';
   };
 
-  const handleCropComplete = (croppedImage: string) => {
-    if (!canvas) return;
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
 
-    const safeArea = (canvas as any).safeArea;
-    if (!safeArea) {
-      alert('Please wait for the phone case to load first!');
-      return;
+  const handleDragLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file && file.type.startsWith('image/') && onImageUpload) {
+      onImageUpload(file);
     }
-
-    addImageToCanvas(canvas, croppedImage, safeArea);
-    if (onObjectAdded) onObjectAdded();
-
-    setSelectedImageSrc(null);
-    setCropperOpen(false);
   };
 
   const handleZoomChange = (value: number) => {
@@ -215,19 +201,23 @@ export default function EditorControls({
         onConfirm={confirmReset}
       />
 
-      {/* Cropper Modal */}
-      <ImageCropper
-        isOpen={cropperOpen}
-        onClose={() => setCropperOpen(false)}
-        imageSrc={selectedImageSrc}
-        onCropComplete={handleCropComplete}
+      <ClearDesignModal
+        isOpen={isClearModalOpen}
+        onClose={() => setIsClearModalOpen(false)}
+        onConfirm={confirmReset}
       />
 
       {/* Action Buttons (Add Art / Add Text) */}
       <div className="grid grid-cols-2 gap-3">
         <div
           onClick={() => fileInputRef.current?.click()}
-          className="bg-black/40 border border-white/10 rounded-xl p-4 flex flex-col items-center justify-center cursor-pointer hover:bg-primary/10 hover:border-primary/50 transition-all duration-300 group active:scale-[0.98]"
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+          className={cn(
+            'bg-black/40 border border-white/10 rounded-xl p-4 flex flex-col items-center justify-center cursor-pointer transition-all duration-300 group active:scale-[0.98] relative overflow-hidden',
+            isDragging ? 'bg-primary/20 border-primary shadow-[0_0_15px_rgba(92,225,230,0.2)]' : 'hover:bg-primary/10 hover:border-primary/50',
+          )}
         >
           <input
             ref={fileInputRef}

@@ -7,7 +7,8 @@ import { Palette, Maximize, Info, Eye } from 'lucide-react';
 import { PhoneModel } from '@/types/phone';
 import CanvasEditor from '@/components/CanvasEditor';
 import EditorControls from '@/components/EditorControls';
-import { exportCanvasAsImage, fitImageToCanvas, fitSelectedImageToSafeArea, clearCanvas, exportArtworkOnly } from '@/lib/canvas-utils';
+import ImageCropper from '@/components/ImageCropper';
+import { exportCanvasAsImage, fitImageToCanvas, fitSelectedImageToSafeArea, clearCanvas, exportArtworkOnly, addImageToCanvas } from '@/lib/canvas-utils';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
@@ -197,11 +198,15 @@ function CustomizeSection({
   selectedObject,
   textColor,
   onColorChange,
+  onImageUpload,
+  onObjectAdded,
 }: {
   canvas: any;
   selectedObject: any;
   textColor: string;
   onColorChange: (color: string) => void;
+  onImageUpload?: (file: File) => void;
+  onObjectAdded?: () => void;
 }) {
   const swatches = ['#20211A', '#FF3131', '#5CE1E6', '#8B5CF6', '#FACC15', '#FFFFFF'];
 
@@ -237,6 +242,8 @@ function CustomizeSection({
           canvas={canvas}
           selectedObject={selectedObject}
           textColor={textColor}
+          onImageUpload={onImageUpload}
+          onObjectAdded={onObjectAdded}
         />
       </div>
     </SectionCard>
@@ -346,6 +353,7 @@ function CanvasPreviewArea({
   onObjectSelected,
   onModelLoaded,
   isPreMadeDesign,
+  onImageDrop,
 }: {
   phoneModel: PhoneModel;
   caseType: string;
@@ -355,9 +363,29 @@ function CanvasPreviewArea({
   onObjectSelected: (obj: any) => void;
   onModelLoaded?: (canvas: any) => void;
   isPreMadeDesign?: boolean;
+  onImageDrop?: (file: File) => void;
 }) {
   const isMagnetic = caseType === 'Magnetic';
   const fitFileInputRef = useRef<HTMLInputElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file && file.type.startsWith('image/') && onImageDrop) {
+      onImageDrop(file);
+    }
+  };
 
   const handleFitImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -392,12 +420,31 @@ function CanvasPreviewArea({
   };
 
   return (
-    <div className="flex-1 bg-black/40 border border-border-subtle rounded-[2.5rem] relative flex flex-col items-center justify-center p-8 backdrop-blur-sm min-h-[600px] shadow-inner">
+    <div
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+      className={cn(
+        'flex-1 bg-black/40 border border-border-subtle rounded-[2.5rem] relative flex flex-col items-center justify-center p-4 md:p-6 backdrop-blur-sm min-h-[600px] shadow-inner transition-all duration-300',
+        isDragging && 'border-primary bg-primary/5 scale-[1.01] shadow-[0_0_30px_rgba(92,225,230,0.2)]',
+      )}
+    >
+      {/* Drop Overlay */}
+      {isDragging && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-primary/10 backdrop-blur-[2px] rounded-[2.5rem] pointer-events-none">
+          <div className="flex flex-col items-center gap-3 animate-in zoom-in duration-300">
+            <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center border-2 border-primary/50 border-dashed">
+              <Maximize className="w-8 h-8 text-primary animate-bounce" />
+            </div>
+            <p className="text-primary font-black uppercase tracking-widest text-sm">Drop your Art here</p>
+          </div>
+        </div>
+      )}
       {/* Corner glow accents */}
-      <div className="absolute top-10 left-10 w-16 h-16 border-t-2 border-l-2 border-primary/40 rounded-tl-2xl shadow-[-10px_-10px_30px_-10px_rgba(92,225,230,0.4)]" />
-      <div className="absolute top-10 right-10 w-16 h-16 border-t-2 border-r-2 border-secondary/40 rounded-tr-2xl shadow-[10px_-10px_30px_-10px_rgba(255,49,49,0.4)]" />
-      <div className="absolute bottom-10 left-10 w-16 h-16 border-b-2 border-l-2 border-secondary/40 rounded-bl-2xl shadow-[-10px_10px_30px_-10px_rgba(255,49,49,0.4)]" />
-      <div className="absolute bottom-10 right-10 w-16 h-16 border-b-2 border-r-2 border-primary/40 rounded-br-2xl shadow-[10px_10px_30px_-10px_rgba(92,225,230,0.4)]" />
+      <div className="hidden md:block absolute top-10 left-10 w-16 h-16 border-t-2 border-l-2 border-primary/40 rounded-tl-2xl shadow-[-10px_-10px_30px_-10px_rgba(92,225,230,0.4)]" />
+      <div className="hidden md:block absolute top-10 right-10 w-16 h-16 border-t-2 border-r-2 border-secondary/40 rounded-tr-2xl shadow-[10px_-10px_30px_-10px_rgba(255,49,49,0.4)]" />
+      <div className="hidden md:block absolute bottom-10 left-10 w-16 h-16 border-b-2 border-l-2 border-secondary/40 rounded-bl-2xl shadow-[-10px_10px_30px_-10px_rgba(255,49,49,0.4)]" />
+      <div className="hidden md:block absolute bottom-10 right-10 w-16 h-16 border-b-2 border-r-2 border-primary/40 rounded-br-2xl shadow-[10px_10px_30px_-10px_rgba(92,225,230,0.4)]" />
 
       {/* Hidden file input for fit-to-model */}
       <input
@@ -463,7 +510,7 @@ function CanvasPreviewArea({
 
       {/* Canvas */}
       <div
-        className="scale-[0.80] sm:scale-[0.85] md:scale-90 transition-transform relative bg-transparent my-16 lg:my-28 z-20"
+        className="scale-[0.80] sm:scale-[0.85] md:scale-90 transition-transform relative bg-transparent my-8 lg:my-10 z-20"
       >
         <CanvasEditor
           phoneModel={phoneModel}
@@ -474,12 +521,12 @@ function CanvasPreviewArea({
       </div>
 
       {/* Bottom info bar */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-8 bg-black/60 backdrop-blur-xl border border-border-subtle px-8 py-4 rounded-2xl z-30 shadow-2xl">
+      <div className="absolute bottom-6 md:bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-3 md:gap-8 bg-black/60 backdrop-blur-xl border border-border-subtle px-4 md:px-8 py-2.5 md:py-4 rounded-2xl z-30 shadow-2xl">
         <div className="text-left">
           <p className="text-[9px] text-muted-foreground font-black uppercase tracking-[0.2em] mb-1 opacity-60">
             Dimensions
           </p>
-          <p className="text-[12px] font-black text-primary tracking-wider hover:text-white transition-colors cursor-default">
+          <p className="text-[10px] md:text-[12px] font-black text-primary tracking-wider hover:text-white transition-colors cursor-default whitespace-nowrap">
             160.7 × 77.6 MM
           </p>
         </div>
@@ -490,7 +537,7 @@ function CanvasPreviewArea({
           <p className="text-[9px] text-muted-foreground font-black uppercase tracking-[0.2em] mb-1 opacity-60">
             Material
           </p>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 md:gap-2">
             <div
               className={cn(
                 'w-1.5 h-1.5 rounded-full',
@@ -501,7 +548,7 @@ function CanvasPreviewArea({
             />
             <p
               className={cn(
-                'text-[12px] font-black tracking-wider hover:text-white transition-colors cursor-default uppercase',
+                'text-[10px] md:text-[12px] font-black tracking-wider hover:text-white transition-colors cursor-default uppercase whitespace-nowrap',
                 isMagnetic ? 'text-secondary' : 'text-primary',
               )}
             >
@@ -548,6 +595,31 @@ function CustomizeContent() {
   // Holds a pending cart item while waiting for guest email
   const [pendingCartItem, setPendingCartItem] = useState<any | null>(null);
   const [hasCustomization, setHasCustomization] = useState(false);
+
+  // Cropper State
+  const [cropperOpen, setCropperOpen] = useState(false);
+  const [selectedImageSrc, setSelectedImageSrc] = useState<string | null>(null);
+
+  const handleImageUpload = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (reader.result) {
+        setSelectedImageSrc(reader.result as string);
+        setCropperOpen(true);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleCropComplete = (croppedImage: string) => {
+    if (!canvas) return;
+    const safeArea = (canvas as any).safeArea;
+    if (!safeArea) return;
+
+    addImageToCanvas(canvas, croppedImage, safeArea);
+    setCropperOpen(false);
+    setSelectedImageSrc(null);
+  };
 
   const loadingDesignRef = useRef<string | null>(null);
 
@@ -867,6 +939,8 @@ function CustomizeContent() {
               selectedObject={selectedObject}
               textColor={textColor}
               onColorChange={setTextColor}
+              onImageUpload={handleImageUpload}
+              onObjectAdded={() => updateCustomizationState(canvas)}
             />
 
             {/* Price block — desktop only */}
@@ -892,6 +966,7 @@ function CustomizeContent() {
               onObjectSelected={setSelectedObject}
               onModelLoaded={handleModelLoaded}
               isPreMadeDesign={isPreMadeDesign}
+              onImageDrop={handleImageUpload}
             />
 
             {/* Price block — mobile only */}
@@ -926,6 +1001,14 @@ function CustomizeContent() {
         open={showGuestModal}
         onConfirm={handleGuestEmailConfirm}
         onClose={() => { setShowGuestModal(false); setPendingCartItem(null); }}
+      />
+
+      {/* Lifted Cropper Modal */}
+      <ImageCropper
+        isOpen={cropperOpen}
+        onClose={() => setCropperOpen(false)}
+        imageSrc={selectedImageSrc}
+        onCropComplete={handleCropComplete}
       />
     </div>
   );

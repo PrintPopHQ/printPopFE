@@ -7,6 +7,12 @@ import {
   initializeCanvas,
   loadCaseImage,
   createSafeAreaOutline,
+  exportCanvasAsImage,
+  fitImageToCanvas,
+  fitSelectedImageToSafeArea,
+  clearCanvas,
+  exportArtworkOnly,
+  reorderLayers,
 } from '@/lib/canvas-utils';
 
 interface CanvasEditorProps {
@@ -42,17 +48,83 @@ export default function CanvasEditor({
     onModelLoadedRef.current = onModelLoaded;
   });
 
+  // --- Undo/Redo State ---
+  const historyRef = useRef<string[]>([]);
+  const redoStackRef = useRef<string[]>([]);
+  const isUndoingRef = useRef(false);
+  const isRedoingRef = useRef(false);
+
+  const saveHistory = () => {
+    const canvas = fabricCanvasRef.current;
+    if (!canvas || isUndoingRef.current || isRedoingRef.current) return;
+
+    // Capture state with custom properties
+    const json = JSON.stringify(canvas.toObject(['id', 'selectable', 'evented', 'clipPath']));
+
+    // Only save if it's different from the last state
+    if (historyRef.current.length > 0 && historyRef.current[historyRef.current.length - 1] === json) {
+      return;
+    }
+
+    historyRef.current.push(json);
+    if (historyRef.current.length > 30) {
+      historyRef.current.shift();
+    }
+
+    // Clear redo stack on new action
+    redoStackRef.current = [];
+  };
+
+  const undo = async () => {
+    const canvas = fabricCanvasRef.current;
+    if (!canvas || historyRef.current.length <= 1) return;
+
+    isUndoingRef.current = true;
+    const currentState = historyRef.current.pop(); // Remove current state
+    if (currentState) redoStackRef.current.push(currentState);
+
+    const lastState = historyRef.current[historyRef.current.length - 1];
+
+    try {
+      await canvas.loadFromJSON(JSON.parse(lastState));
+      reorderLayers(canvas);
+      canvas.renderAll();
+    } catch (err) {
+      console.error('Failed to undo:', err);
+    } finally {
+      isUndoingRef.current = false;
+    }
+  };
+
+  const redo = async () => {
+    const canvas = fabricCanvasRef.current;
+    if (!canvas || redoStackRef.current.length === 0) return;
+
+    isRedoingRef.current = true;
+    const nextState = redoStackRef.current.pop();
+    if (nextState) {
+      historyRef.current.push(nextState);
+      try {
+        await canvas.loadFromJSON(JSON.parse(nextState));
+        reorderLayers(canvas);
+        canvas.renderAll();
+      } catch (err) {
+        console.error('Failed to redo:', err);
+      }
+    }
+    isRedoingRef.current = false;
+  };
+
   const [isMobile, setIsMobile] = useState(false);
 
-  // Sync isMobile state with window width
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    checkMobile(); // Check on mount
+    checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // 1. Mount canvas element and initialize Fabric ONCE (re-init on model or mobile-view change)
+  // 1. Mount canvas element and initialize Fabric ONCE
   useEffect(() => {
     if (!wrapperRef.current || fabricCanvasRef.current) return;
 
@@ -61,9 +133,11 @@ export default function CanvasEditor({
     canvasElRef.current = canvasEl;
     wrapperRef.current.appendChild(canvasEl);
 
-    const CANVAS_PADDING = isMobile ? 20 : 140;
-    const width = (phoneModel?.canvasWidth || 320) + CANVAS_PADDING * 2;
-    const height = (phoneModel?.canvasHeight || 720) + CANVAS_PADDING * 2;
+    // Use initial sizing
+    const H_PADDING = window.innerWidth < 768 ? 0 : 140;
+    const V_PADDING = window.innerWidth < 768 ? 0 : 60;
+    const width = (phoneModel?.canvasWidth || 320) + H_PADDING * 2;
+    const height = (phoneModel?.canvasHeight || 720) + V_PADDING * 2;
     const canvas = initializeCanvas(canvasEl, width, height);
     fabricCanvasRef.current = canvas;
 
@@ -81,6 +155,15 @@ export default function CanvasEditor({
       onObjectSelectedRef.current?.(null);
     });
 
+    // History tracking
+    const handleObjectsChange = () => {
+      saveHistory();
+    };
+
+    canvas.on('object:added', handleObjectsChange);
+    canvas.on('object:modified', handleObjectsChange);
+    canvas.on('object:removed', handleObjectsChange);
+
     onCanvasReadyRef.current?.(canvas);
 
     return () => {
@@ -89,7 +172,57 @@ export default function CanvasEditor({
       }).catch(console.error);
       fabricCanvasRef.current = null;
     };
-  }, [isMobile]);
+  }, []); // Only once
+
+  // 1.1 Update dimensions on resize/mobile-view change
+  useEffect(() => {
+    const canvas = fabricCanvasRef.current;
+    if (!canvas || !phoneModel) return;
+
+    const H_PADDING = isMobile ? 0 : 140;
+    const V_PADDING = isMobile ? 0 : 60;
+    const newWidth = (phoneModel.canvasWidth || 320) + H_PADDING * 2;
+    const newHeight = (phoneModel.canvasHeight || 720) + V_PADDING * 2;
+
+    if (canvas.width === newWidth && canvas.height === newHeight) return;
+
+    // Track center shift to move objects
+    const oldCenter = canvas.getCenterPoint();
+    canvas.setDimensions({ width: newWidth, height: newHeight });
+    const newCenter = canvas.getCenterPoint();
+
+    const dx = newCenter.x - oldCenter.x;
+    const dy = newCenter.y - oldCenter.y;
+
+    canvas.getObjects().forEach((obj: any) => {
+      obj.set({
+        left: (obj.left || 0) + dx,
+        top: (obj.top || 0) + dy,
+      });
+
+      // Crucial: shift absolutePositioned clipPaths too
+      if (obj.clipPath && obj.clipPath.absolutePositioned) {
+        obj.clipPath.set({
+          left: (obj.clipPath.left || 0) + dx,
+          top: (obj.clipPath.top || 0) + dy,
+        });
+      }
+
+      obj.setCoords();
+    });
+
+    // Update the stored safeArea coordinates on the canvas instance
+    const currentSafeArea = (canvas as any).safeArea;
+    if (currentSafeArea) {
+      (canvas as any).safeArea = {
+        ...currentSafeArea,
+        left: currentSafeArea.left + dx,
+        top: currentSafeArea.top + dy,
+      };
+    }
+
+    canvas.renderAll();
+  }, [isMobile, phoneModel.id]);
 
   // 2. Reload image whenever phoneModel changes
   useEffect(() => {
@@ -110,6 +243,7 @@ export default function CanvasEditor({
       (canvas as any).safeArea = safeArea;
       canvas.renderAll();
       setIsLoading(false);
+      saveHistory(); // Save initial loaded state
       // Notify parent that the model has fully loaded with the real safeArea
       onModelLoadedRef.current?.(canvas);
     }, phoneModel.canvasWidth || 320).catch((err) => {
@@ -176,6 +310,54 @@ export default function CanvasEditor({
       wrapper.removeEventListener('touchmove', handleTouchMove);
       wrapper.removeEventListener('touchend', handleTouchEnd);
     };
+  }, []);
+
+  // 4. Keyboard Shortcuts: Ctrl+Z (Undo) and Delete/Backspace (Remove)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const canvas = fabricCanvasRef.current;
+      if (!canvas) return;
+
+      const activeObj = canvas.getActiveObject();
+      // Guard: Don't delete/undo if we are typing or editing text
+      const isEditingText = activeObj && activeObj.type === 'i-text' && (activeObj as any).isEditing;
+      const isInputFocused =
+        document.activeElement?.tagName === 'INPUT' ||
+        document.activeElement?.tagName === 'TEXTAREA';
+
+      if (isInputFocused) return;
+
+      if (e.ctrlKey && e.key.toLowerCase() === 'z' && !e.shiftKey) {
+        if (isEditingText) return;
+        e.preventDefault();
+        undo();
+        return;
+      }
+
+      if (
+        (e.ctrlKey && e.key.toLowerCase() === 'y') ||
+        (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'z')
+      ) {
+        if (isEditingText) return;
+        e.preventDefault();
+        redo();
+        return;
+      }
+
+      if (e.key === 'Delete' || e.key === 'Backspace') {
+        if (isEditingText) return;
+
+        if (activeObj && activeObj.id !== 'phone-overlay' && activeObj.id !== 'safe-area-outline') {
+          e.preventDefault();
+          canvas.remove(activeObj);
+          canvas.discardActiveObject();
+          canvas.renderAll();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   return (
