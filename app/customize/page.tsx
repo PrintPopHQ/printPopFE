@@ -413,8 +413,8 @@ function CanvasPreviewArea({
           </div>
         </div>
 
-        <div className="w-px h-6 bg-white/10 mx-1 hidden lg:block" />
-        <p className="text-primary text-xs font-bold tracking-widest uppercase hidden lg:block">Device Settings</p>
+        {/* <div className="w-px h-6 bg-white/10 mx-1 hidden lg:block" /> */}
+        {/* <p className="text-primary text-xs font-bold tracking-widest uppercase hidden lg:block">Device Settings</p> */}
 
         {/* Fit to Model button */}
         <div className="w-px h-6 bg-white/10 mx-1" />
