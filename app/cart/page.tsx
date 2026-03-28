@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { Minus, Plus, Loader2 } from 'lucide-react';
+import { Minus, Plus, Loader2, Trash2 } from 'lucide-react';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -15,6 +15,9 @@ import { useCheckoutMutation } from '@/packages/Mutations';
 
 interface CartItem {
   id: string;
+  isGroup?: boolean;
+  groupName?: string;
+  items?: any[];
   phoneModel: string;
   phoneModelId: string;
   caseType: string;
@@ -97,8 +100,21 @@ export default function CartPage() {
 
     toast.loading('Uploading your designs…', { id: 'checkout' });
 
+    // Flatten group items into individual items for the backend
+    const flattenedCartItems = cartItems.flatMap(item => {
+      if (item.isGroup && item.items) {
+        return item.items.map((subItem: any) => ({
+          ...subItem,
+          quantity: subItem.quantity * item.quantity,
+          guestEmail: item.guestEmail,
+          userEmail: item.userEmail
+        }));
+      }
+      return item;
+    });
+
     checkoutMutation.mutate(
-      { cartItems, email, accessToken: getAccessToken() ?? undefined },
+      { cartItems: flattenedCartItems, email, accessToken: getAccessToken() ?? undefined },
       {
         onSuccess: ({ orderId, checkoutUrl }) => {
           toast.dismiss('checkout');
@@ -160,69 +176,155 @@ export default function CartPage() {
           <div className="flex flex-col lg:flex-row gap-12 lg:gap-24">
             {/* Cart Items List */}
             <div className="flex-1 space-y-12">
-              {cartItems.map((item) => (
-                <div
-                  key={item.id}
-                  className="bg-[#000000] flex flex-col sm:flex-row gap-6 relative group"
-                >
-                  {/* Image Container */}
-                  <div className="w-40 h-40 shrink-0 bg-transparent relative overflow-hidden flex items-center justify-center">
-                    <Image
-                      src={item.image}
-                      alt={item.phoneModel}
-                      fill
-                      className="object-contain"
-                    />
-                  </div>
+              {cartItems.map((item) => {
+                if (item.isGroup) {
+                  return (
+                    <div key={item.id} className="relative bg-transparent border border-white/10 p-6 rounded-2xl flex flex-col gap-6">
+                      {/* Pill */}
+                      <div className="absolute -top-3 left-6 inline-flex bg-linear-to-r from-[#5CE1E6]/80 to-[#FF3131]/80 px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest uppercase text-white shadow-[0_0_15px_rgba(92,225,230,0.3)] z-10 w-fit">
+                        {item.groupName}
+                      </div>
 
-                  {/* Details Container */}
-                  <div className="flex-1 flex flex-col justify-center py-2 relative font-comic">
-                    <div className="absolute right-0 top-1/2 -translate-y-1/2">
+                      {/* Remove Button */}
                       <button
                         onClick={() => setItemToRemove(item.id)}
-                        className="bg-[#333333] hover:bg-[#444444] text-[#FF3366] cursor-pointer px-5 py-2 rounded-full text-sm font-medium transition-colors"
+                        className="absolute top-4 right-4 bg-[#333333] hover:bg-[#444444] text-[#FF3366] px-4 py-1.5 rounded-full text-xs font-medium transition-colors z-10 cursor-pointer"
                       >
                         Remove
                       </button>
-                    </div>
 
-                    <div className="space-y-1 pr-24">
-                      <h3 className="font-semibold text-lg text-white">
-                        {item.caseType}
-                      </h3>
-                      <p className="text-sm text-[#9CA3AF]">
-                        {item.phoneModel} - {item.textColor.toUpperCase()}
-                      </p>
-                    </div>
+                      <div className="flex flex-col gap-4 mt-6">
+                        {item.items?.map((sub: any, i: number) => (
+                           <div key={i} className="flex gap-6 items-center bg-black/40 p-4 rounded-xl border border-white/5 relative overflow-hidden group/subitem">
+                             {/* Subtle glow on hover */}
+                             <div className="absolute inset-0 bg-white/5 opacity-0 group-hover/subitem:opacity-100 transition-opacity" />
+                             
+                             <div className="w-20 h-20 shrink-0 bg-transparent relative overflow-hidden flex items-center justify-center">
+                               <Image src={sub.image} alt={sub.phoneModel} fill className="object-contain" />
+                             </div>
+                             
+                             <div className="flex-1 flex flex-col justify-center font-comic z-10">
+                               <h3 className="font-semibold text-white/90 text-sm mb-1">
+                                 <span className="text-[#5CE1E6]/50 mr-2 font-sans font-bold">#{i+1}</span>
+                                 {sub.phoneModel}
+                               </h3>
+                               <p className="text-[11px] text-[#9CA3AF] uppercase tracking-wide">
+                                 {sub.caseType} • {sub.textColor}
+                               </p>
+                             </div>
+                             
+                             <div className="text-right z-10">
+                               <p className="font-bold text-[#5CE1E6] font-sans text-sm">${sub.price.toFixed(2)}</p>
+                             </div>
+                           </div>
+                        ))}
+                      </div>
 
-                    <div className="mt-4">
-                      <p className="text-xl font-bold text-[#5CE1E6] mb-3">
-                        ${item.price.toFixed(2)}
-                      </p>
-
-                      {/* Quantity Selector */}
-                      <div className="flex items-center gap-0 w-fit">
-                        <button
-                          onClick={() => updateQuantity(item.id, 1)}
-                          className="w-8 h-8 flex items-center justify-center bg-[#112238] cursor-pointer text-[#9CA3AF] hover:text-white hover:bg-[#2A2A2A] rounded-l-md transition-colors"
-                        >
-                          <Plus size={16} />
-                        </button>
-                        <div className="w-8 h-8 flex items-center justify-center text-white font-medium text-sm">
-                          {item.quantity}
+                      <div className="flex justify-between items-end mt-2 pt-6 border-t border-white/10">
+                        {/* Quantity Selector */}
+                        <div className="flex items-center gap-0 w-fit">
+                          <button
+                            onClick={() => updateQuantity(item.id, -1)}
+                            disabled={item.quantity === 1}
+                            className="w-8 h-8 flex items-center justify-center bg-[#112238] cursor-pointer text-[#9CA3AF] hover:text-white hover:bg-[#2A2A2A] rounded-l-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            <Minus size={16} />
+                          </button>
+                          <div className="w-8 h-8 flex items-center justify-center text-white font-medium text-sm">
+                            {item.quantity}
+                          </div>
+                          <button
+                            onClick={() => updateQuantity(item.id, 1)}
+                            className="w-8 h-8 flex items-center justify-center bg-[#112238] cursor-pointer text-[#9CA3AF] hover:text-white hover:bg-[#2A2A2A] rounded-r-md transition-colors"
+                          >
+                            <Plus size={16} />
+                          </button>
                         </div>
-                        <button
-                          onClick={() => updateQuantity(item.id, -1)}
-                          disabled={item.quantity === 1}
-                          className="w-8 h-8 flex items-center justify-center bg-[#112238] cursor-pointer text-[#9CA3AF] hover:text-white hover:bg-[#2A2A2A] rounded-r-md transition-colors"
-                        >
-                          <Minus size={16} />
-                        </button>
+                        
+                        <div className="text-right">
+                          <p className="text-[10px] text-[#9CA3AF] uppercase tracking-widest mb-1">Group Total</p>
+                          <p className="text-2xl font-bold text-[#5CE1E6] font-sans">
+                            ${(item.price * item.quantity).toFixed(2)}
+                          </p>
+                        </div>
                       </div>
                     </div>
+                  );
+                }
+
+                // Render normal single items
+                return (
+                  <div
+                    key={item.id}
+                    className="flex gap-4 sm:gap-6 items-center bg-black/40 p-4 sm:p-5 rounded-2xl border border-white/10 relative overflow-hidden group/single transition-all hover:bg-black/60 hover:border-white/20"
+                  >
+                    {/* Subtle glow on hover */}
+                    <div className="absolute inset-0 bg-white/5 opacity-0 group-hover/single:opacity-100 transition-opacity pointer-events-none" />
+
+                    {/* Image Container */}
+                    <div className="w-24 h-24 sm:w-32 sm:h-32 shrink-0 bg-transparent relative overflow-hidden flex items-center justify-center z-10">
+                      <Image src={item.image} alt={item.phoneModel} fill className="object-contain drop-shadow-2xl" />
+                    </div>
+
+                    {/* Details Container */}
+                    <div className="flex-1 flex flex-col justify-center font-comic z-10 py-1">
+                      <div className="flex justify-between items-start mb-1">
+                        <h3 className="font-semibold text-white/90 text-lg sm:text-xl tracking-wide pr-8 sm:pr-0">
+                          {item.phoneModel}
+                        </h3>
+                        <button
+                          onClick={() => setItemToRemove(item.id)}
+                          className="bg-transparent hover:bg-white/10 text-white/40 hover:text-[#FF3366] p-2 cursor-pointer rounded-full transition-colors hidden sm:block"
+                          title="Remove Item"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                      
+                      <p className="text-[11px] sm:text-sm text-[#9CA3AF] uppercase tracking-wider mb-4">
+                        {item.caseType} <span className="mx-1.5 opacity-50">•</span> {item.textColor}
+                      </p>
+
+                      <div className="flex flex-wrap justify-between items-end gap-3 sm:gap-4 mt-auto">
+                        {/* Quantity Selector */}
+                        <div className="flex items-center gap-0 w-fit">
+                          <button
+                            onClick={() => updateQuantity(item.id, -1)}
+                            disabled={item.quantity === 1}
+                            className="w-8 h-8 flex items-center justify-center bg-[#112238] cursor-pointer text-[#9CA3AF] hover:text-white hover:bg-[#2A2A2A] rounded-l-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            <Minus size={16} />
+                          </button>
+                          <div className="w-8 h-8 flex items-center justify-center text-white font-medium text-sm">
+                            {item.quantity}
+                          </div>
+                          <button
+                            onClick={() => updateQuantity(item.id, 1)}
+                            className="w-8 h-8 flex items-center justify-center bg-[#112238] cursor-pointer text-[#9CA3AF] hover:text-white hover:bg-[#2A2A2A] rounded-r-md transition-colors"
+                          >
+                            <Plus size={16} />
+                          </button>
+                        </div>
+
+                        <div className="text-right">
+                          <p className="text-[9px] sm:text-[10px] text-[#9CA3AF] uppercase tracking-[0.2em] mb-0.5 opacity-70">Item Total</p>
+                          <p className="text-xl sm:text-2xl font-black text-[#5CE1E6] font-sans tracking-tight">
+                            ${(item.price * item.quantity).toFixed(2)}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Mobile remove button */}
+                    <button
+                      onClick={() => setItemToRemove(item.id)}
+                      className="absolute top-3 right-3 bg-black/60 backdrop-blur-md border border-white/10 text-white/50 hover:text-[#FF3366] p-1.5 rounded-full sm:hidden z-20 transition-colors"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                    </button>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             {/* Order Summary */}

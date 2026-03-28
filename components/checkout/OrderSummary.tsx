@@ -65,7 +65,7 @@ export function OrderSummary({ cartItems, subtotal, shippingCost, shippingMethod
       <div className="space-y-4 mb-6">
         {cartItems.map((item, idx) => (
           <div key={idx} className="flex justify-between items-center text-sm text-[#9CA3AF]">
-            <span>{item.caseType} x{item.quantity}</span>
+            <span>{item.isGroup ? item.groupName : item.caseType} x{item.quantity}</span>
             <span className="text-white">${(item.price * item.quantity).toFixed(2)}</span>
           </div>
         ))}

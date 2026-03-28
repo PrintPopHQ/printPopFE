@@ -2,7 +2,7 @@
 
 import { useState, useEffect, Suspense, useRef } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Palette, Maximize, Info, Eye } from 'lucide-react';
+import { Palette, Maximize, Info, Eye, ArrowRight, ArrowLeft } from 'lucide-react';
 
 import { PhoneModel } from '@/types/phone';
 import CanvasEditor from '@/components/CanvasEditor';
@@ -256,19 +256,27 @@ function PriceActionBlock({
   originalPrice,
   canvas,
   onAddToCart,
+  onNext,
   className,
   selectedObject,
   isPreMadeDesign,
   hasCustomization,
+  isGroupOrder,
+  currentIteration,
+  groupSize
 }: {
   price: number;
   originalPrice?: number;
   canvas: any;
   onAddToCart: () => void;
+  onNext: () => void;
   className?: string;
   selectedObject: any;
   isPreMadeDesign?: boolean;
   hasCustomization: boolean;
+  isGroupOrder: boolean;
+  currentIteration: number;
+  groupSize: number;
 }) {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -290,7 +298,7 @@ function PriceActionBlock({
       <div className="flex justify-between items-end">
         <div className="space-y-1">
           <p className="text-[9px] text-muted-foreground font-black uppercase tracking-[0.2em]">
-            Total Price
+            {isGroupOrder ? `Phone ${currentIteration} Price` : 'Total Price'}
           </p>
           <div className="flex items-baseline gap-3">
             <h2 className="text-4xl font-neon font-black text-white">
@@ -321,24 +329,36 @@ function PriceActionBlock({
           PREVIEW
         </Button>
 
-        <Button
-          size="lg"
-          className="w-full h-14 text-xs font-neon font-black btn-brand-gradient text-white rounded-xl shadow-[0_0_25px_rgba(255,49,49,0.3)] hover:shadow-[0_0_40px_rgba(255,49,49,0.5)] transition-all duration-500 group uppercase tracking-[0.2em]"
-          onClick={onAddToCart}
-          disabled={!canvas || (!isPreMadeDesign && !hasCustomization)}
-        >
-          ADD TO CART
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="4"
-            className="w-4 h-4 ml-3 group-hover:translate-x-1.5 transition-transform duration-300"
+        {isGroupOrder && currentIteration < groupSize ? (
+          <Button
+            size="lg"
+            className="w-full h-14 text-xs font-neon font-black bg-primary text-black rounded-xl hover:bg-primary/90 transition-all duration-300 uppercase tracking-[0.2em]"
+            onClick={onNext}
+            disabled={!canvas || (!isPreMadeDesign && !hasCustomization)}
           >
-            <line x1="5" y1="12" x2="19" y2="12" />
-            <polyline points="12 5 19 12 12 19" />
-          </svg>
-        </Button>
+            NEXT PHONE
+            <ArrowRight className="w-4 h-4 ml-2" />
+          </Button>
+        ) : (
+          <Button
+            size="lg"
+            className="w-full h-14 text-xs font-neon font-black btn-brand-gradient text-white rounded-xl shadow-[0_0_25px_rgba(255,49,49,0.3)] hover:shadow-[0_0_40px_rgba(255,49,49,0.5)] transition-all duration-500 group uppercase tracking-[0.2em]"
+            onClick={onAddToCart}
+            disabled={!canvas || (!isPreMadeDesign && !hasCustomization)}
+          >
+            ADD TO CART
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="4"
+              className="w-4 h-4 ml-3 group-hover:translate-x-1.5 transition-transform duration-300"
+            >
+              <line x1="5" y1="12" x2="19" y2="12" />
+              <polyline points="12 5 19 12 12 19" />
+            </svg>
+          </Button>
+        )}
       </div>
 
       <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
@@ -600,10 +620,12 @@ function CustomizeContent() {
   const [caseType, setCaseType] = useState<string>('Non-Magnetic');
   const [textColor, setTextColor] = useState<string>('#000000');
   const [isMounted, setIsMounted] = useState(false);
+  const [groupItemsLoaded, setGroupItemsLoaded] = useState(false);
   const [showGuestModal, setShowGuestModal] = useState(false);
   // Holds a pending cart item while waiting for guest email
   const [pendingCartItem, setPendingCartItem] = useState<any | null>(null);
   const [hasCustomization, setHasCustomization] = useState(false);
+  const [groupItems, setGroupItems] = useState<any[]>([]);
 
   // Cropper State
   const [cropperOpen, setCropperOpen] = useState(false);
@@ -639,6 +661,16 @@ function CustomizeContent() {
 
   useEffect(() => {
     setIsMounted(true);
+    // Load group cache on mount
+    const storedGroup = sessionStorage.getItem('printpop_group_order');
+    if (storedGroup) {
+      try {
+        setGroupItems(JSON.parse(storedGroup));
+      } catch (e) {
+        console.error('Failed to parse group order cache');
+      }
+    }
+    setGroupItemsLoaded(true);
   }, []);
 
   useEffect(() => {
@@ -650,18 +682,31 @@ function CustomizeContent() {
 
   // ── Reset all state when group iteration increments ───────────────────────
   useEffect(() => {
-    if (!isMounted) return;
+    if (!isMounted || !groupItemsLoaded) return;
     // Clear canvas user content and reset UI state for each new iteration
     if (canvas) {
       clearCanvas(canvas, true);
     }
-    setSelectedObject(null);
-    setTextColor('#000000');
-    setLocalModelId(null);
-    setPhoneModel(null);
-    setCaseType('Non-Magnetic');
+    
+    const savedItem = groupItems[currentIteration - 1];
+    if (savedItem) {
+      setLocalModelId(savedItem.phoneModelId);
+      setCaseType(savedItem.caseType);
+      setTextColor(savedItem.textColor);
+      if (savedItem.customImage) {
+        loadingDesignRef.current = savedItem.customImage;
+      }
+    } else {
+      // NOTE: setting localModelId to null triggers the next effect to auto-select the first model.
+      // Since this effect no longer depends on canvas or localModelId, it won't loop.
+      setSelectedObject(null);
+      setTextColor('#000000');
+      setLocalModelId(null);
+      setPhoneModel(null);
+      setCaseType('Non-Magnetic');
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentIteration]);
+  }, [currentIteration, isMounted, groupItemsLoaded]); // Run when iteration or mount state changes.
 
   useEffect(() => {
     if (models.length === 0) return;
@@ -743,6 +788,7 @@ function CustomizeContent() {
       // Use lower resolution (1x) and JPEG for localStorage to save space
       customImage: await exportArtworkOnly(canvas, 'jpeg', 0.7, 1),
       quantity: 1,
+      brand: brand || searchParams.get('brand'),
       // attach user email (logged-in or guest) for order tracking
       ...(email ? { guestEmail: email } : {}),
       ...(getUser() ? { userEmail: getUser()!.email } : {}),
@@ -777,38 +823,99 @@ function CustomizeContent() {
     };
 
     saveCart(existingCart);
+    sessionStorage.removeItem('printpop_group_order');
     window.dispatchEvent(new Event('cart_updated'));
 
-    if (isGroupOrder && currentIteration < groupSize) {
-      // More items in the group — go back to brand selector for the next item
-      const nextIteration = currentIteration + 1;
-      const params = new URLSearchParams(searchParams.toString());
-      params.set('c', nextIteration.toString());
-      router.push(`/customize?${params.toString()}`);
+    router.push('/cart');
+  };
+
+  const handleNextIteration = async () => {
+    if (!canvas || !phoneModel) return;
+    const item = await buildCartItem();
+    
+    const newItems = [...groupItems];
+    newItems[currentIteration - 1] = item;
+    setGroupItems(newItems);
+    sessionStorage.setItem('printpop_group_order', JSON.stringify(newItems));
+
+    const nextIteration = currentIteration + 1;
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('c', nextIteration.toString());
+    
+    // Check if we already have a saved brand for the next iteration
+    const nextItem = newItems[nextIteration - 1];
+    if (nextItem && nextItem.brand) {
+      params.set('brand', nextItem.brand);
     } else {
-      router.push('/cart');
+      params.delete('brand'); // Prompt brand selection for new phone
     }
+    
+    router.push(`/customize?${params.toString()}`);
+  };
+
+  const handlePreviousIteration = () => {
+    const prevIteration = currentIteration - 1;
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('c', prevIteration.toString());
+    
+    // Restore brand for the prev iteration if available
+    const prevItem = groupItems[prevIteration - 1];
+    if (prevItem && prevItem.brand) {
+      params.set('brand', prevItem.brand);
+    } else {
+      params.delete('brand');
+    }
+    
+    router.push(`/customize?${params.toString()}`);
   };
 
   const handleAddToCart = async () => {
     if (!canvas || !phoneModel) return;
 
+    let finalCartItem: any;
+    const currentItem = await buildCartItem();
+
+    if (isGroupOrder) {
+      // It's the last iteration!
+      const allItems = [...groupItems];
+      allItems[currentIteration - 1] = currentItem;
+      const groupName = groupSize === 2 ? 'TWO-PAIR' : groupSize === 3 ? 'THREE OF A KIND' : 'FAMILY DEAL';
+      const totalPrice = allItems.reduce((sum, item) => sum + (item?.price || 0), 0);
+      finalCartItem = {
+        id: crypto.randomUUID(),
+        isGroup: true,
+        groupName,
+        price: totalPrice,
+        image: allItems[0]?.image || currentItem.image,
+        items: allItems,
+        quantity: 1
+      };
+    } else {
+      finalCartItem = currentItem;
+    }
+
     if (isLoggedIn()) {
       // ── Logged-in path: go straight to cart ──────────────────────────────
-      commitToCart(await buildCartItem());
+      finalCartItem.userEmail = getUser()!.email;
+      if (finalCartItem.isGroup) {
+         finalCartItem.items.forEach((i: any) => i.userEmail = getUser()!.email);
+      }
+      commitToCart(finalCartItem);
       return;
     }
 
     // ── Guest path ────────────────────────────────────────────────────────
     const existingGuestEmail = getGuestEmail();
-    const cartItem = await buildCartItem(existingGuestEmail ?? undefined);
 
     if (existingGuestEmail) {
-      // Email already captured for a previous item — reuse it
-      commitToCart(cartItem);
+      finalCartItem.guestEmail = existingGuestEmail;
+      if (finalCartItem.isGroup) {
+         finalCartItem.items.forEach((i: any) => i.guestEmail = existingGuestEmail);
+      }
+      commitToCart(finalCartItem);
     } else {
       // First item: capture email via modal
-      setPendingCartItem(cartItem);
+      setPendingCartItem(finalCartItem);
       setShowGuestModal(true);
     }
   };
@@ -816,7 +923,11 @@ function CustomizeContent() {
   const handleGuestEmailConfirm = (email: string) => {
     setShowGuestModal(false);
     if (!pendingCartItem) return;
-    commitToCart({ ...pendingCartItem, guestEmail: email });
+    const itemWithEmail = { ...pendingCartItem, guestEmail: email };
+    if (itemWithEmail.isGroup) {
+        itemWithEmail.items.forEach((i: any) => i.guestEmail = email);
+    }
+    commitToCart(itemWithEmail);
     setPendingCartItem(null);
   };
 
@@ -831,17 +942,25 @@ function CustomizeContent() {
 
     // ── Auto-load pre-made design ──────────────────────────────────────────
     const designUrl = searchParams.get('design_url');
-    if (designUrl) {
-      // Prevent concurrent loads of the same design URL
-      if (loadingDesignRef.current === designUrl) return;
-      loadingDesignRef.current = designUrl;
+    const urlToLoad = loadingDesignRef.current || designUrl;
 
-      // Clear any existing user content before adding the pre-made design
+    if (urlToLoad) {
+      // Prevent concurrent loads of the same design URL
+      if (loadingDesignRef.current === urlToLoad && !designUrl) {
+         // It's loading from ref, we just let it proceed
+      } else if (loadingDesignRef.current === designUrl) {
+         return; 
+      }
+      
+      if (!loadingDesignRef.current) {
+        loadingDesignRef.current = designUrl;
+      }
+
+      // Clear any existing user content before adding the pre-made design or cached design
       clearCanvas(loadedCanvas, true);
 
-      fitImageToCanvas(loadedCanvas, designUrl, safeArea).finally(() => {
-        // Reset ref after load completes (or fails) so it can be re-loaded if needed later
-        // Use a timeout to prevent immediate double-triggering if effect runs twice
+      fitImageToCanvas(loadedCanvas, urlToLoad, safeArea).finally(() => {
+        // Reset ref after load completes
         setTimeout(() => {
           loadingDesignRef.current = null;
         }, 500);
@@ -908,7 +1027,7 @@ function CustomizeContent() {
                     Item {currentIteration} of {groupSize}
                   </span>
                 </div>
-                <div className="flex gap-1.5">
+                <div className="flex gap-1.5 mb-3">
                   {Array.from({ length: groupSize }).map((_, i) => (
                     <div
                       key={i}
@@ -921,7 +1040,30 @@ function CustomizeContent() {
                     />
                   ))}
                 </div>
-                <p className="text-[9px] text-muted-foreground mt-2 leading-relaxed">
+                
+                <div className="flex justify-between items-center mt-4">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-xs uppercase tracking-widest text-[#9CA3AF] hover:text-white"
+                    disabled={currentIteration === 1}
+                    onClick={handlePreviousIteration}
+                  >
+                    <ArrowLeft className="w-3.5 h-3.5 mr-1" />
+                    Prev
+                  </Button>
+                  <Button
+                    size="sm"
+                    className="text-xs uppercase tracking-widest bg-primary text-black hover:bg-primary/90"
+                    disabled={!canvas || (!isPreMadeDesign && !hasCustomization) || currentIteration === groupSize}
+                    onClick={handleNextIteration}
+                  >
+                    Next
+                    <ArrowRight className="w-3.5 h-3.5 ml-1" />
+                  </Button>
+                </div>
+
+                <p className="text-[9px] text-muted-foreground mt-4 leading-relaxed text-center">
                   {currentIteration < groupSize
                     ? `${groupSize - currentIteration} more phone${groupSize - currentIteration > 1 ? 's' : ''} to customize after this.`
                     : 'Last phone — add to cart to complete your group!'}
@@ -949,7 +1091,14 @@ function CustomizeContent() {
               canvas={canvas}
               selectedObject={selectedObject}
               textColor={textColor}
-              onColorChange={setTextColor}
+              onColorChange={(color: string) => {
+                setTextColor(color);
+                if (canvas && selectedObject && (selectedObject.type === 'i-text' || selectedObject.type === 'textbox')) {
+                  selectedObject.set('fill', color);
+                  canvas.renderAll();
+                  updateCustomizationState(canvas);
+                }
+              }}
               onImageUpload={handleImageUpload}
               onObjectAdded={() => updateCustomizationState(canvas)}
             />
@@ -960,10 +1109,14 @@ function CustomizeContent() {
               originalPrice={originalPrice}
               canvas={canvas}
               onAddToCart={handleAddToCart}
+              onNext={handleNextIteration}
               className="hidden lg:block"
               selectedObject={selectedObject}
               isPreMadeDesign={isPreMadeDesign}
               hasCustomization={hasCustomization}
+              isGroupOrder={isGroupOrder}
+              currentIteration={currentIteration}
+              groupSize={groupSize}
             />
           </div>
 
@@ -975,7 +1128,12 @@ function CustomizeContent() {
               canvas={canvas}
               selectedObject={selectedObject}
               onCanvasReady={setCanvas}
-              onObjectSelected={setSelectedObject}
+              onObjectSelected={(obj: any) => {
+                setSelectedObject(obj);
+                if (obj && (obj.type === 'i-text' || obj.type === 'textbox')) {
+                  setTextColor(obj.fill);
+                }
+              }}
               onModelLoaded={handleModelLoaded}
               isPreMadeDesign={isPreMadeDesign}
               onImageDrop={handleImageUpload}
@@ -987,10 +1145,14 @@ function CustomizeContent() {
               originalPrice={originalPrice}
               canvas={canvas}
               onAddToCart={handleAddToCart}
+              onNext={handleNextIteration}
               className="lg:hidden mt-4"
               selectedObject={selectedObject}
               isPreMadeDesign={isPreMadeDesign}
               hasCustomization={hasCustomization}
+              isGroupOrder={isGroupOrder}
+              currentIteration={currentIteration}
+              groupSize={groupSize}
             />
           </div>
         </div>
