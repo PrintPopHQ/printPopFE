@@ -4,21 +4,21 @@ import { getPricing } from "@/lib/pricing";
 export const PopularProducts = async () => {
   const pricingData = await getPricing();
 
-  const getPrice = (plan: string, isMagnetic: boolean, multiplier: number) => {
+  const getPrice = (plan: string, isMagnetic: boolean) => {
     const caseType = isMagnetic ? "magnetic" : "non_magnetic";
     const item = pricingData.find((p) => p.plan_type === plan && p.case_type === caseType);
-    if (!item) return multiplier * (isMagnetic ? 35 : 30); // fallback
-    return parseFloat(item.price) * multiplier;
+    if (!item) return isMagnetic ? 35 : 30; // fallback
+    return parseFloat(item.price);
   };
 
-  const twoPairNonMag = getPrice("pair_of_2", false, 2);
-  const twoPairMag = getPrice("pair_of_2", true, 2);
+  const twoPairNonMag = getPrice("pair_of_2", false);
+  const twoPairMag = getPrice("pair_of_2", true);
 
-  const threeKindNonMag = getPrice("pair_of_3", false, 3);
-  const threeKindMag = getPrice("pair_of_3", true, 3);
+  const threeKindNonMag = getPrice("pair_of_3", false);
+  const threeKindMag = getPrice("pair_of_3", true);
 
-  const familyNonMag = getPrice("family_plan", false, 4);
-  const familyMag = getPrice("family_plan", true, 4);
+  const familyNonMag = getPrice("family_plan", false);
+  const familyMag = getPrice("family_plan", true);
 
   return (
     <section className="relative overflow-hidden pt-6 pb-40">
@@ -51,7 +51,7 @@ export const PopularProducts = async () => {
                 TWO-PAIR
               </h3>
               <p className="text-gray-300 font-comic text-sm mb-6 opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500 line-clamp-2">
-                (Prices For non magnetic ({twoPairNonMag}$) and magnetic ({twoPairMag}$))
+                Available at ${twoPairNonMag} per piece for standard options and ${twoPairMag} per piece for magnetic cases.
               </p>
               <Link href="/customize?g=2&c=1&fresh=1" className="inline-flex items-center text-primary font-bold uppercase tracking-widest text-xs border-b-2 border-primary/30 hover:border-primary pb-1 transition-all duration-300">
                 start designing <span className="material-symbols-outlined text-sm ml-2">arrow_forward</span>
@@ -77,7 +77,7 @@ export const PopularProducts = async () => {
                 THREE OF A KIND
               </h3>
               <p className="text-gray-300 font-comic text-sm mb-6 opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500 line-clamp-2">
-                Non magnetic ({threeKindNonMag}$) and magnetic ({threeKindMag}$)
+                Available at ${threeKindNonMag} per piece for standard options and ${threeKindMag} per piece for magnetic cases.
               </p>
               <Link href="/customize?g=3&c=1&fresh=1" className="inline-flex items-center text-secondary font-bold uppercase tracking-widest text-xs border-b-2 border-secondary/30 hover:border-secondary pb-1 transition-all duration-300">
                 start designing <span className="material-symbols-outlined text-sm ml-2">arrow_forward</span>
@@ -99,7 +99,7 @@ export const PopularProducts = async () => {
                 FAMILY DEAL
               </h3>
               <p className="text-gray-300 font-comic text-sm mb-6 opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500 line-clamp-2">
-                Non magnetic ({familyNonMag}$) and magnetic ({familyMag}$)
+                Available at ${familyNonMag} per piece for standard options and ${familyMag} per piece for magnetic cases.
               </p>
               <Link href="/customize?g=4&c=1&fresh=1" className="inline-flex items-center text-primary font-bold uppercase tracking-widest text-xs border-b-2 border-primary/30 hover:border-primary pb-1 transition-all duration-300">
                 start designing <span className="material-symbols-outlined text-sm ml-2">arrow_forward</span>
