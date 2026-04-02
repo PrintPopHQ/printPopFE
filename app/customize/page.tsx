@@ -18,6 +18,8 @@ import { toast } from 'sonner';
 import { useGetModels } from '@/packages/Queries';
 import { isLoggedIn, getUser, getGuestEmail } from '@/lib/auth-store';
 import { TrendingStyles } from '@/app/landing/TrendingStyles';
+import { usePricing } from '@/contexts/PricingContext';
+
 
 // ─── Shared Primitives ────────────────────────────────────────────────────────
 
@@ -146,7 +148,7 @@ function ArmorTypeSelector({
       <div className="grid grid-cols-2 gap-2.5 text-left">
         {types.map((type) => {
           const isActive = caseType === type;
-          const isMagnetic = type === 'Magnetic';
+          const isMagnetic = type?.toLowerCase() === 'magnetic';
 
           return (
             <div
@@ -394,7 +396,7 @@ function CanvasPreviewArea({
   isPreMadeDesign?: boolean;
   onImageDrop?: (file: File) => void;
 }) {
-  const isMagnetic = caseType === 'Magnetic';
+  const isMagnetic = caseType?.toLowerCase() === 'magnetic';
   const fitFileInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
 
@@ -607,6 +609,8 @@ function CustomizeContent() {
   const searchParams = useSearchParams();
   const brand = searchParams.get('brand');
   const router = useRouter();
+  const { getPriceForConfig } = usePricing();
+
 
   // ── Group ordering params ─────────────────────────────────────────────────
   const groupSize = parseInt(searchParams.get('g') ?? '1', 10);
@@ -756,10 +760,8 @@ function CustomizeContent() {
   }, [localModelId, models]);
 
   // ── Handlers ─────────────────────────────────────────────────────────────
-  const basePrice = groupSize > 1 ? 30 : 35;
-  const originalBasePrice = 35;
-  const currentPrice = caseType === 'Magnetic' ? basePrice + 5 : basePrice;
-  const originalPrice = caseType === 'Magnetic' ? originalBasePrice + 5 : originalBasePrice;
+  const { price: currentPrice, originalPrice } = getPriceForConfig(groupSize, caseType?.toLowerCase() === 'magnetic');
+
 
   const updateCustomizationState = (c: any) => {
     const objects = c.getObjects();

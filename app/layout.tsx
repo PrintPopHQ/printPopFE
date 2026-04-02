@@ -3,6 +3,8 @@ import { Comic_Neue, Montserrat } from "next/font/google";
 import "./globals.css";
 import { LayoutHeaderFooter } from "@/components/layout/LayoutHeaderFooter";
 import { Providers } from "./providers";
+import { PricingProvider } from "@/contexts/PricingContext";
+import { getPricing } from "@/lib/pricing";
 
 const comicNeue = Comic_Neue({
   variable: "--font-comic-neue",
@@ -22,11 +24,13 @@ export const metadata: Metadata = {
   description: "Printpop - Your one-stop shop for all your printing needs.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const pricingData = await getPricing();
+
   return (
     <html lang="en">
       <head>
@@ -38,11 +42,13 @@ export default function RootLayout({
       <body
         className={`${comicNeue.variable} ${montserrat.variable} antialiased bg-background text-foreground font-sans`}
       >
-        <Providers>
-          <LayoutHeaderFooter>
-            {children}
-          </LayoutHeaderFooter>
-        </Providers>
+        <PricingProvider initialPricing={pricingData}>
+          <Providers>
+            <LayoutHeaderFooter>
+              {children}
+            </LayoutHeaderFooter>
+          </Providers>
+        </PricingProvider>
       </body>
     </html>
   );
