@@ -462,27 +462,51 @@ export const updateObjectFontFamily = (
   }
 };
 
+/**
+ * Export the canvas as an image.
+ * When cropToSafeArea=true, crops to just the phone-model safe area (no black padding borders).
+ */
 export const exportCanvasAsImage = (
   canvas: any,
   format: 'png' | 'jpeg' = 'png',
   quality: number = 1,
-  multiplier: number = 2
+  multiplier: number = 2,
+  cropToSafeArea: boolean = false
 ): string => {
-  return canvas.toDataURL({
-    format,
-    quality,
-    multiplier, // Default to 2x for print, can be lowered for preview
-  });
+  if (cropToSafeArea) {
+    const safeArea = (canvas as any).safeArea as SafeArea | undefined;
+    if (safeArea) {
+      return canvas.toDataURL({
+        format,
+        quality,
+        multiplier,
+        left: safeArea.left,
+        top: safeArea.top,
+        width: safeArea.width,
+        height: safeArea.height,
+      });
+    }
+  }
+  return canvas.toDataURL({ format, quality, multiplier });
 };
 
 /**
- * Exports only the user's artwork (images + text) cropped to the safe area (phone model bounds).
+ * Serialise the full Fabric canvas state (all user objects + system layers) to
+ * a JSON string that can later be restored via canvas.loadFromJSON().
+ * Custom properties (id, selectable, evented, clipPath) are preserved.
+ */
+export const exportCanvasJSON = (canvas: any): string => {
+  return JSON.stringify(canvas.toObject(['id', 'selectable', 'evented', 'clipPath']));
+};
+
+/**
+ * Exports only the user's artwork (images + text) cropped to the safe area.
  *
- * Strategy: directly read the underlying HTML canvas element (bypasses all Fabric toDataURL
- * multiplier/crop bugs), hide the phone overlay, render, then draw the exact safe-area region
- * onto an offscreen canvas scaled up to 2× for print quality.
+ * Uses Fabric's native left/top/width/height crop in toDataURL — this is the only reliable
+ * approach because Fabric's toDataURL pixel output dimensions don't map 1:1 with logical
+ * canvas coords on retina/HiDPI displays, making manual drawImage cropping unreliable.
  *
- * Returns a Promise resolving to a data-URL of the cropped artwork.
+ * Returns a Promise for API compatibility.
  */
 export const exportArtworkOnly = (
   canvas: any,
@@ -495,43 +519,33 @@ export const exportArtworkOnly = (
   const safeArea = (canvas as any).safeArea as SafeArea | undefined;
   const objects = canvas.getObjects();
   const overlay = objects.find((obj: any) => obj.id === 'phone-overlay');
+  const safeAreaOutline = objects.find((obj: any) => obj.id === 'safe-area-outline');
   const safeAreaObj = objects.find((obj: any) => obj.id === 'safe-area');
 
-  // Hide phone overlay and safe-area outline so only user artwork is visible
-  const originalOverlayVisible = overlay?.visible;
-  const originalSafeAreaVisible = safeAreaObj?.visible;
+  // Hide system objects so only user artwork is visible
+  const originalOverlayVisible = overlay?.visible ?? true;
+  const originalOutlineVisible = safeAreaOutline?.visible ?? true;
+  const originalSafeAreaVisible = safeAreaObj?.visible ?? true;
+
   if (overlay) overlay.set({ visible: false });
+  if (safeAreaOutline) safeAreaOutline.set({ visible: false });
   if (safeAreaObj) safeAreaObj.set({ visible: false });
   canvas.renderAll();
 
-  // Get the underlying HTML canvas element – Fabric renders into this
-  const sourceEl: HTMLCanvasElement = canvas.getElement();
+  // Use Fabric's native crop export — avoids all manual coordinate & DPR math
+  const result = canvas.toDataURL({
+    format,
+    quality,
+    multiplier: resolutionMultiplier,
+    left: safeArea?.left ?? 0,
+    top: safeArea?.top ?? 0,
+    width: safeArea?.width ?? canvas.width,
+    height: safeArea?.height ?? canvas.height,
+  });
 
-  // Determine crop region in the SOURCE canvas pixel space.
-  // sourceEl.width / canvas.width gives the device-pixel-ratio that Fabric uses.
-  const dpRatio = sourceEl.width / canvas.width;
-
-  const cropX = (safeArea?.left ?? 0) * dpRatio;
-  const cropY = (safeArea?.top ?? 0) * dpRatio;
-  const cropW = (safeArea?.width ?? canvas.width) * dpRatio;
-  const cropH = (safeArea?.height ?? canvas.height) * dpRatio;
-
-  // Build an offscreen canvas at the requested scale
-  const outputW = Math.round(cropW * resolutionMultiplier);
-  const outputH = Math.round(cropH * resolutionMultiplier);
-  const offscreen = document.createElement('canvas');
-  offscreen.width = outputW;
-  offscreen.height = outputH;
-  const ctx = offscreen.getContext('2d');
-
-  if (ctx) {
-    ctx.drawImage(sourceEl, cropX, cropY, cropW, cropH, 0, 0, outputW, outputH);
-  }
-
-  const result = offscreen.toDataURL(`image/${format}`, quality);
-
-  // Restore phone overlay
+  // Restore system objects
   if (overlay) overlay.set({ visible: originalOverlayVisible });
+  if (safeAreaOutline) safeAreaOutline.set({ visible: originalOutlineVisible });
   if (safeAreaObj) safeAreaObj.set({ visible: originalSafeAreaVisible });
   canvas.renderAll();
 

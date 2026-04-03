@@ -8,7 +8,7 @@ import { PhoneModel } from '@/types/phone';
 import CanvasEditor from '@/components/CanvasEditor';
 import EditorControls from '@/components/EditorControls';
 import ImageCropper from '@/components/ImageCropper';
-import { exportCanvasAsImage, fitImageToCanvas, fitSelectedImageToSafeArea, clearCanvas, exportArtworkOnly, addImageToCanvas } from '@/lib/canvas-utils';
+import { exportCanvasAsImage, fitImageToCanvas, fitSelectedImageToSafeArea, clearCanvas, exportArtworkOnly, addImageToCanvas, exportCanvasJSON } from '@/lib/canvas-utils';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
@@ -631,6 +631,9 @@ function CustomizeContent() {
   const [hasCustomization, setHasCustomization] = useState(false);
   const [groupItems, setGroupItems] = useState<any[]>([]);
 
+  // Track intentional navigation (Next/Prev/Cart) to avoid clearing session on those route changes
+  const isNavigatingRef = useRef(false);
+
   // Cropper State
   const [cropperOpen, setCropperOpen] = useState(false);
   const [selectedImageSrc, setSelectedImageSrc] = useState<string | null>(null);
@@ -675,6 +678,16 @@ function CustomizeContent() {
       }
     }
     setGroupItemsLoaded(true);
+
+    // Clear group session storage when the page is fully destroyed (user navigates away),
+    // but NOT during intentional group iteration navigation (Next / Prev / Cart).
+    return () => {
+      if (!isNavigatingRef.current) {
+        sessionStorage.removeItem('printpop_group_order');
+      }
+      // Always reset the flag
+      isNavigatingRef.current = false;
+    };
   }, []);
 
   useEffect(() => {
@@ -697,7 +710,11 @@ function CustomizeContent() {
       setLocalModelId(savedItem.phoneModelId);
       setCaseType(savedItem.caseType);
       setTextColor(savedItem.textColor);
-      if (savedItem.customImage) {
+      // canvasJSON takes priority — it fully restores the editable canvas state
+      // customImage is the fallback for old items that don't have canvasJSON
+      if (savedItem.canvasJSON) {
+        loadingDesignRef.current = savedItem.canvasJSON; // signal to handleModelLoaded
+      } else if (savedItem.customImage) {
         loadingDesignRef.current = savedItem.customImage;
       }
     } else {
@@ -783,11 +800,10 @@ function CustomizeContent() {
       caseType,
       textColor,
       price: currentPrice,
-      // image: full canvas preview/mockup (complete design)
+      // image: full canvas preview/mockup (phone frame + artwork)
       // Use lower resolution (1x) and JPEG for localStorage to save space (prevents QuotaExceededError)
       image: exportCanvasAsImage(canvas, 'jpeg', 0.7, 1),
-      // customImage: the artwork itself (user upload + text, no phone frame)
-      // Use lower resolution (1x) and JPEG for localStorage to save space
+      // customImage: artwork cropped to safe area (no phone frame) — used in backend processing
       customImage: await exportArtworkOnly(canvas, 'jpeg', 0.7, 1),
       quantity: 1,
       brand: brand || searchParams.get('brand'),
@@ -833,13 +849,18 @@ function CustomizeContent() {
 
   const handleNextIteration = async () => {
     if (!canvas || !phoneModel) return;
-    const item = await buildCartItem();
-    
+    const baseItem = await buildCartItem();
+
+    // Save the full Fabric JSON so we can perfectly restore this canvas on Back navigation.
+    // This preserves exact object positions, scales, text, and user transforms.
+    const item = { ...baseItem, canvasJSON: exportCanvasJSON(canvas) };
+
     const newItems = [...groupItems];
     newItems[currentIteration - 1] = item;
     setGroupItems(newItems);
     sessionStorage.setItem('printpop_group_order', JSON.stringify(newItems));
 
+    isNavigatingRef.current = true; // Don't clear session on this route change
     const nextIteration = currentIteration + 1;
     const params = new URLSearchParams(searchParams.toString());
     params.set('c', nextIteration.toString());
@@ -867,7 +888,8 @@ function CustomizeContent() {
     } else {
       params.delete('brand');
     }
-    
+
+    isNavigatingRef.current = true; // Don't clear session on this route change
     router.push(`/customize?${params.toString()}`);
   };
 
@@ -902,6 +924,7 @@ function CustomizeContent() {
       if (finalCartItem.isGroup) {
          finalCartItem.items.forEach((i: any) => i.userEmail = getUser()!.email);
       }
+      isNavigatingRef.current = true; // Don't clear session on cart navigation
       commitToCart(finalCartItem);
       return;
     }
@@ -914,6 +937,7 @@ function CustomizeContent() {
       if (finalCartItem.isGroup) {
          finalCartItem.items.forEach((i: any) => i.guestEmail = existingGuestEmail);
       }
+      isNavigatingRef.current = true; // Don't clear session on cart navigation
       commitToCart(finalCartItem);
     } else {
       // First item: capture email via modal
@@ -929,6 +953,7 @@ function CustomizeContent() {
     if (itemWithEmail.isGroup) {
         itemWithEmail.items.forEach((i: any) => i.guestEmail = email);
     }
+    isNavigatingRef.current = true; // Don't clear session on cart navigation
     commitToCart(itemWithEmail);
     setPendingCartItem(null);
   };
@@ -942,30 +967,47 @@ function CustomizeContent() {
     const safeArea = (loadedCanvas as any).safeArea;
     if (!safeArea) return;
 
-    // ── Auto-load pre-made design ──────────────────────────────────────────
+    // Attach listeners to track customization (always)
+    loadedCanvas.on('object:added', () => updateCustomizationState(loadedCanvas));
+    loadedCanvas.on('object:removed', () => updateCustomizationState(loadedCanvas));
+
+    const pending = loadingDesignRef.current;
+    loadingDesignRef.current = null;
+
+    // ── Restore full Fabric JSON (group Back navigation) ──────────────────
+    // canvasJSON is a serialised JSON *string* of the full Fabric state.
+    // We detect it by checking if it starts with '{' (JSON object).
+    if (pending && pending.trimStart().startsWith('{')) {
+      clearCanvas(loadedCanvas, true);
+      try {
+        const json = JSON.parse(pending);
+        loadedCanvas.loadFromJSON(json).then(() => {
+          // After restoring, re-apply the phone overlay on top
+          import('@/lib/canvas-utils').then(({ reorderLayers }) => {
+            reorderLayers(loadedCanvas);
+            loadedCanvas.renderAll();
+            updateCustomizationState(loadedCanvas);
+          });
+        }).catch((err: any) => {
+          console.error('Failed to restore canvas JSON:', err);
+          updateCustomizationState(loadedCanvas);
+        });
+      } catch (err) {
+        console.error('Failed to parse canvas JSON:', err);
+        updateCustomizationState(loadedCanvas);
+      }
+      return;
+    }
+
+    // ── Auto-load image URL (pre-made design or customImage fallback) ────
     const designUrl = searchParams.get('design_url');
-    const urlToLoad = loadingDesignRef.current || designUrl;
+    const urlToLoad = pending || designUrl;
 
     if (urlToLoad) {
-      // Prevent concurrent loads of the same design URL
-      if (loadingDesignRef.current === urlToLoad && !designUrl) {
-         // It's loading from ref, we just let it proceed
-      } else if (loadingDesignRef.current === designUrl) {
-         return; 
-      }
-      
-      if (!loadingDesignRef.current) {
-        loadingDesignRef.current = designUrl;
-      }
-
-      // Clear any existing user content before adding the pre-made design or cached design
+      // Clear any existing user content before adding the design
       clearCanvas(loadedCanvas, true);
-
       fitImageToCanvas(loadedCanvas, urlToLoad, safeArea).finally(() => {
-        // Reset ref after load completes
-        setTimeout(() => {
-          loadingDesignRef.current = null;
-        }, 500);
+        updateCustomizationState(loadedCanvas);
       });
       return;
     }
@@ -977,9 +1019,6 @@ function CustomizeContent() {
       fitSelectedImageToSafeArea(loadedCanvas, uploadedImg, safeArea);
     }
 
-    // Attach listeners to track customization
-    loadedCanvas.on('object:added', () => updateCustomizationState(loadedCanvas));
-    loadedCanvas.on('object:removed', () => updateCustomizationState(loadedCanvas));
     // Initial check
     updateCustomizationState(loadedCanvas);
   };
