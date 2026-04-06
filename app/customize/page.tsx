@@ -804,7 +804,7 @@ function CustomizeContent() {
       // Use lower resolution (1x) and JPEG for localStorage to save space (prevents QuotaExceededError)
       image: exportCanvasAsImage(canvas, 'jpeg', 0.7, 1),
       // customImage: artwork cropped to safe area (no phone frame) — used in backend processing
-      customImage: await exportArtworkOnly(canvas, 'jpeg', 0.7, 1),
+      customImage: await exportArtworkOnly(canvas, 'jpeg', 0.9, 2),
       quantity: 1,
       brand: brand || searchParams.get('brand'),
       // attach user email (logged-in or guest) for order tracking

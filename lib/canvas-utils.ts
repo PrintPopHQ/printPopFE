@@ -502,52 +502,110 @@ export const exportCanvasJSON = (canvas: any): string => {
 /**
  * Exports only the user's artwork (images + text) cropped to the safe area.
  *
- * Uses Fabric's native left/top/width/height crop in toDataURL — this is the only reliable
- * approach because Fabric's toDataURL pixel output dimensions don't map 1:1 with logical
- * canvas coords on retina/HiDPI displays, making manual drawImage cropping unreliable.
- *
- * Returns a Promise for API compatibility.
+ * 1. Hide system layers, export full canvas at multiplier=1.
+ * 2. Manually crop the safe-area region from the full export.
+ * 3. Apply white background + rounded corners.
  */
 export const exportArtworkOnly = (
   canvas: any,
   format: 'png' | 'jpeg' = 'png',
   quality: number = 1,
-  resolutionMultiplier: number = 2
+  _resolutionMultiplier: number = 2
 ): Promise<string> => {
   if (!canvas) return Promise.resolve('');
 
   const safeArea = (canvas as any).safeArea as SafeArea | undefined;
+  if (!safeArea) {
+    return Promise.resolve(canvas.toDataURL({ format, quality, multiplier: 1 }));
+  }
+
   const objects = canvas.getObjects();
   const overlay = objects.find((obj: any) => obj.id === 'phone-overlay');
   const safeAreaOutline = objects.find((obj: any) => obj.id === 'safe-area-outline');
   const safeAreaObj = objects.find((obj: any) => obj.id === 'safe-area');
 
-  // Hide system objects so only user artwork is visible
-  const originalOverlayVisible = overlay?.visible ?? true;
-  const originalOutlineVisible = safeAreaOutline?.visible ?? true;
-  const originalSafeAreaVisible = safeAreaObj?.visible ?? true;
+  // Save and hide system layers
+  const origOverlay = overlay?.visible ?? true;
+  const origOutline = safeAreaOutline?.visible ?? true;
+  const origSafeArea = safeAreaObj?.visible ?? true;
 
   if (overlay) overlay.set({ visible: false });
   if (safeAreaOutline) safeAreaOutline.set({ visible: false });
   if (safeAreaObj) safeAreaObj.set({ visible: false });
-  canvas.renderAll();
 
-  // Use Fabric's native crop export — avoids all manual coordinate & DPR math
-  const result = canvas.toDataURL({
-    format,
-    quality,
-    multiplier: resolutionMultiplier,
-    left: safeArea?.left ?? 0,
-    top: safeArea?.top ?? 0,
-    width: safeArea?.width ?? canvas.width,
-    height: safeArea?.height ?? canvas.height,
+  // Temporarily remove rounded corners from user object clipPaths for sharp print export
+  const clipPathOriginals: { obj: any; rx: number; ry: number }[] = [];
+  objects.forEach((obj: any) => {
+    if (obj.clipPath && obj.id !== 'phone-overlay' && obj.id !== 'safe-area-outline' && obj.id !== 'safe-area') {
+      clipPathOriginals.push({ obj, rx: obj.clipPath.rx || 0, ry: obj.clipPath.ry || 0 });
+      obj.clipPath.set({ rx: 0, ry: 0 });
+    }
   });
 
-  // Restore system objects
-  if (overlay) overlay.set({ visible: originalOverlayVisible });
-  if (safeAreaOutline) safeAreaOutline.set({ visible: originalOutlineVisible });
-  if (safeAreaObj) safeAreaObj.set({ visible: originalSafeAreaVisible });
+  // Deselect objects to remove selection handles from export
+  const activeObj = canvas.getActiveObject();
+  canvas.discardActiveObject();
   canvas.renderAll();
 
-  return Promise.resolve(result);
+  // Export full canvas at 1x
+  const fullDataUrl: string = canvas.toDataURL({
+    format: 'png',
+    quality: 1,
+    multiplier: 1,
+  });
+
+  // Restore clipPath rounded corners
+  clipPathOriginals.forEach(({ obj, rx, ry }) => {
+    obj.clipPath.set({ rx, ry });
+  });
+
+  // Restore system layers and selection
+  if (overlay) overlay.set({ visible: origOverlay });
+  if (safeAreaOutline) safeAreaOutline.set({ visible: origOutline });
+  if (safeAreaObj) safeAreaObj.set({ visible: origSafeArea });
+  if (activeObj) canvas.setActiveObject(activeObj);
+  canvas.renderAll();
+
+  // Crop the safe-area region from the full export
+  return new Promise<string>((resolve) => {
+    const fullImg = new Image();
+    fullImg.onload = () => {
+      const exportW = fullImg.naturalWidth;
+      const exportH = fullImg.naturalHeight;
+
+      const pixRatioX = exportW / canvas.width;
+      const pixRatioY = exportH / canvas.height;
+
+      // safeArea.left/top are CENTER coordinates (set via canvas.centerObject
+      // with originX/Y: 'center'). Convert to top-left for cropping.
+      const safeLeftTopX = safeArea.left - safeArea.width / 2;
+      const safeLeftTopY = safeArea.top - safeArea.height / 2;
+
+      const srcX = Math.round(safeLeftTopX * pixRatioX);
+      const srcY = Math.round(safeLeftTopY * pixRatioY);
+      const srcW = Math.round(safeArea.width * pixRatioX);
+      const srcH = Math.round(safeArea.height * pixRatioY);
+
+      // Output dimensions
+      const outW = Math.max(srcW, Math.round(safeArea.width * _resolutionMultiplier));
+      const outH = Math.max(srcH, Math.round(safeArea.height * _resolutionMultiplier));
+
+      const outCanvas = document.createElement('canvas');
+      outCanvas.width = outW;
+      outCanvas.height = outH;
+      const ctx = outCanvas.getContext('2d')!;
+
+
+      // Draw cropped region upscaled to output
+      ctx.drawImage(
+        fullImg,
+        srcX, srcY, srcW, srcH,
+        0, 0, outW, outH,
+      );
+
+      resolve(outCanvas.toDataURL('image/png', quality));
+    };
+    fullImg.onerror = () => resolve(fullDataUrl);
+    fullImg.src = fullDataUrl;
+  });
 };
