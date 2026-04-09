@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { OrderSummary } from '@/components/checkout/OrderSummary';
@@ -48,23 +48,69 @@ export default function CheckoutPage() {
   const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
   const total = Math.max(0, subtotal - discountAmount + shippingCost);
 
-  const shippingDetails = {
+  const shippingDetails = useMemo(() => ({
     firstName: shippingData.firstName,
     lastName: shippingData.lastName,
     email: shippingData.email,
     phone: shippingData.phone,
     shippingMethodName: shippingMethodName,
     shippingCost: shippingCost,
-  };
+  }), [shippingData.firstName, shippingData.lastName, shippingData.email, shippingData.phone, shippingMethodName, shippingCost]);
 
-  const shippingAddress = {
+  const shippingAddress = useMemo(() => ({
     streetAddress1: shippingData.streetAddress1,
     streetAddress2: shippingData.streetAddress2,
     suburb: shippingData.suburb,
     state: shippingData.state,
     postal: shippingData.postal,
     country: shippingData.country,
-  };
+  }), [shippingData.streetAddress1, shippingData.streetAddress2, shippingData.suburb, shippingData.state, shippingData.postal, shippingData.country]);
+
+  const finalBillingAddress = useMemo(() => {
+    if (useSameAsShipping) return shippingAddress;
+    return {
+      firstName: billingAddress.firstName,
+      lastName: billingAddress.lastName,
+      email: billingAddress.email,
+      phone: billingAddress.phone,
+      streetAddress1: billingAddress.streetAddress1,
+      streetAddress2: billingAddress.streetAddress2,
+      suburb: billingAddress.suburb,
+      state: billingAddress.state,
+      postal: billingAddress.postal,
+      country: billingAddress.country,
+    };
+  }, [useSameAsShipping, shippingAddress, billingAddress]);
+
+  const isFormComplete = useMemo(() => {
+    const hasShipping = !!(
+      shippingData.firstName &&
+      shippingData.lastName &&
+      shippingData.email &&
+      shippingData.phone &&
+      shippingData.streetAddress1 &&
+      shippingData.suburb &&
+      shippingData.state &&
+      shippingData.postal &&
+      shippingData.country &&
+      shippingCost > 0
+    );
+
+    if (!hasShipping) return false;
+    if (useSameAsShipping) return true;
+
+    return !!(
+      billingAddress.firstName &&
+      billingAddress.lastName &&
+      billingAddress.email &&
+      billingAddress.phone &&
+      billingAddress.streetAddress1 &&
+      billingAddress.suburb &&
+      billingAddress.state &&
+      billingAddress.postal &&
+      billingAddress.country
+    );
+  }, [shippingData, shippingCost, useSameAsShipping, billingAddress]);
 
   if (!isMounted) return <div className="min-h-screen bg-[#000000]" />;
 
@@ -106,8 +152,9 @@ export default function CheckoutPage() {
               amount={total} 
               shippingAddress={shippingAddress}
               shippingDetails={shippingDetails}
-              billingAddress={useSameAsShipping ? shippingAddress : billingAddress}
+              billingAddress={finalBillingAddress}
               couponCode={couponCode}
+              isFormComplete={isFormComplete}
               onStripeStateChange={setIsStripeComplete}
               onSubmittingChange={setIsSubmitting}
               bindSubmit={(fn) => { submitRef.current = fn; }}
@@ -137,3 +184,4 @@ export default function CheckoutPage() {
     </div>
   );
 }
+
