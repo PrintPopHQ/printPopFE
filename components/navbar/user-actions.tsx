@@ -49,6 +49,8 @@ export function UserActions() {
 
   const handleLogout = () => {
     removeUser();
+    localStorage.removeItem('printpop_cart');
+    window.dispatchEvent(new Event('cart_updated'));
     toast.success("Logged out", { description: "See you next time!" });
     router.push('/signin');
   };

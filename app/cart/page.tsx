@@ -11,7 +11,8 @@ import { cn } from '@/lib/utils';
 import RemoveCartItemModal from '@/components/modals/RemoveCartItemModal';
 import { isLoggedIn, getUser, getGuestEmail, getAccessToken } from '@/lib/auth-store';
 import { toast } from 'sonner';
-import { useCheckoutMutation } from '@/packages/Mutations';
+import { useCheckoutMutation, useUpdateCartItemMutation, useDeleteCartItemMutation } from '@/packages/Mutations';
+
 
 interface CartItem {
   id: string;
@@ -36,6 +37,9 @@ export default function CartPage() {
   const [isMounted, setIsMounted] = useState(false);
   const [itemToRemove, setItemToRemove] = useState<string | null>(null);
   const checkoutMutation = useCheckoutMutation();
+  const updateCartItemMutation = useUpdateCartItemMutation();
+  const deleteCartItemMutation = useDeleteCartItemMutation();
+
 
   useEffect(() => {
     setIsMounted(true);
@@ -54,6 +58,15 @@ export default function CartPage() {
       const updated = prev.map(item => {
         if (item.id === id) {
           const newQuantity = Math.max(1, item.quantity + delta);
+          
+          // ── API Update ──────────────────────────────────────────────────
+          if (isLoggedIn()) {
+            const token = getAccessToken();
+            if (token) {
+              updateCartItemMutation.mutate({ id, quantity: newQuantity, token });
+            }
+          }
+
           return { ...item, quantity: newQuantity };
         }
         return item;
@@ -67,6 +80,15 @@ export default function CartPage() {
   const removeItem = (id: string) => {
     setCartItems(prev => {
       const updated = prev.filter(item => item.id !== id);
+      
+      // ── API Delete ──────────────────────────────────────────────────
+      if (isLoggedIn()) {
+        const token = getAccessToken();
+        if (token) {
+          deleteCartItemMutation.mutate({ id, token });
+        }
+      }
+
       localStorage.setItem('printpop_cart', JSON.stringify(updated));
       // If the cart is now empty and the user is not logged in,
       // clear the guest email so the next add-to-cart asks again.
@@ -77,6 +99,7 @@ export default function CartPage() {
       return updated;
     });
   };
+
 
 
   // ── Checkout ────────────────────────────────────────────────────────────────

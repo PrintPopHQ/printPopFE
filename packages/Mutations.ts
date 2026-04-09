@@ -207,3 +207,30 @@ export const useUpdateProfileMutation = () => {
     },
   });
 };
+
+export const useAddToCartMutation = () => {
+  return useMutation({
+    mutationFn: async ({ data, token }: { data: any[]; token: string }) => {
+      const response = await ApiService.getInstance().addToCart(data, token);
+      return handleApiResponse(response.data);
+    },
+  });
+};
+
+export const useUpdateCartItemMutation = () => {
+  return useMutation({
+    mutationFn: async ({ id, quantity, token }: { id: string; quantity: number; token: string }) => {
+      const response = await ApiService.getInstance().updateCartItem(id, quantity, token);
+      return handleApiResponse(response.data);
+    },
+  });
+};
+
+export const useDeleteCartItemMutation = () => {
+  return useMutation({
+    mutationFn: async ({ id, token }: { id: string; token: string }) => {
+      const response = await ApiService.getInstance().deleteCartItem(id, token);
+      return handleApiResponse(response.data);
+    },
+  });
+};
