@@ -88,6 +88,7 @@ export interface OrderItem {
 export interface CreateOrderPayload {
   items: OrderItem[];
   email: string;
+  skipInventoryCheck?: boolean;
 }
 
 export interface ContactPayload {
