@@ -4,7 +4,7 @@ import designCase from "@/public/images/printpop-design-case.jpg"
 
 export const DesignCase = () => {
   return (
-    <section className="relative pt-24 overflow-hidden">
+    <section className="relative py-12 md:py-24 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <SectionCard className="flex flex-col md:flex-row items-center gap-16 relative">
 

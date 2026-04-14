@@ -117,7 +117,7 @@ export const Testimonials = () => {
   }, [api]);
 
   return (
-    <section className="relative overflow-hidden py-36">
+    <section className="relative overflow-hidden py-12 md:py-24">
       {/* Background Glows */}
       <div className="absolute inset-0 z-0 pointer-events-none">
         <div className="absolute top-36 left-32 w-[180px] h-[180px] bg-secondary opacity-20 blur-[120px] rounded-full mix-blend-screen animate-pulse duration-4000"></div>

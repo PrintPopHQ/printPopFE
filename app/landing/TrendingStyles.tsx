@@ -3,7 +3,7 @@ import { type ReactNode } from "react";
 
 export const TrendingStyles = ({ title }: { title?: ReactNode }) => {
   return (
-    <section id="trending-styles" className="relative overflow-hidden py-24 pb-32">
+    <section id="trending-styles" className="relative overflow-hidden py-12 md:py-24">
       {/* Background Glows */}
       <div className="absolute inset-0 z-0 pointer-events-none">
         <div className="absolute top-32 left-32 w-[180px] h-[180px] bg-secondary opacity-20 blur-[120px] rounded-full mix-blend-screen animate-pulse duration-4000"></div>

@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 export const TrustedBy = () => {
   return (
-    <div className="pb-16 border-b border-gray-900">
+    <section className="py-12 md:py-24 border-b border-gray-900">
       <div className="max-w-7xl mx-auto px-4 md:px-8 text-center">
         <p className="text-gray-500 font-comic uppercase tracking-widest text-sm mb-12 font-bold">
           Trusted Protection For Devices By
@@ -83,6 +83,6 @@ export const TrustedBy = () => {
           </Link>
         </div>
       </div>
-    </div>
+    </section>
   );
 };
