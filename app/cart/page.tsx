@@ -11,7 +11,9 @@ import { cn } from '@/lib/utils';
 import RemoveCartItemModal from '@/components/modals/RemoveCartItemModal';
 import { isLoggedIn, getUser, getGuestEmail, getAccessToken } from '@/lib/auth-store';
 import { toast } from 'sonner';
-import { useCheckoutMutation } from '@/packages/Mutations';
+import { useCheckoutMutation, useUpdateCartItemMutation, useDeleteCartItemMutation } from '@/packages/Mutations';
+import InventoryCheckModal from '@/components/modals/InventoryCheckModal';
+
 
 interface CartItem {
   id: string;
@@ -35,7 +37,12 @@ export default function CartPage() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isMounted, setIsMounted] = useState(false);
   const [itemToRemove, setItemToRemove] = useState<string | null>(null);
+  const [showInventoryModal, setShowInventoryModal] = useState(false);
+  const [preUploadedImages, setPreUploadedImages] = useState<{ designUrl: string; customUrl: string }[] | null>(null);
   const checkoutMutation = useCheckoutMutation();
+  const updateCartItemMutation = useUpdateCartItemMutation();
+  const deleteCartItemMutation = useDeleteCartItemMutation();
+
 
   useEffect(() => {
     setIsMounted(true);
@@ -54,6 +61,15 @@ export default function CartPage() {
       const updated = prev.map(item => {
         if (item.id === id) {
           const newQuantity = Math.max(1, item.quantity + delta);
+          
+          // ── API Update ──────────────────────────────────────────────────
+          if (isLoggedIn()) {
+            const token = getAccessToken();
+            if (token) {
+              updateCartItemMutation.mutate({ id, quantity: newQuantity, token });
+            }
+          }
+
           return { ...item, quantity: newQuantity };
         }
         return item;
@@ -67,6 +83,15 @@ export default function CartPage() {
   const removeItem = (id: string) => {
     setCartItems(prev => {
       const updated = prev.filter(item => item.id !== id);
+      
+      // ── API Delete ──────────────────────────────────────────────────
+      if (isLoggedIn()) {
+        const token = getAccessToken();
+        if (token) {
+          deleteCartItemMutation.mutate({ id, token });
+        }
+      }
+
       localStorage.setItem('printpop_cart', JSON.stringify(updated));
       // If the cart is now empty and the user is not logged in,
       // clear the guest email so the next add-to-cart asks again.
@@ -79,9 +104,10 @@ export default function CartPage() {
   };
 
 
+
   // ── Checkout ────────────────────────────────────────────────────────────────
 
-  const handleCheckout = () => {
+  const handleCheckout = (skipInventoryCheck = false) => {
     if (cartItems.length === 0) return;
 
     const email =
@@ -98,7 +124,11 @@ export default function CartPage() {
       return;
     }
 
-    toast.loading('Uploading your designs…', { id: 'checkout' });
+    if (preUploadedImages) {
+      toast.loading('Creating your order…', { id: 'checkout' });
+    } else {
+      toast.loading('Uploading your designs…', { id: 'checkout' });
+    }
 
     // Flatten group items into individual items for the backend
     const flattenedCartItems = cartItems.flatMap(item => {
@@ -114,10 +144,25 @@ export default function CartPage() {
     });
 
     checkoutMutation.mutate(
-      { cartItems: flattenedCartItems, email, accessToken: getAccessToken() ?? undefined },
+      { 
+        cartItems: flattenedCartItems, 
+        email, 
+        accessToken: getAccessToken() ?? undefined, 
+        skipInventoryCheck,
+        preUploadedImages: preUploadedImages ?? undefined
+      },
       {
-        onSuccess: ({ orderId, checkoutUrl }) => {
+        onSuccess: (data) => {
           toast.dismiss('checkout');
+
+          // Handle Inventory Check (4003)
+          if ((data as any)?.responseCode === 4003) {
+            setPreUploadedImages((data as any).itemImages || null);
+            setShowInventoryModal(true);
+            return;
+          }
+
+          const { orderId, checkoutUrl } = data as { orderId: string; checkoutUrl: string };
 
           // If we have an orderId, go to our new checkout page. Fallback to checkoutUrl if not.
           if (orderId) {
@@ -351,7 +396,7 @@ export default function CartPage() {
 
                 <Button
                   size="lg"
-                  onClick={handleCheckout}
+                  onClick={() => handleCheckout()}
                   disabled={checkoutMutation.isPending || cartItems.length === 0}
                   className={cn(
                     "w-full h-12 text-sm font-semibold capitalize tracking-wide rounded-xl text-white transition-opacity hover:opacity-90",
@@ -379,6 +424,15 @@ export default function CartPage() {
             removeItem(itemToRemove);
             setItemToRemove(null);
           }
+        }}
+      />
+
+      <InventoryCheckModal
+        isOpen={showInventoryModal}
+        onClose={() => setShowInventoryModal(false)}
+        onContinue={() => {
+          setShowInventoryModal(false);
+          handleCheckout(true);
         }}
       />
     </div>

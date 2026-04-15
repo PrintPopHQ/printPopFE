@@ -97,14 +97,16 @@ interface CheckoutPayload {
   cartItems: CheckoutItem[];
   email: string;
   accessToken?: string;
+  skipInventoryCheck?: boolean;
+  preUploadedImages?: { designUrl: string; customUrl: string }[];
 }
 
 /** Uploads all cart-item images in parallel, then creates the order in one shot. */
 export const useCheckoutMutation = () => {
   return useMutation({
-    mutationFn: async ({ cartItems, email, accessToken }: CheckoutPayload) => {
-      // 1. Upload both images (custom & design) for each item
-      const itemImages = await Promise.all(
+    mutationFn: async ({ cartItems, email, accessToken, skipInventoryCheck, preUploadedImages }: CheckoutPayload) => {
+      // 1. Upload both images (custom & design) for each item (skip if already uploaded)
+      const itemImages = preUploadedImages || await Promise.all(
         cartItems.map(async (item) => {
           // Upload design image (canvas export)
           const designRes = await fetch(item.image);
@@ -137,9 +139,16 @@ export const useCheckoutMutation = () => {
           material: item.caseType,
         })),
         email,
+        skipInventoryCheck,
       };
 
       const orderRes = await ApiService.getInstance().createOrder(orderPayload, accessToken);
+      
+      // Specifically handle 4003 (Inventory Check)
+      if (orderRes.data.responseCode === 4003) {
+        return { ...orderRes.data, itemImages };
+      }
+
       const orderResult = handleApiResponse(orderRes.data);
       return orderResult.data as { checkoutUrl: string; orderId: string };
     },
@@ -204,6 +213,33 @@ export const useUpdateProfileMutation = () => {
         saveUser(result.data);
       }
       return result;
+    },
+  });
+};
+
+export const useAddToCartMutation = () => {
+  return useMutation({
+    mutationFn: async ({ data, token }: { data: any[]; token: string }) => {
+      const response = await ApiService.getInstance().addToCart(data, token);
+      return handleApiResponse(response.data);
+    },
+  });
+};
+
+export const useUpdateCartItemMutation = () => {
+  return useMutation({
+    mutationFn: async ({ id, quantity, token }: { id: string; quantity: number; token: string }) => {
+      const response = await ApiService.getInstance().updateCartItem(id, quantity, token);
+      return handleApiResponse(response.data);
+    },
+  });
+};
+
+export const useDeleteCartItemMutation = () => {
+  return useMutation({
+    mutationFn: async ({ id, token }: { id: string; token: string }) => {
+      const response = await ApiService.getInstance().deleteCartItem(id, token);
+      return handleApiResponse(response.data);
     },
   });
 };

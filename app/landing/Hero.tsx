@@ -2,14 +2,14 @@ import Link from "next/link";
 
 export const Hero = () => {
     return (
-        <div className="relative overflow-hidden min-h-[600px] flex items-center pb-16">
+        <div className="relative overflow-hidden min-h-[600px] flex items-center pt-8 pb-12 md:pt-12 md:pb-24">
             {/* Background Glows */}
             <div className="absolute inset-0 z-0 pointer-events-none">
                 <div className="absolute top-16 left-32 w-[250px] h-[250px] bg-secondary opacity-20 blur-[120px] rounded-full mix-blend-screen animate-pulse duration-4000"></div>
                 <div className="absolute top-[60%] right-[36%] w-[180px] h-[180px] bg-primary opacity-15 blur-[100px] rounded-full mix-blend-screen animate-pulse duration-4000"></div>
             </div>
 
-            <div className="relative z-10 w-full max-w-7xl mx-auto px-4 md:px-8 py-12 md:py-16 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div className="relative z-10 w-full max-w-7xl mx-auto px-4 md:px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                 {/* Left Content */}
                 <div className="text-left space-y-6">
                     <span

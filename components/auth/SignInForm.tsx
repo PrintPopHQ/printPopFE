@@ -11,6 +11,8 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useSignInMutation } from "@/packages/Mutations";
 import { saveUser, saveAccessToken } from "@/lib/auth-store";
+import { ApiService } from "@/services/ApiService";
+
 
 export function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -31,15 +33,58 @@ export function SignInForm() {
       signInMutation.mutate(
         { email: values.email, password: values.password },
         {
-          onSuccess: (data) => {
+          onSuccess: async (data) => {
             // Persist user and access token to localStorage
             if (data.data?.user) saveUser(data.data.user);
-            if (data.data?.access_token) saveAccessToken(data.data.access_token);
+            if (data.data?.access_token) {
+              const token = data.data.access_token;
+              saveAccessToken(token);
+
+              // ── Sync cart from backend IN BACKGROUND ──────────────────────
+              (async () => {
+                try {
+                  const cartRes = await ApiService.getInstance().getCart(token);
+                  if (cartRes.data && cartRes.data.responseCode === 2000) {
+                    const backendCart = cartRes.data.data?.items || [];
+                    
+                    // Read existing local cart to merge without duplicates
+                    const cartRaw = localStorage.getItem("printpop_cart");
+                    let localCart: any[] = [];
+                    if (cartRaw) {
+                      try {
+                        localCart = JSON.parse(cartRaw);
+                      } catch (e) {}
+                    }
+
+                    // Use Map to deduplicate by ID (assuming ID indicates unique item logic)
+                    const mergedMap = new Map();
+                    
+                    // Add backend cart items first
+                    backendCart.forEach((item: any) => {
+                      if (item.id) mergedMap.set(item.id, item);
+                    });
+                    
+                    // Add local cart items (overriding or adding unique local items)
+                    localCart.forEach((item: any) => {
+                      if (item.id) mergedMap.set(item.id, item);
+                    });
+
+                    const finalCart = Array.from(mergedMap.values());
+                    localStorage.setItem("printpop_cart", JSON.stringify(finalCart));
+                    window.dispatchEvent(new Event("cart_updated"));
+                  }
+                } catch (e) {
+                  console.error("Failed to sync cart after login", e);
+                }
+              })();
+            }
+
             toast.success("Welcome back!", {
               description: data.message || "You have signed in successfully.",
             });
             router.push("/profile");
           },
+
           onError: (error: any) => {
             toast.error("Sign In Failed", {
               description: error?.response?.data?.message || error.message || "Invalid email or password.",

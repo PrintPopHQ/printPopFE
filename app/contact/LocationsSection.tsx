@@ -28,7 +28,7 @@ export const LocationsSection = () => {
   const activeLocation = LOCATIONS.find(loc => loc.id === activeId) || LOCATIONS[0];
 
   return (
-    <section className="relative py-16">
+    <section className="relative py-12 md:py-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 md:gap-24 lg:gap-32 items-center">
           <div className="animate-in fade-in slide-in-from-left-4 duration-1000">

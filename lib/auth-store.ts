@@ -40,8 +40,10 @@ export function getUser(): StoredUser | null {
 export function removeUser() {
   if (typeof window === "undefined") return;
   localStorage.removeItem(USER_KEY);
+  localStorage.removeItem("printpop_cart");
   window.dispatchEvent(new Event("auth_updated"));
 }
+
 
 export function isLoggedIn(): boolean {
   return getUser() !== null;

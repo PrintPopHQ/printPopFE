@@ -61,7 +61,7 @@ export function DynamicBanner() {
   }, [nextSlide]);
 
   return (
-    <section className="relative w-full overflow-hidden py-12 lg:py-16">
+    <section className="relative w-full overflow-hidden py-12 md:py-24">
       <div className="container mx-auto px-4 md:px-6">
         <div className="relative mx-auto w-full max-w-6xl overflow-hidden rounded-3xl shadow-xl group">
           {/* Main Image Slider */}

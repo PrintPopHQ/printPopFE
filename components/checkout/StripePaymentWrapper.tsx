@@ -17,46 +17,82 @@ interface StripePaymentWrapperProps {
   shippingDetails: any;
   billingAddress: any;
   couponCode: string;
+  isFormComplete: boolean;
   onStripeStateChange: (complete: boolean) => void;
   onSubmittingChange: (isSubmitting: boolean) => void;
   bindSubmit: (fn: () => void) => void;
 }
 
-export function StripePaymentWrapper({ orderId, amount, shippingAddress, shippingDetails, billingAddress, couponCode, onStripeStateChange, onSubmittingChange, bindSubmit }: StripePaymentWrapperProps) {
+export function StripePaymentWrapper({ 
+  orderId, 
+  amount, 
+  shippingAddress, 
+  shippingDetails, 
+  billingAddress, 
+  couponCode, 
+  isFormComplete,
+  onStripeStateChange, 
+  onSubmittingChange, 
+  bindSubmit 
+}: StripePaymentWrapperProps) {
   const [clientSecret, setClientSecret] = useState<string>('');
   const createIntentMutation = useCreatePaymentIntentMutation();
 
   useEffect(() => {
-    // Only create intent when amount is available and orderId is known
-    if (amount > 0 && orderId) {
-      // Clear existing client secret so Elements remounts
-      setClientSecret('');
+    // Only create intent when form is complete, amount is available and orderId is known
+    if (isFormComplete && amount > 0 && orderId) {
+      
+      const timer = setTimeout(() => {
+        // Clear existing client secret to show loader during update
+        setClientSecret('');
 
-      const paymentPayload = {
-        orderId,
-        billingAddress,
-        shippingAddress,
-        shippingDetails,
-        totalCost: amount,
-        couponCode
-      };
+        const paymentPayload = {
+          orderId,
+          billingAddress,
+          shippingAddress,
+          shippingDetails,
+          totalCost: amount,
+          couponCode
+        };
 
-      createIntentMutation.mutate(
-        { payload: paymentPayload, token: getAccessToken() ?? undefined },
-        {
-          onSuccess: (data) => {
-            if (data?.clientSecret) {
-              setClientSecret(data.clientSecret);
+        createIntentMutation.mutate(
+          { payload: paymentPayload, token: getAccessToken() ?? undefined },
+          {
+            onSuccess: (data) => {
+              if (data?.clientSecret) {
+                setClientSecret(data.clientSecret);
+              }
+            },
+            onError: (err: any) => {
+              console.error('Failed to create PaymentIntent', err);
+              toast.error('Payment Error', { description: 'Failed to initialize payment method. Please try again.' });
             }
-          },
-          onError: (err: any) => {
-            console.error('Failed to create PaymentIntent', err);
-            toast.error('Payment Error', { description: 'Failed to initialize payment method. Please try again.' });
           }
-        }
-      );
+        );
+      }, 800); // 800ms debounce to avoid spamming while typing
+
+      return () => clearTimeout(timer);
     }
-  }, [amount, orderId, couponCode]);
+  }, [
+    amount, 
+    orderId, 
+    couponCode, 
+    shippingAddress, 
+    shippingDetails, 
+    billingAddress, 
+    isFormComplete
+  ]);
+
+  if (!isFormComplete) {
+    return (
+      <div className="pt-8 flex flex-col items-center justify-center p-6 border border-white/10 rounded-xl bg-black/50">
+        <p className="text-[#9CA3AF] text-sm text-center">
+          Please complete your shipping and billing details <br />
+          to proceed with payment.
+        </p>
+      </div>
+    );
+  }
 
   if (createIntentMutation.isPending || !clientSecret) {
     return (

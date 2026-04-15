@@ -37,3 +37,15 @@ export const useGetBlogs = (params: BlogsParams) => {
     },
   });
 };
+
+export const useGetCartQuery = (token: string | null) => {
+  return useQuery({
+    queryKey: ["cart", token],
+    queryFn: async () => {
+      if (!token) throw new Error("No token provided");
+      const response = await ApiService.getInstance().getCart(token);
+      return handleApiResponse(response.data);
+    },
+    enabled: !!token,
+  });
+};

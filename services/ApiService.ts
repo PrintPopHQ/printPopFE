@@ -20,7 +20,11 @@ const ENDPOINTS = {
   GET_SHIPPING_COST: "/api/orders/shipping-cost",
   VALIDATE_COUPON: "/api/payment/validate-coupon",
   CREATE_PAYMENT_INTENT: "/api/payment/create-intent",
+  GET_CART: "/cart",
+  CART_ADD: "/cart/add",
+  CART_ITEM: "/cart/item",
 };
+
 
 export interface SignUpPayload {
   email: string;
@@ -84,6 +88,7 @@ export interface OrderItem {
 export interface CreateOrderPayload {
   items: OrderItem[];
   email: string;
+  skipInventoryCheck?: boolean;
 }
 
 export interface ContactPayload {
@@ -263,4 +268,28 @@ export class ApiService {
     const headers = bearerToken ? { Authorization: `Bearer ${bearerToken}` } : undefined;
     return this.axiosInstance.post<PaymentIntentResponse>(ENDPOINTS.CREATE_PAYMENT_INTENT, payload, { headers });
   }
+  public getCart(bearerToken: string) {
+    return this.axiosInstance.get(ENDPOINTS.GET_CART, {
+      headers: { Authorization: `Bearer ${bearerToken}` }
+    });
+  }
+
+  public addToCart(data: any[], bearerToken: string) {
+    return this.axiosInstance.post(ENDPOINTS.CART_ADD, { data }, {
+      headers: { Authorization: `Bearer ${bearerToken}` }
+    });
+  }
+
+  public updateCartItem(id: string, quantity: number, bearerToken: string) {
+    return this.axiosInstance.patch(`${ENDPOINTS.CART_ITEM}/${id}`, { quantity }, {
+      headers: { Authorization: `Bearer ${bearerToken}` }
+    });
+  }
+
+  public deleteCartItem(id: string, bearerToken: string) {
+    return this.axiosInstance.delete(`${ENDPOINTS.CART_ITEM}/${id}`, {
+      headers: { Authorization: `Bearer ${bearerToken}` }
+    });
+  }
 }
+

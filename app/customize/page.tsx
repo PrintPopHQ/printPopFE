@@ -876,7 +876,19 @@ function CustomizeContent() {
     router.push(`/customize?${params.toString()}`);
   };
 
-  const handlePreviousIteration = () => {
+  const handlePreviousIteration = async () => {
+    if (!canvas || !phoneModel) return;
+    const baseItem = await buildCartItem();
+
+    // Save the full Fabric JSON so we can perfectly restore this canvas on Back navigation.
+    // This preserves exact object positions, scales, text, and user transforms.
+    const item = { ...baseItem, canvasJSON: exportCanvasJSON(canvas) };
+
+    const newItems = [...groupItems];
+    newItems[currentIteration - 1] = item;
+    setGroupItems(newItems);
+    sessionStorage.setItem('printpop_group_order', JSON.stringify(newItems));
+
     const prevIteration = currentIteration - 1;
     const params = new URLSearchParams(searchParams.toString());
     params.set('c', prevIteration.toString());

@@ -6,6 +6,8 @@ import { Providers } from "./providers";
 import { PricingProvider } from "@/contexts/PricingContext";
 import { getPricing } from "@/lib/pricing";
 
+import Script from "next/script";
+
 const comicNeue = Comic_Neue({
   variable: "--font-comic-neue",
   subsets: ["latin"],
@@ -42,6 +44,19 @@ export default async function RootLayout({
       <body
         className={`${comicNeue.variable} ${montserrat.variable} antialiased bg-background text-foreground font-sans`}
       >
+        <Script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=G-Z2J5QHWC0L"
+        />
+        <Script id="google-analytics">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'G-Z2J5QHWC0L');
+          `}
+        </Script>
         <PricingProvider initialPricing={pricingData}>
           <Providers>
             <LayoutHeaderFooter>

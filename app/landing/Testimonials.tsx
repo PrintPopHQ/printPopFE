@@ -117,7 +117,7 @@ export const Testimonials = () => {
   }, [api]);
 
   return (
-    <section className="relative overflow-hidden py-36">
+    <section className="relative overflow-hidden py-12 md:py-24">
       {/* Background Glows */}
       <div className="absolute inset-0 z-0 pointer-events-none">
         <div className="absolute top-36 left-32 w-[180px] h-[180px] bg-secondary opacity-20 blur-[120px] rounded-full mix-blend-screen animate-pulse duration-4000"></div>
@@ -133,9 +133,9 @@ export const Testimonials = () => {
             <span className="text-shadow-[0_0_30px_#5CE1E6]">CUSTOMERS</span>
           </h2>
           <div className="h-1 w-24 bg-linear-to-r from-secondary to-primary mx-auto rounded-full shadow-[0_0_10px_rgba(255,49,49,0.3)]"></div>
-          <p className="mt-6 text-gray-400 font-comic text-lg max-w-2xl mx-auto">
+          {/* <p className="mt-6 text-gray-400 font-comic text-lg max-w-2xl mx-auto">
             Real experiences from real customers — printed with pride.
-          </p>
+          </p> */}
         </div>
 
         {/* Carousel — pt-10 on CarouselContent gives the floating -top-6 quote badge room within the viewport */}
