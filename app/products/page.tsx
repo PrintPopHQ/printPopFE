@@ -17,7 +17,7 @@ export default function DesignsPage() {
         const api = ApiService.getInstance();
         const response = await api.getCoverDesigns();
         if (response.data.responseCode === 2000) {
-          setDesigns(response.data.data.slice(0, 12));
+          setDesigns(response.data.data);
         } else {
           setError(response.data.message || "Failed to fetch designs");
         }
