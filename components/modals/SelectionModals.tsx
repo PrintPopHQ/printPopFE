@@ -21,7 +21,7 @@ export default function SelectionModals({ brand, modelId, models, isLoadingModel
   const handleBrandSelect = (selectedBrand: string) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set('brand', selectedBrand);
-    router.push(`/customize?${params.toString()}`);
+    router.replace(`/customize?${params.toString()}`);
   };
 
   const g = searchParams.get('g');
@@ -33,7 +33,7 @@ export default function SelectionModals({ brand, modelId, models, isLoadingModel
   return (
     <>
       {/* Brand Selection Modal */}
-      <Dialog open={isBrandModalOpen} onOpenChange={(open) => { if (!open) router.push('/'); }}>
+      <Dialog open={isBrandModalOpen} onOpenChange={(open) => { if (!open) router.replace('/'); }}>
         <DialogContent className="sm:max-w-[900px] bg-black border-white/10 text-white rounded-[2.5rem] p-10">
           <DialogHeader>
             <DialogTitle className="text-center text-4xl font-neon font-black tracking-tighter mb-8">SELECT YOUR BRAND</DialogTitle>
