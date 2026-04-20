@@ -13,7 +13,7 @@ import React from "react";
 const testimonials = [
   {
     name: "Jessica Morgan",
-    role: "Happy Customer",
+    role: "",
     accent: "secondary",
     accentClass: "border-secondary text-secondary shadow-[0_0_15px_rgba(92,225,230,0.5)]",
     hoverClass: "hover:border-secondary hover:shadow-[0_0_30px_rgba(92,225,230,0.2)]",
@@ -23,7 +23,7 @@ const testimonials = [
   },
   {
     name: "Daniel Robertson",
-    role: "Verified Buyer",
+    role: "",
     accentClass: "border-primary text-primary shadow-[0_0_15px_rgba(255,49,49,0.5)]",
     hoverClass: "hover:border-primary hover:shadow-[0_0_30px_rgba(255,49,49,0.2)]",
     roleClass: "text-primary",
@@ -32,7 +32,7 @@ const testimonials = [
   },
   {
     name: "Priya Sharma",
-    role: "Photography Enthusiast",
+    role: "",
     accentClass: "border-purple-500 text-purple-500 shadow-[0_0_15px_rgba(168,85,247,0.5)]",
     hoverClass: "hover:border-purple-500 hover:shadow-[0_0_30px_rgba(168,85,247,0.2)]",
     roleClass: "text-purple-500",
@@ -41,7 +41,7 @@ const testimonials = [
   },
   {
     name: "Liam Thompson",
-    role: "Tech Enthusiast",
+    role: "",
     accentClass: "border-secondary text-secondary shadow-[0_0_15px_rgba(92,225,230,0.5)]",
     hoverClass: "hover:border-secondary hover:shadow-[0_0_30px_rgba(92,225,230,0.2)]",
     roleClass: "text-secondary",
@@ -50,7 +50,7 @@ const testimonials = [
   },
   {
     name: "Chloe Bennett",
-    role: "Travel Blogger",
+    role: "",
     accentClass: "border-primary text-primary shadow-[0_0_15px_rgba(255,49,49,0.5)]",
     hoverClass: "hover:border-primary hover:shadow-[0_0_30px_rgba(255,49,49,0.2)]",
     roleClass: "text-primary",
@@ -59,7 +59,7 @@ const testimonials = [
   },
   {
     name: "Ethan Walker",
-    role: "Business Owner",
+    role: "",
     accentClass: "border-purple-500 text-purple-500 shadow-[0_0_15px_rgba(168,85,247,0.5)]",
     hoverClass: "hover:border-purple-500 hover:shadow-[0_0_30px_rgba(168,85,247,0.2)]",
     roleClass: "text-purple-500",
@@ -68,7 +68,7 @@ const testimonials = [
   },
   {
     name: "Sarah Khan",
-    role: "Verified Buyer",
+    role: "",
     accentClass: "border-secondary text-secondary shadow-[0_0_15px_rgba(92,225,230,0.5)]",
     hoverClass: "hover:border-secondary hover:shadow-[0_0_30px_rgba(92,225,230,0.2)]",
     roleClass: "text-secondary",
@@ -77,7 +77,7 @@ const testimonials = [
   },
   {
     name: "Michael Paxton",
-    role: "Everyday Carry Fan",
+    role: "",
     accentClass: "border-primary text-primary shadow-[0_0_15px_rgba(255,49,49,0.5)]",
     hoverClass: "hover:border-primary hover:shadow-[0_0_30px_rgba(255,49,49,0.2)]",
     roleClass: "text-primary",
@@ -86,7 +86,7 @@ const testimonials = [
   },
   {
     name: "Aisha Hussain",
-    role: "Gift Shopper",
+    role: "",
     accentClass: "border-purple-500 text-purple-500 shadow-[0_0_15px_rgba(168,85,247,0.5)]",
     hoverClass: "hover:border-purple-500 hover:shadow-[0_0_30px_rgba(168,85,247,0.2)]",
     roleClass: "text-purple-500",
@@ -95,7 +95,7 @@ const testimonials = [
   },
   {
     name: "Ryan Douglas",
-    role: "Daily User",
+    role: "",
     accentClass: "border-secondary text-secondary shadow-[0_0_15px_rgba(92,225,230,0.5)]",
     hoverClass: "hover:border-secondary hover:shadow-[0_0_30px_rgba(92,225,230,0.2)]",
     roleClass: "text-secondary",
@@ -133,9 +133,9 @@ export const Testimonials = () => {
             <span className="text-shadow-[0_0_30px_#5CE1E6]">CUSTOMERS</span>
           </h2>
           <div className="h-1 w-24 bg-linear-to-r from-secondary to-primary mx-auto rounded-full shadow-[0_0_10px_rgba(255,49,49,0.3)]"></div>
-          {/* <p className="mt-6 text-gray-400 font-comic text-lg max-w-2xl mx-auto">
+          <p className="mt-6 text-gray-400 font-comic text-lg max-w-2xl mx-auto">
             Real experiences from real customers — printed with pride.
-          </p> */}
+          </p>
         </div>
 
         {/* Carousel — pt-10 on CarouselContent gives the floating -top-6 quote badge room within the viewport */}
