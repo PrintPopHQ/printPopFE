@@ -1,16 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { isLoggedIn } from "@/lib/auth-store";
+import { useAuth } from "@/hooks/useAuth";
 
 export const Newsletter = () => {
-  const [signedIn, setSignedIn] = useState(false);
+  const { signedIn } = useAuth();
   const router = useRouter();
-
-  useEffect(() => {
-    setSignedIn(isLoggedIn());
-  }, []);
 
   if (signedIn) {
     return <div className="mt-24"></div>;

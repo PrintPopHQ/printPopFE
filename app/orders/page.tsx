@@ -6,7 +6,7 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
-import { isLoggedIn, getAccessToken } from '@/lib/auth-store';
+import { useAuth } from '@/hooks/useAuth';
 import { useGetMyOrders } from '@/packages/Queries';
 import { Loader2 } from 'lucide-react';
 
@@ -26,14 +26,11 @@ const formatDate = (dateString?: string) => {
 };
 
 export default function OrdersPage() {
+  const { token } = useAuth();
   const [isMounted, setIsMounted] = useState(false);
-  const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
     setIsMounted(true);
-    if (isLoggedIn()) {
-      setToken(getAccessToken());
-    }
   }, []);
 
   const { data: responseData, isLoading, error } = useGetMyOrders(token);

@@ -12,20 +12,17 @@ import {
 } from "@/components/ui/dropdown-menu";
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { getUser, removeUser, StoredUser } from '@/lib/auth-store';
-import { toast } from 'sonner';
+import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
+import { removeUser } from '@/lib/auth-store';
+import { toast } from 'sonner';
 
 export function UserActions() {
+  const { user } = useAuth();
   const [cartCount, setCartCount] = useState(0);
-  const [user, setUser] = useState<StoredUser | null>(null);
   const router = useRouter();
 
   useEffect(() => {
-    // Read auth state
-    const updateAuth = () => setUser(getUser());
-    updateAuth();
-
     // Sync cart count
     const updateCount = () => {
       try {
@@ -40,10 +37,8 @@ export function UserActions() {
 
     updateCount();
     window.addEventListener('cart_updated', updateCount);
-    window.addEventListener('auth_updated', updateAuth);
     return () => {
       window.removeEventListener('cart_updated', updateCount);
-      window.removeEventListener('auth_updated', updateAuth);
     };
   }, []);
 
