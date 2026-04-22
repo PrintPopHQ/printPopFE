@@ -19,7 +19,7 @@ export async function getPricing(): Promise<PricingItem[]> {
   try {
     // Next.js fetch with revalidation for deduplication on the server
     const res = await fetch(`${ENV.API_URL}api/pricing`, {
-      next: { revalidate: 3600 },
+      next: { revalidate: 0 },
     });
 
     if (!res.ok) {
