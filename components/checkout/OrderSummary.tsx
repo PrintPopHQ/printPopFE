@@ -17,9 +17,10 @@ interface OrderSummaryProps {
   isStripeComplete: boolean;
   isSubmitting: boolean;
   onConfirmPurchase: () => void;
+  email?: string;
 }
 
-export function OrderSummary({ cartItems, subtotal, shippingCost, shippingMethodName, discountAmount = 0, total, onCouponApplied, isStripeComplete, isSubmitting, onConfirmPurchase }: OrderSummaryProps) {
+export function OrderSummary({ cartItems, subtotal, shippingCost, shippingMethodName, discountAmount = 0, total, onCouponApplied, isStripeComplete, isSubmitting, onConfirmPurchase, email }: OrderSummaryProps) {
   const [couponInput, setCouponInput] = useState('');
   const [appliedCode, setAppliedCode] = useState('');
   const validateCoupon = useValidateCouponMutation();
@@ -27,7 +28,7 @@ export function OrderSummary({ cartItems, subtotal, shippingCost, shippingMethod
   const handleApplyCoupon = () => {
     if (!couponInput.trim()) return;
     
-    validateCoupon.mutate(couponInput.trim(), {
+    validateCoupon.mutate({ code: couponInput.trim(), email }, {
       onSuccess: (data) => {
         toast.success('Coupon Applied', { description: data.message });
         const coupon = data.data.coupon;

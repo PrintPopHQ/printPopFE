@@ -260,8 +260,9 @@ export class ApiService {
     });
   }
 
-  public validateCoupon(code: string) {
-    return this.axiosInstance.get<ValidateCouponResponse>(`${ENDPOINTS.VALIDATE_COUPON}/${code}`);
+  public validateCoupon(code: string, email?: string) {
+    const params = email ? { email } : {};
+    return this.axiosInstance.get<ValidateCouponResponse>(`${ENDPOINTS.VALIDATE_COUPON}/${code}`, { params });
   }
 
   public createPaymentIntent(payload: PaymentIntentPayload, bearerToken?: string) {

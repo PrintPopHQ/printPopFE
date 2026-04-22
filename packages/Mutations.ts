@@ -177,8 +177,8 @@ export const useCreatePaymentIntentMutation = () => {
 
 export const useValidateCouponMutation = () => {
   return useMutation({
-    mutationFn: async (code: string) => {
-      const response = await ApiService.getInstance().validateCoupon(code);
+    mutationFn: async ({ code, email }: { code: string; email?: string }) => {
+      const response = await ApiService.getInstance().validateCoupon(code, email);
       // Let it bypass strict handleApiResponse if it returns 4000 manually instead of dropping errors
       const data: any = response.data;
       if (data.responseCode !== 2000) {

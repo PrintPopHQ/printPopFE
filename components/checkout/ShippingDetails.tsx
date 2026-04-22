@@ -10,9 +10,10 @@ import { Button } from '@/components/ui/button';
 interface ShippingDetailsProps {
   onChange: (data: any) => void;
   onShippingCostChange: (cost: number, name: string) => void;
+  email?: string;
 }
 
-export function ShippingDetails({ onChange, onShippingCostChange }: ShippingDetailsProps) {
+export function ShippingDetails({ onChange, onShippingCostChange, email }: ShippingDetailsProps) {
   const [postcode, setPostcode] = useState('');
   const [searchTrigger, setSearchTrigger] = useState('');
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
@@ -59,6 +60,13 @@ export function ShippingDetails({ onChange, onShippingCostChange }: ShippingDeta
       }
     }
   }, [filteredOptions, selectedOption, onShippingCostChange]);
+
+  // Pre-fill email in parent state if provided
+  useEffect(() => {
+    if (email) {
+      onChange((prev: any) => ({ ...prev, email }));
+    }
+  }, [email, onChange]);
 
   const handleOptionSelect = (name: string, price: number) => {
     setSelectedOption(name);
@@ -168,9 +176,11 @@ export function ShippingDetails({ onChange, onShippingCostChange }: ShippingDeta
           <Input
             required
             type="email"
+            value={email || ''}
+            disabled
+            readOnly
             placeholder="john.martin@gmail.com"
-            className="bg-[#112238] border-none text-white h-12 focus-visible:ring-1 focus-visible:ring-[#5CE1E6]"
-            onChange={(e) => onChange((prev: any) => ({ ...prev, email: e.target.value }))}
+            className="bg-[#112238] border-none text-white/50 h-12 focus-visible:ring-1 focus-visible:ring-[#5CE1E6] opacity-70 cursor-not-allowed"
           />
         </div>
 

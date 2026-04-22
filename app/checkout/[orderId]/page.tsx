@@ -7,6 +7,7 @@ import { OrderSummary } from '@/components/checkout/OrderSummary';
 import { ShippingDetails } from '@/components/checkout/ShippingDetails';
 import { BillingDetails } from '@/components/checkout/BillingDetails';
 import { StripePaymentWrapper } from '@/components/checkout/StripePaymentWrapper';
+import { getUser, getGuestEmail } from '@/lib/auth-store';
 
 export default function CheckoutPage() {
   const params = useParams();
@@ -44,6 +45,11 @@ export default function CheckoutPage() {
       // router.push('/cart'); // disabled for testing locally
     }
   }, []);
+
+  const userEmail = useMemo(() => {
+    if (!isMounted) return '';
+    return getUser()?.email || getGuestEmail() || '';
+  }, [isMounted]);
 
   const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
   const total = Math.max(0, subtotal - discountAmount + shippingCost);
@@ -137,6 +143,7 @@ export default function CheckoutPage() {
               setShippingCost(cost);
               setShippingMethodName(name);
             }} 
+            email={userEmail}
           />
           
           <BillingDetails 
@@ -178,6 +185,7 @@ export default function CheckoutPage() {
             isStripeComplete={isStripeComplete}
             isSubmitting={isSubmitting}
             onConfirmPurchase={() => submitRef.current?.()}
+            email={userEmail}
           />
         </div>
       </div>
