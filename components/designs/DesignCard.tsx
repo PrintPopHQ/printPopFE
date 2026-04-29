@@ -38,7 +38,7 @@ export function DesignCard({ design }: DesignCardProps) {
           Premium design for your device. High quality finish.
         </p>
         <div className="flex items-center justify-between">
-          <span className="text-secondary font-black text-xl tracking-tighter">${design.price}</span>
+          <span className="text-secondary font-black text-xl tracking-tighter">{design.price}</span>
           <div className="text-[10px] font-black text-white uppercase tracking-[0.2em] bg-white/10 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">
             Premium
           </div>

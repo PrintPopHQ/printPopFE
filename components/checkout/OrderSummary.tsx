@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { useValidateCouponMutation } from '@/packages/Mutations';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
+import Link from 'next/link';
 
 interface OrderSummaryProps {
   cartItems: any[];
@@ -23,6 +24,8 @@ interface OrderSummaryProps {
 export function OrderSummary({ cartItems, subtotal, shippingCost, shippingMethodName, discountAmount = 0, total, onCouponApplied, isStripeComplete, isSubmitting, onConfirmPurchase, email }: OrderSummaryProps) {
   const [couponInput, setCouponInput] = useState('');
   const [appliedCode, setAppliedCode] = useState('');
+  const [isAgreedToTerms, setIsAgreedToTerms] = useState(false);
+  const [isAgreedToMarketing, setIsAgreedToMarketing] = useState(false);
   const validateCoupon = useValidateCouponMutation();
 
   const handleApplyCoupon = () => {
@@ -123,9 +126,36 @@ export function OrderSummary({ cartItems, subtotal, shippingCost, shippingMethod
         <span className="text-lg font-bold text-white">${total.toFixed(2)}</span>
       </div>
 
+      <div className="space-y-4 mb-8">
+        <div className="flex gap-3 items-start">
+          <input 
+            type="checkbox" 
+            id="terms" 
+            checked={isAgreedToTerms}
+            onChange={(e) => setIsAgreedToTerms(e.target.checked)}
+            className="mt-1 w-4 h-4 rounded border-[#333333] bg-[#112238] accent-[#5CE1E6] cursor-pointer"
+          />
+          <label htmlFor="terms" className="text-xs text-[#9CA3AF] leading-relaxed cursor-pointer select-none">
+            I read and accept the <Link href="/privacy-policy" className="text-white hover:underline">privacy policy</Link>, <Link href="/terms-of-use" className="text-white hover:underline">terms of use</Link>, and <Link href="/shipping-returns" className="text-white hover:underline">refunds & returns policy</Link>
+          </label>
+        </div>
+        <div className="flex gap-3 items-start">
+          <input 
+            type="checkbox" 
+            id="marketing" 
+            checked={isAgreedToMarketing}
+            onChange={(e) => setIsAgreedToMarketing(e.target.checked)}
+            className="mt-1 w-4 h-4 rounded border-[#333333] bg-[#112238] accent-[#5CE1E6] cursor-pointer"
+          />
+          <label htmlFor="marketing" className="text-xs text-[#9CA3AF] leading-relaxed cursor-pointer select-none">
+            I agree to receive communications, including special offers, promotions, and marketing updates via email and SMS (optional)
+          </label>
+        </div>
+      </div>
+
       <button 
         onClick={onConfirmPurchase}
-        disabled={!isStripeComplete || isSubmitting}
+        disabled={!isStripeComplete || isSubmitting || !isAgreedToTerms}
         className="w-full h-12 text-sm font-semibold capitalize tracking-wide rounded-xl text-white bg-linear-to-r from-[#5CE1E6] to-[#FF3131] hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2"
       >
         {isSubmitting ? (

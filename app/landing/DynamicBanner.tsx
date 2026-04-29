@@ -61,9 +61,9 @@ export function DynamicBanner() {
   }, [nextSlide]);
 
   return (
-    <section className="relative w-full overflow-hidden py-12 md:py-24">
-      <div className="container mx-auto px-4 md:px-6">
-        <div className="relative mx-auto w-full max-w-6xl overflow-hidden rounded-3xl shadow-xl group">
+    <section className="relative w-full overflow-hidden py-8 md:py-24">
+      <div className="container mx-auto px-0 md:px-6">
+        <div className="relative mx-auto w-full max-w-6xl overflow-hidden md:rounded-3xl shadow-xl group">
           {/* Main Image Slider */}
           <div
             className="flex transition-transform duration-700 ease-in-out"
@@ -86,7 +86,7 @@ export function DynamicBanner() {
                     src={src}
                     alt={`Banner ${index + 1}`}
                     fill
-                    className={`object-contain p-4 md:object-cover md:p-0 transition-opacity duration-500 ${loadedImages[index] ? "opacity-100" : "opacity-0"}`}
+                    className={`object-cover p-0 transition-opacity duration-500 ${loadedImages[index] ? "opacity-100" : "opacity-0"}`}
                     priority={index === 0}
                     onLoad={() => setLoadedImages(prev => ({ ...prev, [index]: true }))}
                   />
