@@ -98,7 +98,7 @@ export function DynamicBanner() {
           {/* Left Arrow Controls */}
           <button
             onClick={prevSlide}
-            className="absolute left-4 top-1/2 -translate-y-1/2 flex h-12 w-12 items-center justify-center rounded-full text-secondary shadow-lg opacity-0 backdrop-blur-sm transition-all duration-300 hover:bg-primary hover:scale-110 group-hover:opacity-100 focus:opacity-100 z-10 cursor-pointer"
+            className="absolute left-4 top-1/2 -translate-y-1/2 flex h-12 w-12 items-center justify-center rounded-full text-secondary shadow-lg bg-black/20 backdrop-blur-sm transition-all duration-300 hover:bg-primary hover:scale-110 z-10 cursor-pointer"
             aria-label="Previous slide"
           >
             <ChevronLeft className="h-6 w-6" />
@@ -107,7 +107,7 @@ export function DynamicBanner() {
           {/* Right Arrow Controls */}
           <button
             onClick={nextSlide}
-            className="absolute right-4 top-1/2 -translate-y-1/2 flex h-12 w-12 items-center justify-center rounded-full text-secondary shadow-lg opacity-0 backdrop-blur-sm transition-all duration-300 hover:bg-primary hover:scale-110 group-hover:opacity-100 focus:opacity-100 z-10 cursor-pointer"
+            className="absolute right-4 top-1/2 -translate-y-1/2 flex h-12 w-12 items-center justify-center rounded-full text-secondary shadow-lg bg-black/20 backdrop-blur-sm transition-all duration-300 hover:bg-primary hover:scale-110 z-10 cursor-pointer"
             aria-label="Next slide"
           >
             <ChevronRight className="h-6 w-6" />
