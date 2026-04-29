@@ -8,7 +8,7 @@ import { useCreatePaymentIntentMutation } from '@/packages/Mutations';
 import { toast } from 'sonner';
 import { getAccessToken } from '@/lib/auth-store';
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || 'pk_test_51TCoFqDlb5yHu0ZOhQF6Mbo4cXREhTJptD0tvDNZe0uQx31DW4ZUUphiCEUfINQxv7W4u6V4mkcfKl9CjkYdWDVh00pFvHLrnP');
+const stripePromise = loadStripe('pk_live_51TCoFqDlb5yHu0ZOwxLXTwbxcfTIrXQDoA9K4IlbrlpJGIU2B883lPvcvlDwGsSVpLVCol0H908ibEJoWddy3LvH00pWZpBQX0');
 
 interface StripePaymentWrapperProps {
   orderId: string;
