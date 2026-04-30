@@ -58,7 +58,7 @@ export function DynamicBanner() {
     }, 5000); // 5 sec auto scroll
 
     return () => clearInterval(timer);
-  }, [nextSlide]);
+  }, [nextSlide, currentIndex]);
 
   return (
     <section className="relative w-full overflow-hidden py-8 md:py-24">
