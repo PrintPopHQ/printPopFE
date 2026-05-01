@@ -31,6 +31,15 @@ export const useSignInMutation = () => {
   });
 };
 
+export const useGoogleLoginMutation = () => {
+  return useMutation({
+    mutationFn: async (payload: { token: string }) => {
+      const response = await ApiService.getInstance().googleLogin(payload);
+      return handleApiResponse(response.data);
+    },
+  });
+};
+
 export const useVerifyEmailMutation = () => {
   return useMutation({
     mutationFn: async (token: string) => {

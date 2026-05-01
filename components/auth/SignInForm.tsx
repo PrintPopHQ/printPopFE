@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { useSignInMutation } from "@/packages/Mutations";
 import { saveUser, saveAccessToken } from "@/lib/auth-store";
 import { ApiService } from "@/services/ApiService";
+import { OAuthButtons } from "./OAuthButtons";
 
 
 export function SignInForm() {
@@ -100,7 +101,7 @@ export function SignInForm() {
       <h1 className="text-3xl md:text-4xl font-bold font-neon tracking-wide mb-2 text-transparent bg-clip-text" style={{ backgroundImage: "linear-gradient(90deg, #FFFFFF 0%, #9CA3AF 100%)" }}>WELCOME BACK</h1>
       <p className="text-sm text-gray-400 mb-8 max-w-sm">Sign in to your account and Discover world class customize Mobile casing</p>
 
-      {/* <OAuthButtons /> */}
+      <OAuthButtons />
 
       <form onSubmit={formik.handleSubmit} className="space-y-4">
         <div className="space-y-1">

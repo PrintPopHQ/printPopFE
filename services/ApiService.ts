@@ -23,6 +23,7 @@ const ENDPOINTS = {
   GET_CART: "/cart",
   CART_ADD: "/cart/add",
   CART_ITEM: "/cart/item",
+  GOOGLE_LOGIN: "/api/auth/google",
 };
 
 
@@ -190,6 +191,10 @@ export class ApiService {
 
   public signIn(payload: SignInPayload) {
     return this.axiosInstance.post(ENDPOINTS.LOGIN, payload);
+  }
+
+  public googleLogin(payload: { token: string }) {
+    return this.axiosInstance.post(ENDPOINTS.GOOGLE_LOGIN, payload);
   }
 
   public forgotPassword(payload: ForgotPasswordPayload) {
