@@ -82,7 +82,7 @@ export default function DesignsPage() {
       </main>
 
       {/* Footer-like spacing */}
-      <div className="py-20" />
+      {/* <div className="py-20" /> */}
     </div>
   );
 }

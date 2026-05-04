@@ -12,7 +12,7 @@ export const Newsletter = () => {
   }
 
   return (
-    <section className="relative py-24 overflow-hidden border-t border-white/5">
+    <section className="relative py-8 md:py-10 overflow-hidden border-t border-white/5">
       {/* Background Glows */}
       <div className="absolute inset-0 z-0 pointer-events-none">
         <div className="absolute top-20 right-32 w-[180px] h-[180px] bg-primary opacity-15 blur-[100px] rounded-full mix-blend-screen animate-pulse duration-4000"></div>

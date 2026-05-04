@@ -55,7 +55,7 @@ const scenarios = [
 
 export const ApplicationScenario = () => {
   return (
-    <section className="relative overflow-hidden w-full">
+    <section className="relative overflow-hidden w-full py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
         <div>
           {scenarios.map((scenario, index) => {
@@ -64,7 +64,7 @@ export const ApplicationScenario = () => {
             const isImageLeft = index % 2 !== 0;
 
             return (
-              <div key={scenario.id} className="py-16">
+              <div key={scenario.id} className="pb-4 sm:pb-4 md:pb-10">
                 <SectionCard 
                   className={`flex flex-col md:flex-row items-center gap-16 ${
                     isImageLeft ? "md:flex-row-reverse" : ""
