@@ -213,7 +213,7 @@ export function ShippingDetails({ onChange, onShippingCostChange, email }: Shipp
             <label className="text-sm font-medium text-white">State</label>
             <Input
               required
-              placeholder="NSW"
+              placeholder=""
               className="bg-[#112238] border-none text-white h-12 focus-visible:ring-1 focus-visible:ring-[#5CE1E6]"
               onChange={(e) => onChange((prev: any) => ({ ...prev, state: e.target.value }))}
             />

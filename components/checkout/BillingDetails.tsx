@@ -81,7 +81,7 @@ export function BillingDetails({ useSameAsShipping, setUseSameAsShipping, onChan
             <div className="space-y-2">
               <label className="text-sm font-medium text-white">State</label>
               <Input
-                placeholder="NSW"
+                placeholder=""
                 className="bg-[#112238] border-none text-white h-12"
                 onChange={(e) => onChange((prev: any) => ({ ...prev, state: e.target.value }))}
               />
