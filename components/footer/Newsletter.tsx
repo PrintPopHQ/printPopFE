@@ -28,7 +28,7 @@ export const Newsletter = () => {
           <span className="text-shadow-[0_0_30px_#5CE1E6]">JOIN THE </span><span className="text-neon-blue">PRINTPOP</span> <span className="text-shadow-[0_0_30px_#5CE1E6]">CLUB</span>
         </h2>
         <p className="text-gray-400 font-comic mb-8 text-lg max-w-2xl mx-auto">
-          Get 15% off your first order and be the first to know about our limited edition drops.
+          Get 10% off your first order and be the first to know about our limited edition drops.
         </p>
         <form className="max-w-md mx-auto relative group">
           <input

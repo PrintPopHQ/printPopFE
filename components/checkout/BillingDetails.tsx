@@ -34,7 +34,7 @@ export function BillingDetails({ useSameAsShipping, setUseSameAsShipping, onChan
             <div className="space-y-2">
               <label className="text-sm font-medium text-white">First Name</label>
               <Input
-                placeholder="John"
+                // placeholder="John"
                 className="bg-[#112238] border-none text-white h-12"
                 onChange={(e) => onChange((prev: any) => ({ ...prev, firstName: e.target.value }))}
               />
@@ -42,7 +42,7 @@ export function BillingDetails({ useSameAsShipping, setUseSameAsShipping, onChan
             <div className="space-y-2">
               <label className="text-sm font-medium text-white">Last Name</label>
               <Input
-                placeholder="Martin"
+                // placeholder="Martin"
                 className="bg-[#112238] border-none text-white h-12"
                 onChange={(e) => onChange((prev: any) => ({ ...prev, lastName: e.target.value }))}
               />
@@ -53,7 +53,7 @@ export function BillingDetails({ useSameAsShipping, setUseSameAsShipping, onChan
             <label className="text-sm font-medium text-white">Email Address</label>
             <Input
               type="email"
-              placeholder="john.martin@gmail.com"
+              // placeholder="john.martin@gmail.com"
               className="bg-[#112238] border-none text-white h-12"
               onChange={(e) => onChange((prev: any) => ({ ...prev, email: e.target.value }))}
             />
@@ -63,7 +63,7 @@ export function BillingDetails({ useSameAsShipping, setUseSameAsShipping, onChan
             <label className="text-sm font-medium text-white">Phone Number</label>
             <Input
               type="tel"
-              placeholder="+91 2344566"
+              // placeholder="+91 2344566"
               className="bg-[#112238] border-none text-white h-12"
               onChange={(e) => onChange((prev: any) => ({ ...prev, phone: e.target.value }))}
             />
@@ -73,7 +73,7 @@ export function BillingDetails({ useSameAsShipping, setUseSameAsShipping, onChan
             <div className="space-y-2">
               <label className="text-sm font-medium text-white">Suburb</label>
               <Input
-                placeholder="Surry Hills"
+                // placeholder="Surry Hills"
                 className="bg-[#112238] border-none text-white h-12"
                 onChange={(e) => onChange((prev: any) => ({ ...prev, suburb: e.target.value }))}
               />
@@ -92,7 +92,7 @@ export function BillingDetails({ useSameAsShipping, setUseSameAsShipping, onChan
             <div className="space-y-2">
               <label className="text-sm font-medium text-white">Street Address 1</label>
               <Input
-                placeholder="123 Example Street"
+                // placeholder="123 Example Street"
                 className="bg-[#112238] border-none text-white h-12"
                 onChange={(e) => onChange((prev: any) => ({ ...prev, streetAddress1: e.target.value }))}
               />
@@ -100,7 +100,7 @@ export function BillingDetails({ useSameAsShipping, setUseSameAsShipping, onChan
             <div className="space-y-2">
               <label className="text-sm font-medium text-white">Street Address 2</label>
               <Input
-                placeholder="Apartment 4, Suite 10"
+                // placeholder="Apartment 4, Suite 10"
                 className="bg-[#112238] border-none text-white h-12"
                 onChange={(e) => onChange((prev: any) => ({ ...prev, streetAddress2: e.target.value }))}
               />
@@ -111,7 +111,7 @@ export function BillingDetails({ useSameAsShipping, setUseSameAsShipping, onChan
             <div className="space-y-2">
               <label className="text-sm font-medium text-white">Postal Code</label>
               <Input
-                placeholder="4400"
+                // placeholder="4400"
                 className="bg-[#112238] border-none text-white h-12"
                 onChange={(e) => onChange((prev: any) => ({ ...prev, postal: e.target.value }))}
               />
@@ -119,7 +119,7 @@ export function BillingDetails({ useSameAsShipping, setUseSameAsShipping, onChan
             <div className="space-y-2">
               <label className="text-sm font-medium text-white">Country</label>
               <Input
-                placeholder="Australia"
+                // placeholder="Australia"
                 className="bg-[#112238] border-none text-white h-12"
                 onChange={(e) => onChange((prev: any) => ({ ...prev, country: e.target.value }))}
               />
