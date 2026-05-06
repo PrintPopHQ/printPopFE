@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import { getAccessToken } from '@/lib/auth-store';
 
 const stripePromise = loadStripe('pk_live_51TCoFqDlb5yHu0ZOwxLXTwbxcfTIrXQDoA9K4IlbrlpJGIU2B883lPvcvlDwGsSVpLVCol0H908ibEJoWddy3LvH00pWZpBQX0');
+// const stripePromise = loadStripe('pk_test_51TCoFqDlb5yHu0ZOhQF6Mbo4cXREhTJptD0tvDNZe0uQx31DW4ZUUphiCEUfINQxv7W4u6V4mkcfKl9CjkYdWDVh00pFvHLrnP');
 
 interface StripePaymentWrapperProps {
   orderId: string;

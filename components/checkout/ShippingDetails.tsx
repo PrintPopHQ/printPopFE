@@ -99,7 +99,7 @@ export function ShippingDetails({ onChange, onShippingCostChange, email }: Shipp
                   handlePostcodeSearch();
                 }
               }}
-              placeholder="4400"
+              // placeholder="4400"
               className="bg-[#112238] border-none text-white h-12 pr-12 focus-visible:ring-1 focus-visible:ring-[#5CE1E6]"
             />
             <button
@@ -155,7 +155,7 @@ export function ShippingDetails({ onChange, onShippingCostChange, email }: Shipp
             <label className="text-sm font-medium text-white">First Name</label>
             <Input
               required
-              placeholder="John"
+              // placeholder="John"
               className="bg-[#112238] border-none text-white h-12 focus-visible:ring-1 focus-visible:ring-[#5CE1E6]"
               onChange={(e) => onChange((prev: any) => ({ ...prev, firstName: e.target.value }))}
             />
@@ -164,7 +164,7 @@ export function ShippingDetails({ onChange, onShippingCostChange, email }: Shipp
             <label className="text-sm font-medium text-white">Last Name</label>
             <Input
               required
-              placeholder="Martin"
+              // placeholder="Martin"
               className="bg-[#112238] border-none text-white h-12 focus-visible:ring-1 focus-visible:ring-[#5CE1E6]"
               onChange={(e) => onChange((prev: any) => ({ ...prev, lastName: e.target.value }))}
             />
@@ -179,7 +179,7 @@ export function ShippingDetails({ onChange, onShippingCostChange, email }: Shipp
             value={email || ''}
             disabled
             readOnly
-            placeholder="john.martin@gmail.com"
+            // placeholder="john.martin@gmail.com"
             className="bg-[#112238] border-none text-white/50 h-12 focus-visible:ring-1 focus-visible:ring-[#5CE1E6] opacity-70 cursor-not-allowed"
           />
         </div>
@@ -190,7 +190,7 @@ export function ShippingDetails({ onChange, onShippingCostChange, email }: Shipp
             <Input
               required
               type="tel"
-              placeholder="+91 2344566"
+              // placeholder="+91 2344566"
               className="bg-[#112238] border-none text-white h-12 focus-visible:ring-1 focus-visible:ring-[#5CE1E6]"
               onChange={(e) => onChange((prev: any) => ({ ...prev, phone: e.target.value }))}
             />
@@ -204,7 +204,7 @@ export function ShippingDetails({ onChange, onShippingCostChange, email }: Shipp
             <label className="text-sm font-medium text-white">Suburb</label>
             <Input
               required
-              placeholder="Surry Hills"
+              // placeholder="Surry Hills"
               className="bg-[#112238] border-none text-white h-12 focus-visible:ring-1 focus-visible:ring-[#5CE1E6]"
               onChange={(e) => onChange((prev: any) => ({ ...prev, suburb: e.target.value }))}
             />
@@ -213,7 +213,7 @@ export function ShippingDetails({ onChange, onShippingCostChange, email }: Shipp
             <label className="text-sm font-medium text-white">State</label>
             <Input
               required
-              placeholder=""
+              // placeholder=""
               className="bg-[#112238] border-none text-white h-12 focus-visible:ring-1 focus-visible:ring-[#5CE1E6]"
               onChange={(e) => onChange((prev: any) => ({ ...prev, state: e.target.value }))}
             />
@@ -225,7 +225,7 @@ export function ShippingDetails({ onChange, onShippingCostChange, email }: Shipp
             <label className="text-sm font-medium text-white">Street Address 1</label>
             <Input
               required
-              placeholder="123 Example Street"
+              // placeholder="123 Example Street"
               className="bg-[#112238] border-none text-white h-12 focus-visible:ring-1 focus-visible:ring-[#5CE1E6]"
               onChange={(e) => onChange((prev: any) => ({ ...prev, streetAddress1: e.target.value }))}
             />
@@ -233,7 +233,7 @@ export function ShippingDetails({ onChange, onShippingCostChange, email }: Shipp
           <div className="space-y-2">
             <label className="text-sm font-medium text-white">Street Address 2</label>
             <Input
-              placeholder="Apartment 4, Suite 10"
+              // placeholder="Apartment 4, Suite 10"
               className="bg-[#112238] border-none text-white h-12 focus-visible:ring-1 focus-visible:ring-[#5CE1E6]"
               onChange={(e) => onChange((prev: any) => ({ ...prev, streetAddress2: e.target.value }))}
             />
@@ -244,7 +244,7 @@ export function ShippingDetails({ onChange, onShippingCostChange, email }: Shipp
           <label className="text-sm font-medium text-white">Country</label>
           <Input
             required
-            placeholder="Australia"
+            // placeholder="Australia"
             className="bg-[#112238] border-none text-white h-12 focus-visible:ring-1 focus-visible:ring-[#5CE1E6]"
             onChange={(e) => onChange((prev: any) => ({ ...prev, country: e.target.value }))}
           />

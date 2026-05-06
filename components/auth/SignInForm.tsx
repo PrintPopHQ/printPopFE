@@ -15,9 +15,13 @@ import { ApiService } from "@/services/ApiService";
 import { OAuthButtons } from "./OAuthButtons";
 
 
+import { useSearchParams } from "next/navigation";
+
 export function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl");
   const signInMutation = useSignInMutation();
 
   const formik = useFormik({
@@ -83,7 +87,7 @@ export function SignInForm() {
             toast.success("Welcome back!", {
               description: data.message || "You have signed in successfully.",
             });
-            router.push("/profile");
+            router.push(callbackUrl || "/profile");
           },
 
           onError: (error: any) => {
